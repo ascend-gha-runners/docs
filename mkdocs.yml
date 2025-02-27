@@ -1,0 +1,52 @@
+site_name: Ascend GitHub Action Runners
+site_url: https://ascend-gha-runners.github.io/docs/
+repo_name: ascend-gha-runners/docs
+repo_url: https://github.com/ascend-gha-runners/docs
+theme:
+  name: material
+  logo: assets/logo/logo.png
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+extra:
+  generator: false
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  # - mdx_truly_sane_lists
+  - pymdownx.details
+  - toc:
+      permalink: true
+nav:
+  - Home:
+    - index.md
+  - User Manual En:
+      - user-manual-en.md
+  - User Manual Zh:
+    - user-manual-zh.md
+  
+
