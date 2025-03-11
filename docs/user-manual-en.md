@@ -1,5 +1,11 @@
 # User Manual
-## Installation
+
+This document provides two methods to integrate with NPU Runners.
+
+`GitHub App` enables repositories within the same organization to integrate NPU Runners with one single configuration. However, installing the `GitHub App` requires permission of your organization administrators.
+
+`Personal Access Tokens (classic)` allow users to configure individual repository without requiring approval from organization administrators.
+## Installing via GitHub App
 ### Prerequisites
 Require administrative permissions for the organization.
 
@@ -34,6 +40,33 @@ Fill in the parameters and click `Create`.
 Fill in the parameters and click `Create`.
 `org-name`：Full name of the organization.
 ![alt text](assets/user-manual-zh/image-13.png)
+
+## Installing via Personal Access Tokens (Classic)
+### Prerequisites
+You must have repository access permissions.
+
+### Generate a Token
+Navigate to your personal account:
+`Settings` → `Developer settings` → `Personal access tokens` → `Tokens (classic)` → `Generate new token` → `Generate new token (classic)`.
+
+Fill in a token name, select an expiration period.
+
+Under `permissions`, enable the `repo` scope.
+
+Click `Generate token` to create the token.
+![alt text](assets/user-manual-zh/image-16.png)
+
+### Submit a Request to Activate the Application
+To ensure token confidentiality, send an email to `gouzhonglin@huawei.com` with the following details:
+Email Subject:
+`Request Ascend NPU Runners`
+
+Email Body Template:
+```yaml
+repo: my-org/my-repo
+token: gha_xxx
+expire-at: 30days
+```
 
 ## Usage
 ### NPU Runners names

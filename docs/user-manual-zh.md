@@ -1,5 +1,8 @@
 # 用户手册
-## 安装
+本文档提供2种方法接入`NPU Runners`。
+`Github App`使得同一个组织内的仓库只需配置一次即可接入`NPU Runners`，但是安装`Github App`需要联系组织管理员处理。
+而`Personal access tokens (classic)`允许用户配置单个仓库，无需组织管理员同意。
+## 通过 GitHub App 安装
 ### 准备工作
 需要具备组织的管理权限.
 
@@ -34,6 +37,24 @@
 填写配置参数后点击`Create`。
 `org-name`表示您的组织名称。
 ![alt text](assets/user-manual-zh/image-13.png)
+
+## 通过 Personal access tokens (classic) 安装
+### 准备工作
+需要具备仓库的访问权限.
+
+### 生成 token
+依次点击个人账户的`Settings`, `Developer settings`, `Personal access tokens`, `Tokens (classic)`, `Generate new token`, `Generate new token (classic)`。
+填写名称，选择过期时间，点击`repo`，点击`Generate token`，即生成token。
+![alt text](assets/user-manual-zh/image-16.png)
+### 提交申请激活应用
+考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。
+邮件主题模板：`Request Ascend NPU Runners`
+邮件内容模板：
+```yaml
+repo: my-org/my-repo
+token: gha_xxx
+expire-at: 30days
+```
 
 ## 使用
 ### NPU Runners命名规范
