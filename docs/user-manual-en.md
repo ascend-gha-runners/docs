@@ -64,7 +64,7 @@ Email Subject:
 Email Body Template:
 ```yaml
 repo: my-org/my-repo
-token: gha_xxx
+token: ghp_xxx
 expire-at: 30days
 ```
 
