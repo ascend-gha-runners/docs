@@ -44,6 +44,7 @@ Fill in the parameters and click `Create`.
 ## Installing via Personal Access Tokens (Classic)
 ### Prerequisites
 You must have repository access permissions.
+Both ``public` and `private` repositories can be accessed to `NPU Runners` via `PAT`.
 
 ### Generate a Token
 Navigate to your personal account:

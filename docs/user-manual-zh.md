@@ -40,7 +40,7 @@
 
 ## 通过 Personal access tokens (classic) 安装
 ### 准备工作
-需要具备仓库的访问权限.
+需要具备仓库的访问权限。`公共`仓库和`私有`仓库都可以通过`PAT`接入`NPU Runners`。
 
 ### 生成 token
 依次点击个人账户的`Settings`, `Developer settings`, `Personal access tokens`, `Tokens (classic)`, `Generate new token`, `Generate new token (classic)`。

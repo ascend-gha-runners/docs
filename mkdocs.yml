@@ -48,5 +48,5 @@ nav:
       - user-manual-en.md
   - User Manual Zh:
     - user-manual-zh.md
-  
-
+  - Integrated repo:
+    - Repo.md
