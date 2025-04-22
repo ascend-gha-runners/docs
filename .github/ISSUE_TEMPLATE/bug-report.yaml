@@ -1,0 +1,59 @@
+name: Bug report (Github action)
+description: File a bug here.
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+- type: markdown
+  attributes:
+    value: >
+      #### Before submitting an issue, please read [docs](https://ascend-gha-runners.github.io/docs/) and [the past issues](https://github.com/ascend-gha-runners/docs/issues).
+- type: textarea
+  attributes:
+    label: Github action url
+    description: |
+      Please tell us the Github action url.
+    render: markdown
+    placeholder: |
+      https://github.com/your-organization/your-repository/actions/runs/your-run-id
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Workflow url
+    description: |
+      Please tell us the workflow url.
+    render: markdown
+    placeholder: |
+      https://github.com/your-organization/your-repository/.github/workflows/your-workflow.yaml
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Runner sets
+    description: |
+      Please tell us the name of Runner sets.
+    render: markdown
+    placeholder: |
+      linux-arm64-npu-1
+      linux-arm64-npu-2
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Describe the bug
+    description: |
+      Please provide a clear and concise description of what the bug is.
+    placeholder: |
+      A clear and concise description of what the bug is.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Describe the expected behavior
+    description: |
+      Please tell us, what did you expect to happen?
+    placeholder: |
+      A clear and concise description of of what the expected behavior is.
+  validations:
+    required: true
