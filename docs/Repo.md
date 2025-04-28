@@ -5,3 +5,5 @@
 [nv-action/vllm-benchmark](https://github.com/nv-action/vllm-benchmark)  
 
 [cosdt/pytorch-integration-tests](https://github.com/cosdt/pytorch-integration-tests)  
+
+[Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI)  
