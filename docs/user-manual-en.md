@@ -55,6 +55,8 @@ Fill in a token name, select an expiration period.
 Under `permissions`, enable the `repo` scope.
 
 Click `Generate token` to create the token.
+
+Please note the token's expiration time. It must be regenerated after expiration.
 ![alt text](assets/user-manual-zh/image-16.png)
 
 ### Submit a Request to Activate the Application

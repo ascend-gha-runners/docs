@@ -6,4 +6,6 @@
 
 [cosdt/pytorch-integration-tests](https://github.com/cosdt/pytorch-integration-tests)  
 
-[Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI)  
+[Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI)
+
+[pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg)
