@@ -45,7 +45,7 @@
 ### 生成 token
 依次点击个人账户的`Settings`, `Developer settings`, `Personal access tokens`, `Tokens (classic)`, `Generate new token`, `Generate new token (classic)`。
 填写名称，选择过期时间，点击`repo`，点击`Generate token`，即生成token。
-请注意token到期时间，到期之后需要重新生成token。
+请注意token到期时间，token到期之后仓库不显示 Runner scale set，无法执行 Github Action，需要重新生成有效token。
 ![alt text](assets/user-manual-zh/image-16.png)
 ### 提交申请激活应用
 考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。

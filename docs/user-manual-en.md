@@ -56,7 +56,7 @@ Under `permissions`, enable the `repo` scope.
 
 Click `Generate token` to create the token.
 
-Please note the token's expiration time. It must be regenerated after expiration.
+Note: Pay attention to the token expiration time. After the token expires, the Runner scale set will not be displayed in the repository, and GitHub Actions will fail to execute. You will need to regenerate a valid token.
 ![alt text](assets/user-manual-zh/image-16.png)
 
 ### Submit a Request to Activate the Application
