@@ -1,64 +1,114 @@
 # 用户手册
-本文档提供2种方法接入`NPU Runners`。
-`Github App`使得同一个组织内的仓库只需配置一次即可接入`NPU Runners`，但是安装`Github App`需要联系组织管理员处理。
-而`Personal access tokens (classic)`允许用户配置单个仓库，无需组织管理员同意。
-## 通过 GitHub App 安装
-### 准备工作
-需要具备组织的管理权限.
+我们基于[ARC](https://github.com/actions/actions-runner-controller/)实现 GitHub Action 任务在昇腾集群节点上执行。
 
-### 安装 Github App
+我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种种方式安装，也可以搭配多种方式混合安装。
+如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
+
+||组织|仓库|
+|--|--|--|
+|GitHub App|[安装方式](#通过-github-app-将-runner-安装到组织)|[安装方式](#通过-github-app-将-runner-安装到仓库)|
+|PAT|[安装方式](#通过-pat-将-runner-安装到组织)|[安装方式](#通过-pat-将-runner-安装到仓库)|
+
+
+## 通过 GitHub App 将 runner 安装到组织
+### 准备工作
+需要具备组织的管理权限。
+### 可选：安装 runner group
+被安装到组织的 runner 由 runner group 管理。
+runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 runner。
+1. 仓库：选择组织下所有仓库 / 选择指定仓库。
+2. 仓库访问权限：private / public。
+3. workflow: 选择所有 workflow / 选择指定 workflow。
+同时满足3个配置的仓库可以使用组织的 runner。
+
+如果没有指定 runner group，则使用默认 runner group，其默认配置是：
+1. 仓库：选择所有仓库。
+2. 仓库访问权限： private。
+3. workflow: 选择所有 workflow。
+
+您可以使用并更改默认 runner group 来管理 runner，跳过[新建 runner group](#新建-runner-group)。
+如果默认 runner group 已经管理 runner 并且其权限与新 runner 不同，您可以参考[新建 runner group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)创建自定义 runner group 来管理 runner。
+
+### 安装 GitHub App
 浏览器访问[apps/ascend-runner-mgmt][1]并且点击`Install`。
 ![alt text](assets/user-manual-zh/image-3.png)
-选择组织，选择仓库，点击`Install`。
-![alt text](assets/user-manual-zh/image-5.png)
+选择组织，选择`All repositories`，点击`Install`。
+![alt text](assets/user-manual-zh/image-19.png)
 
-### 配置Runner group
-依次点击组织的`Settings`, `Actions`, `Runner groups`, `New runner group`，进入创建页面。
-![alt text](assets/user-manual-zh/image-8.png)
-
-在新建页面配置仓库和workflow。保存`Group name`，稍后会用到。
-如果想让`public`仓库接入`NPU Runners`，必须点击`Allow public repositories`。
-![alt text](assets/user-manual-zh/image-4.png)
-
-### 提交申请激活应用
-浏览器输入`https://github.com/ascend-gha-runners/org-archive/issues`，点击`New issue`选择模板。
-
-- `Add Or Modify Organizaiton`表示新建或者更新组织配置。
-- `Delete Organization`表示删除组织。
-
-![alt text](assets/user-manual-zh/image-10.png)
-##### 添加或者修改组织
-填写配置参数后点击`Create`。
+### 提交申请激活组织
+浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Organization`选择模板。
+![alt text](assets/user-manual-zh/image-17.png)
+填写3个配置参数后点击`Create`。
 `org-name`表示您的组织名称。
-`runner-group-name`表示`Runner group`的名称。
+`runner-group-name`表示`Runner group`的名称，默认`Default`。
 `npu-counts`表示NPU Runners挂载的NPU卡数量。
 ![alt text](assets/user-manual-zh/image-15.png)
-##### 删除组织
-填写配置参数后点击`Create`。
-`org-name`表示您的组织名称。
-![alt text](assets/user-manual-zh/image-13.png)
 
-## 通过 Personal access tokens (classic) 安装
+## 通过 GitHub App 将 runner 安装到仓库
 ### 准备工作
-需要具备仓库的访问权限。`公共`仓库和`私有`仓库都可以通过`PAT`接入`NPU Runners`。
+需要具备组织及仓库的管理权限。
+### 安装 GitHub App
+浏览器访问[apps/ascend-runner-mgmt][1]并且点击`Install`。
+![alt text](assets/user-manual-zh/image-3.png)
+选择组织，选择`Only select repositories`，选择目标仓库，点击`Install`。
+![alt text](assets/user-manual-zh/image-18.png)
+### 提交申请激活仓库
+浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Repository`选择模板。
+![alt text](assets/user-manual-zh/image-20.png)
+填写2个配置参数后点击`Create`。
+`repo-name`表示您的仓库名称。
+`npu-counts`表示NPU Runners挂载的NPU卡数量。
+![alt text](assets/user-manual-zh/image-21.png)
 
-### 生成 token
-依次点击个人账户的`Settings`, `Developer settings`, `Personal access tokens`, `Tokens (classic)`, `Generate new token`, `Generate new token (classic)`。
-填写名称，选择过期时间，点击`repo`，点击`Generate token`，即生成token。
-请注意token到期时间，token到期之后仓库不显示 Runner scale set，无法执行 Github Action，需要重新生成有效token。
-![alt text](assets/user-manual-zh/image-16.png)
-### 提交申请激活应用
+
+## 通过 PAT 将 runner 安装到组织
+### 准备工作
+需要具备组织的管理权限。
+
+### [可选:安装-runner-group](#可选安装-runner-group)
+
+### 创建 token
+根据[GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)创建token。
+scopes 选择`admin:org`。
+请注意token到期时间，token到期之后仓库不显示 Runner scale set，无法执行 workflow，需要重新生成有效token。
+![alt text](assets/user-manual-zh/image-23.png)
+
+### 提交申请激活组织
 考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
-repo: my-org/my-repo
+repo: https://github.com/my-org/
+runner_group: ascend-ci
 token: ghp_xxx
 expire-at: 30days
+npu_counts: 1, 2, 4
+```
+
+## 通过 PAT 将 runner 安装到仓库
+### 准备工作
+需要具备仓库的管理权限。
+
+### 创建 token
+根据[GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)创建token。
+scopes 选择`repo`。
+请注意token到期时间，token到期之后仓库不显示 Runner scale set，无法执行 workflow，需要重新生成有效token。
+
+![alt text](assets/user-manual-zh/image-16.png)
+
+### 提交申请激活仓库
+考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。
+邮件主题模板：`Request Ascend NPU Runners`
+邮件内容模板：
+```yaml
+repo: https://github.com/my-org/my-repo
+token: ghp_xxx
+expire-at: 30days
+npu_counts: 1, 2, 4
 ```
 
 ## 使用
-### NPU Runners命名规范
+### Runners命名规范
 NPU Runners由以下部分组成：
 ```
 linux-amd64-npu-x
@@ -70,16 +120,12 @@ linux-amd64-npu-x
 Operating System
 ```
 
-### 查看 NPU Runners
-#### 通过归档文件查看
-我们在`https://github.com/ascend-gha-runners/org-archive/tree/main/org-archive/`目录维护接入NPU Runners的所有组织的最新配置状态。在`<your-org>.yaml`中查看您的组织。其中`online-runners`字段展示NPU Runners。
-
-#### 通过Runner group查看
-依次点击组织的`Settings, Actions, Runner groups`。在自己配置的runner group里就能看到runners，比如图中的`linux-arm64-npu-1, linux-arm64-npu-2`。
-![alt text](assets/user-manual-zh/image-7.png)
+### 查看 Runner
+无论是将 runner 安装到仓库还是组织，启动 runner 的都是仓库里的workflow。进入您的仓库，依次点击组织的`Settings, Actions, Runner `。`Runner scale set`目录下是配置到仓库的 runner。`Shared with this repository`目录下是仓库可以访问的组织 runner。`Status`为`Online`表示可以使用。
+![alt text](assets/user-manual-zh/image-24.png)
 
 ### 在workflow中使用NPU Runners
-NPU jobs必须运行在容器中(比如：`ascendai/cann:latest`)。如果未指定容器，则job不会调用NPU资源。
+如果想在 job 中使用昇腾芯片，需要指定`container.image`字段，否则job不会调用NPU资源。
 以下例子展示Github Action workflow如何使用NPU Runners。
 ```yaml
 name: Test NPU Runner
@@ -97,7 +143,5 @@ jobs:
           npu-smi info
 ```
 
-如果有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
-
-
 [1]: https://github.com/apps/ascend-runner-mgmt
+[2]: https://github.com/ascend-gha-runners/org-archive/issues
