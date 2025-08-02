@@ -1,6 +1,32 @@
 # User Manual  
 We implement GitHub Action tasks on Ascend cluster nodes based on [ARC](https://github.com/actions/actions-runner-controller/).  
 
+
+## Runner Pod Types and Naming Methods​​
+Ascend clusters create runner pods to execute GitHub Action jobs.We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
+
+
+|​​Type​​|​​Architecture​​|​Number of Nodes|Number of chips per Node|Default name(x = chip count)|
+|--|--|--|--|--|
+|310P3|arm64|1|8|linux-aarch64-310p-x|
+|910C|arm64|2|16|linux-aarch64-910c-x|
+|910B4|arm64|4|8|linux-arm64-npu-x|
+|910B1|arm64|4|8|linux-aarch64-a2-x|
+
+
+### Runner Naming Convention  
+The naming convention for runner pod is composed of the following parts:
+```  
+linux-amd64-npu-x  
+^     ^     ^   ^  
+|     |     |   |  
+|     |     |   Number of NPUs Available  
+|     |     NPU Designator  
+|     Architecture  
+Operating System  
+```  
+
+# Installation
 We introduce the installation methods based on the installation scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method for installation or combine multiple methods.  
 If you encounter any issues during installation/usage, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions).  
 
@@ -38,11 +64,11 @@ Select the organization, choose `All repositories`, and click `Install`.
 ### Submit Request to Activate Organization  
 Visit [ascend-gha-runners/org-archive/issues][2] in your browser and click `New issue` → `Add Or Modify Organization` template.  
 ![alt text](assets/user-manual-zh/image-17.png)
-Fill in the three configuration parameters and click `Create`:  
+Fill in the three configuration parameters and click `Create`.If you need to customize the runner name, please specify it in your issue.  
 - `org-name`: Your organization name.  
 - `runner-group-name`: Runner group name (default: `Default`).  
-- `npu-counts`: Number of NPU cards mounted on NPU Runners.  
-![alt text](assets/user-manual-zh/image-15.png)
+- `runner-names`: Names of runner set.  
+![alt text](assets/user-manual-zh/image-1.png)
 
 ---
 
@@ -59,10 +85,10 @@ Select the organization, choose `Only select repositories`, select your reposito
 ### Submit Request to Activate Repository  
 Visit [ascend-gha-runners/org-archive/issues][2] in your browser and click `New issue` → `Add Or Modify Repository` template.  
 ![alt text](assets/user-manual-zh/image-20.png)
-Fill in the two configuration parameters and click `Create`:  
+Fill in the two configuration parameters and click `Create`.If you need to customize the runner name, please specify it in your issue.
 - `repo-name`: Your repository name.  
-- `npu-counts`: Number of NPU cards mounted on NPU Runners.  
-![alt text](assets/user-manual-zh/image-21.png)
+- `runner-names`: Names of runner set.  
+![alt text](assets/user-manual-en/image.png)
 
 ---
 
@@ -79,15 +105,15 @@ Select `admin:org` for scopes.
 ![alt text](assets/user-manual-zh/image-23.png)
 
 ### Submit Request to Activate Organization  
-For token security, send an email to `gouzhonglin@huawei.com`.  
+For token security, send an email to `gouzhonglin@huawei.com`.If you need to customize the runner name, please specify it in your email.
 **Email Subject**: `Request Ascend NPU Runners`  
 **Email Content**:  
 ```yaml  
 repo: https://github.com/my-org/  
-runner_group: ascend-ci  
+runner-group: ascend-ci  
 token: ghp_xxx  
 expire-at: 30days  
-npu_counts: 1, 2, 4  
+runner-names: linux-arm64-npu-1
 ```  
 
 ---
@@ -103,30 +129,19 @@ Select `repo` for scopes.
 ![alt text](assets/user-manual-zh/image-16.png)
 
 ### Submit Request to Activate Repository  
-For token security, send an email to `gouzhonglin@huawei.com`.  
+For token security, send an email to `gouzhonglin@huawei.com`.If you need to customize the runner name, please specify it in your email.
 **Email Subject**: `Request Ascend NPU Runners`  
 **Email Content**:  
 ```yaml  
 repo: https://github.com/my-org/my-repo  
 token: ghp_xxx  
 expire-at: 30days  
-npu_counts: 1, 2, 4  
+runner-names: linux-arm64-npu-1
 ```  
 
 ---
 
 ## Usage  
-### Runner Naming Convention  
-The naming convention for runner is composed of the following parts:
-```  
-linux-amd64-npu-x  
-^     ^     ^   ^  
-|     |     |   |  
-|     |     |   Number of NPUs Available  
-|     |     NPU Designator  
-|     Architecture  
-Operating System  
-```  
 
 ### View Runners  
 Whether installed at the repository or organization level, runners are triggered by repository workflows. Navigate to your repository → `Settings` → `Actions` → `Runners`.  

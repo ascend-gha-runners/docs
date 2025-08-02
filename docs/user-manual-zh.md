@@ -1,14 +1,40 @@
 # 用户手册
 我们基于[ARC](https://github.com/actions/actions-runner-controller/)实现 GitHub Action 任务在昇腾集群节点上执行。
 
+## Runner pod 类型及命名方式
+昇腾集群创建 runner pod 执行 Github Action job。
+我们提供如下类型的昇腾芯片。如果您未指定名称，我们将使用默认命名。
+
+
+|类型|架构|节点数|每台节点卡数|默认命名(x表示卡数)|
+|--|--|--|--|--|
+|310P3|arm64|1|8|linux-aarch64-310p-x|
+|910C|arm64|2|16|linux-aarch64-910c-x|
+|910B4|arm64|4|8|linux-arm64-npu-x|
+|910B1|arm64|4|8|linux-aarch64-a2-x|
+
+### 默认 runner pod 命名规范
+Runner pod 名称由以下部分组成：
+```
+linux-arm64-npu-x
+^     ^     ^   ^
+|     |     |   |
+|     |     |   Number of NPUs Available
+|     |     NPU Designator
+|     Architecture
+Operating System
+```
+
+## 安装
 我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种种方式安装，也可以搭配多种方式混合安装。
+如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。
+GitHub App 权限更安全，但是需要组织管理者权限。如果觉得很难获取组织层面的许可，可以选择 PAT 权限。
 如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
 
 ||组织|仓库|
 |--|--|--|
 |GitHub App|[安装方式](#通过-github-app-将-runner-安装到组织)|[安装方式](#通过-github-app-将-runner-安装到仓库)|
 |PAT|[安装方式](#通过-pat-将-runner-安装到组织)|[安装方式](#通过-pat-将-runner-安装到仓库)|
-
 
 ## 通过 GitHub App 将 runner 安装到组织
 ### 准备工作
@@ -38,11 +64,11 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 ### 提交申请激活组织
 浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Organization`选择模板。
 ![alt text](assets/user-manual-zh/image-17.png)
-填写3个配置参数后点击`Create`。
+填写3个配置参数后点击`Create`。如果您需要自定义 runner 名称，请在 issue 中说明。
 `org-name`表示您的组织名称。
 `runner-group-name`表示`Runner group`的名称，默认`Default`。
-`npu-counts`表示NPU Runners挂载的NPU卡数量。
-![alt text](assets/user-manual-zh/image-15.png)
+`runner-names`表示 Runner 的名称。
+![alt text](assets/user-manual-zh/image-1.png)
 
 ## 通过 GitHub App 将 runner 安装到仓库
 ### 准备工作
@@ -55,10 +81,10 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 ### 提交申请激活仓库
 浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Repository`选择模板。
 ![alt text](assets/user-manual-zh/image-20.png)
-填写2个配置参数后点击`Create`。
+填写2个配置参数后点击`Create`。如果您需要自定义 runner 名称，请在 issue 中说明。
 `repo-name`表示您的仓库名称。
-`npu-counts`表示NPU Runners挂载的NPU卡数量。
-![alt text](assets/user-manual-zh/image-21.png)
+`runner-names`表示 Runner 的名称。
+![alt text](assets/user-manual-zh/image-2.png)
 
 
 ## 通过 PAT 将 runner 安装到组织
@@ -74,15 +100,15 @@ scopes 选择`admin:org`。
 ![alt text](assets/user-manual-zh/image-23.png)
 
 ### 提交申请激活组织
-考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。
+考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。如果您需要自定义 runner 名称，请在邮件中说明。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
 repo: https://github.com/my-org/
-runner_group: ascend-ci
+runner-group: ascend-ci
 token: ghp_xxx
 expire-at: 30days
-npu_counts: 1, 2, 4
+runner-names: linux-arm64-npu-1
 ```
 
 ## 通过 PAT 将 runner 安装到仓库
@@ -97,29 +123,17 @@ scopes 选择`repo`。
 ![alt text](assets/user-manual-zh/image-16.png)
 
 ### 提交申请激活仓库
-考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。
+考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。如果您需要自定义 runner 名称，请在邮件中说明。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
 expire-at: 30days
-npu_counts: 1, 2, 4
+runner-names: linux-arm64-npu-1
 ```
 
 ## 使用
-### Runners命名规范
-NPU Runners由以下部分组成：
-```
-linux-amd64-npu-x
-^     ^     ^   ^
-|     |     |   |
-|     |     |   Number of NPUs Available
-|     |     NPU Designator
-|     Architecture
-Operating System
-```
-
 ### 查看 Runner
 无论是将 runner 安装到仓库还是组织，启动 runner 的都是仓库里的workflow。进入您的仓库，依次点击组织的`Settings, Actions, Runner `。`Runner scale set`目录下是配置到仓库的 runner。`Shared with this repository`目录下是仓库可以访问的组织 runner。`Status`为`Online`表示可以使用。
 ![alt text](assets/user-manual-zh/image-24.png)
