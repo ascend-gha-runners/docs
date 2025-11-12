@@ -10,12 +10,6 @@
 
 [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg)
 
-[sglang-npu/sglang_npu](https://github.com/sglang-npu/sglang_npu)
-
 [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu)
 
 [sgl-project/sglang](https://github.com/sgl-project/sglang)
-
-
-
-
