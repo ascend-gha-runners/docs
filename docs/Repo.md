@@ -15,3 +15,7 @@
 [sgl-project/sglang](https://github.com/sgl-project/sglang)
 
 [volcengine/verl](https://github.com/volcengine/verl)
+
+[hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
+
+[modelscope/ms-swift](https://github.com/modelscope/ms-swift)
