@@ -23,7 +23,9 @@ This is the most secure and low-maintenance method.
      - **All repositories**: Authorize all current and future repositories in the organization.
      - **Only select repositories**: Authorize only specific repositories.
 3. **Complete Installation**: Review the permissions and click `Install`.
-![alt text](./image.png)
+
+![GitHub App Installation](assets/credentials/github-app-install.png)
+
 ### Next Steps:
 Once installed, please open an Issue at [ascend-gha-runners/docs](https://github.com/ascend-gha-runners/docs/issues) to activate your configuration.
 
@@ -39,7 +41,9 @@ If you are unable to obtain permissions to install a GitHub App at the organizat
    - **For Organization installation**: Select `admin:org`.
    - **For Repository installation**: Select `repo`.
 3. **Set Expiration**: We recommend a longer expiration period, but please ensure you renew it before it expires to avoid CI downtime.
-![alt text](./image-1.png)
+
+![PAT Scopes](assets/credentials/pat-scopes.png)
+
 ### Submitting Credentials:
 Since a PAT is sensitive information, **do not submit it via a public GitHub Issue**. Please send the following details via email to: `wenlang1@h-partners.com`
 
