@@ -1,0 +1,1306 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/ci-infrastructure-deployment-zh/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>CI 基础设施部署架构说明 - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ci" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CI 基础设施部署架构说明
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-en/" class="md-tabs__link">
+          
+  
+  
+  User Manual En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-zh/" class="md-tabs__link">
+          
+  
+  
+  User Manual Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Repo/" class="md-tabs__link">
+          
+  
+  
+  Integrated repo
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Manual En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Manual Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Manual Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    用户手册
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated repo
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrated repo
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        架构总览
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、物理基础设施层
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kubernetes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、Kubernetes 集群
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、Kubernetes 集群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ascend-device-plugindaemonset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Ascend Device Plugin（DaemonSet）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、基础服务（管理员直接部署）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、基础服务（管理员直接部署）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-hashicorp-vaultnamespace-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 HashiCorp Vault（namespace: vault）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-secrets-manager-esonamespace-infra-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 secrets-manager / ESO（namespace: infra-system）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-imagepullsecret-patchernamespace-infra-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 imagepullsecret-patcher（namespace: infra-system）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-nginx-pypi-cachenamespace-infra-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 nginx-pypi-cache（namespace: infra-system）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-argocdnamespace-argocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 ArgoCD（namespace: argocd）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actions-runner-controllerargocd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、actions-runner-controller（ArgoCD 同步部署）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、actions-runner-controller（ArgoCD 同步部署）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 架构组成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-scale-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 工作模式（Scale Sets）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、GitHub App 集成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        六、完整部署时序
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        七、贡献者须知
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="七、贡献者须知">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-npu-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 如何触发 NPU CI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-runner-pod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Runner Pod 的环境约定
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 安全边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 常见问题
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/ci-infrastructure-deployment-zh.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/ci-infrastructure-deployment-zh.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="ci">CI 基础设施部署架构说明<a class="headerlink" href="#ci" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>本文档面向参与开源，介绍项目 CI 流水线背后的自托管基础设施架构。
+如需参与 CI 相关的维护或改造工作，请先阅读本文档以了解整体结构。</p>
+</blockquote>
+<hr />
+<h2 id="_1">架构总览<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><img alt="部署视图" src="../assets/ci-infrastructure-deployment/deployment_view.png" /></p>
+<p>上图展示了完整的部署架构，分为三个纵向职责域：</p>
+<table>
+<thead>
+<tr>
+<th>域</th>
+<th>内容</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>左栏</strong></td>
+<td>Vault + infra-system + Device Plugin</td>
+<td>密钥管理 / 基础服务 / NPU 资源注册</td>
+</tr>
+<tr>
+<td><strong>中栏</strong></td>
+<td>arc-system + arc-runners</td>
+<td>ARC 控制器 + 动态 Runner Pod 执行面</td>
+</tr>
+<tr>
+<td><strong>右栏</strong></td>
+<td>ArgoCD</td>
+<td>GitOps 管控，负责 ARC HelmChart 同步</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_2">一、物理基础设施层<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  NPU 节点集群 (Ascend 910B/C × N)   │  X86 CPU 节点  │  NFS     │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>规格</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NPU 节点</strong></td>
+<td>Ascend 910B/C，每节点 8 卡</td>
+<td>K8s 节点，用于承载 Runner Pod</td>
+</tr>
+<tr>
+<td><strong>X86 CPU 节点</strong></td>
+<td>16 核</td>
+<td>K8s 节点，同时运行管理面 Pod（Vault、ArgoCD 等）</td>
+</tr>
+<tr>
+<td><strong>NFS 共享存储</strong></td>
+<td>-</td>
+<td>挂载到全部节点，提供模型权重、PyPI 缓存、构建目录</td>
+</tr>
+</tbody>
+</table>
+<p>NFS 目录约定示例：</p>
+<pre><code>/models       ← 模型权重（Runner 推理测试时读取）
+/pip-cache    ← PyPI 本地缓存（nginx-pypi-cache 挂载）
+/workspace    ← 构建临时目录
+</code></pre>
+<hr />
+<h2 id="kubernetes">二、Kubernetes 集群<a class="headerlink" href="#kubernetes" title="Permanent link">&para;</a></h2>
+<p>在上述物理节点上部署标准 K8s 集群：</p>
+<ul>
+<li>X86 CPU 节点，运行仅能支持X86的服务</li>
+<li>全部 NPU 节点，用于调度 Runner Pod</li>
+</ul>
+<h3 id="21-ascend-device-plugindaemonset">2.1 Ascend Device Plugin（DaemonSet）<a class="headerlink" href="#21-ascend-device-plugindaemonset" title="Permanent link">&para;</a></h3>
+<p>Device Plugin 以 DaemonSet 形式部署在全部 NPU Worker 节点，负责向 K8s 注册 NPU 扩展资源：</p>
+<p>Runner Pod 通过该资源声明获得 NPU 算力分配。</p>
+<hr />
+<h2 id="_3">三、基础服务（管理员直接部署）<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>以下服务由<strong>平台管理员通过 <code>helm install</code> 直接部署</strong>，不经由 ArgoCD 管理：</p>
+<h3 id="31-hashicorp-vaultnamespace-vault">3.1 HashiCorp Vault（<code>namespace: vault</code>）<a class="headerlink" href="#31-hashicorp-vaultnamespace-vault" title="Permanent link">&para;</a></h3>
+<p><strong>职责</strong>：加密存储所有敏感凭证，提供细粒度访问控制。</p>
+<p>关键 KV 路径：</p>
+<pre><code>secret/github-arc/
+├── github-app-id         # GitHub App 的数字 ID
+├── github-private-key    # GitHub App 私钥（.pem 格式）
+├── webhook-secret        # Webhook 签名密钥
+└── runner-token          # 其他仓库级别密钥
+</code></pre>
+<blockquote>
+<p><strong>注意</strong>：Vault Unseal Key 由平台管理员持有，不存储在任何版本控制系统中。</p>
+</blockquote>
+<h3 id="32-secrets-manager-esonamespace-infra-system">3.2 secrets-manager / ESO（<code>namespace: infra-system</code>）<a class="headerlink" href="#32-secrets-manager-esonamespace-infra-system" title="Permanent link">&para;</a></h3>
+<p><strong>职责</strong>：<a href="https://external-secrets.io/">External Secrets Operator</a>，周期性读取 Vault KV，自动在 <code>arc-system</code> namespace 中创建或刷新 K8s Secret。</p>
+<pre><code>Vault KV  ──(ESO 读取)──►  K8s Secret: github-arc-secret
+                                   │
+                                   └──► 注入到 ARC Controller Pod
+</code></pre>
+<h3 id="33-imagepullsecret-patchernamespace-infra-system">3.3 imagepullsecret-patcher（<code>namespace: infra-system</code>）<a class="headerlink" href="#33-imagepullsecret-patchernamespace-infra-system" title="Permanent link">&para;</a></h3>
+<p><strong>职责</strong>：DaemonSet，监听 Namespace 创建事件，将私有镜像仓库的 <code>imagePullSecret</code> 自动同步到全部 Namespace（包括动态创建的 <code>arc-runners</code>），确保 Runner Pod 可正常拉取私有镜像。</p>
+<h3 id="34-nginx-pypi-cachenamespace-infra-system">3.4 nginx-pypi-cache（<code>namespace: infra-system</code>）<a class="headerlink" href="#34-nginx-pypi-cachenamespace-infra-system" title="Permanent link">&para;</a></h3>
+<p><strong>职责</strong>：PyPI 私有加速缓存服务，挂载 NFS <code>/pip-cache</code> 目录。</p>
+<p>Runner Pod 通过环境变量使用本地缓存，避免每次 <code>pip install</code> 访问公网：</p>
+<pre><code class="language-bash">PIP_INDEX_URL=http://nginx-pypi-cache.infra-system.svc/simple
+PIP_TRUSTED_HOST=nginx-pypi-cache.infra-system.svc
+</code></pre>
+<h3 id="35-argocdnamespace-argocd">3.5 ArgoCD（<code>namespace: argocd</code>）<a class="headerlink" href="#35-argocdnamespace-argocd" title="Permanent link">&para;</a></h3>
+<p><strong>职责</strong>：GitOps 引擎，<strong>仅用于管理 actions-runner-controller 的部署</strong>（其自身由管理员直接部署）。</p>
+<p>ArgoCD 持续监听 Git 仓库中 <code>charts/arc/</code> 目录的 HelmChart 变更，自动同步部署到 K8s。</p>
+<hr />
+<h2 id="actions-runner-controllerargocd">四、actions-runner-controller（ArgoCD 同步部署）<a class="headerlink" href="#actions-runner-controllerargocd" title="Permanent link">&para;</a></h2>
+<p>ARC 是唯一通过 ArgoCD 管理的组件，实现 GitOps 受控升级。</p>
+<h3 id="41">4.1 架构组成<a class="headerlink" href="#41" title="Permanent link">&para;</a></h3>
+<pre><code>namespace: arc-system
+├── actions-runner-controller (Deployment)   ← 控制器
+├── K8s Secret: github-arc-secret            ← 由 ESO 从 Vault 同步
+└── AutoscalingRunnerSet (CRD)               ← Runner 规格定义
+
+namespace: arc-runners
+└── Runner Pod-1 / Pod-2 / ... / Pod-N       ← Ephemeral，按需创建
+</code></pre>
+<h3 id="42-scale-sets">4.2 工作模式（Scale Sets）<a class="headerlink" href="#42-scale-sets" title="Permanent link">&para;</a></h3>
+<p>ARC 采用 <strong>Scale Sets 模式</strong>（v0.5+ 推荐），工作流程如下：</p>
+<pre><code>开发者 push/PR
+    │
+    ▼  ⑪ 触发 workflow（runs-on: npu-runner）
+GitHub Actions Service（Job Queue）
+    │
+    ▼  ⑫ Job 分发给匹配的 Runner Scale Set
+ARC Controller（arc-system）
+    │  ⑬ 检测到 Job，按 AutoscalingRunnerSet 规格
+    ▼     动态创建 Ephemeral Runner Pod
+Runner Pod（arc-runners）
+    │  ⑭ 注册为 Runner → 拉取 Job → 执行 Steps → 上报结果
+    ▼
+Job 完成 → Runner Pod 自动销毁
+</code></pre>
+<hr />
+<h2 id="github-app">五、GitHub App 集成<a class="headerlink" href="#github-app" title="Permanent link">&para;</a></h2>
+<p>集成方案<a href="../user-manual-zh/">user-manual-zh.md</a></p>
+<hr />
+<h2 id="_4">六、完整部署时序<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>以下为从零开始的推荐部署顺序：</p>
+<pre><code>阶段 1：物理层 &amp; K8s
+  1. 准备 NPU 节点 + X86 节点 + NFS 存储
+  2. 搭建 K8s 集群（X86，NPU 节点）
+  3. 部署 Ascend Device Plugin（DaemonSet）
+
+阶段 2：基础服务（直接 helm install，顺序无强依赖）
+  4. helm install vault           # 先于 ESO，否则 ESO 无 Backend
+  5. helm install argocd          # 先于 ARC，否则无法同步
+  6. helm install external-secrets  # secrets-manager / ESO
+  7. helm install imagepullsecret-patcher
+  8. helm install nginx-pypi-cache  # 需要 NFS PVC 就绪
+
+阶段 3：凭证配置
+  9.  在开源仓安装 GitHub App，获取 App ID + Private Key
+  10. 将凭证录入 Vault KV（vault kv put secret/github-arc/ ...）
+  11. ESO ExternalSecret CR 创建后，自动同步 K8s Secret
+
+阶段 4：ArgoCD 同步 ARC
+  12. 在 ArgoCD 中创建 Application（指向 charts/arc/）
+  13. ArgoCD 自动同步，部署 ARC Controller 到 arc-system
+  14. ARC 读取 K8s Secret，完成向 GitHub Actions Service 注册
+
+阶段 5：仓库配置
+  15. 在 .github/workflows/*.yaml 中使用 Runner：
+      runs-on: [self-hosted, npu-runner]
+</code></pre>
+<hr />
+<h2 id="_5">七、贡献者须知<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="71-npu-ci">7.1 如何触发 NPU CI<a class="headerlink" href="#71-npu-ci" title="Permanent link">&para;</a></h3>
+<p>在 PR 的 workflow 文件中指定 Runner 标签：</p>
+<pre><code class="language-yaml">jobs:
+  npu-test:
+    runs-on: [self-hosted, npu-runner]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run NPU tests
+        run: pytest tests/e2e/ -v
+</code></pre>
+<h3 id="72-runner-pod">7.2 Runner Pod 的环境约定<a class="headerlink" href="#72-runner-pod" title="Permanent link">&para;</a></h3>
+<p>每个 Runner Pod 启动时具备以下环境：</p>
+<table>
+<thead>
+<tr>
+<th>资源 / 环境</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NPU 卡数</td>
+<td>8 × Ascend 910B/C</td>
+<td>通过 Device Plugin 分配</td>
+</tr>
+<tr>
+<td><code>/models</code></td>
+<td>NFS 挂载</td>
+<td>预置模型权重，无需每次下载</td>
+</tr>
+<tr>
+<td><code>PIP_INDEX_URL</code></td>
+<td>nginx-pypi-cache</td>
+<td>pip 走本地缓存，加速依赖安装</td>
+</tr>
+<tr>
+<td>Runner 生命周期</td>
+<td>Ephemeral</td>
+<td>Job 完成后 Pod 自动销毁，环境完全隔离</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73">7.3 安全边界<a class="headerlink" href="#73" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Vault 凭证不暴露</strong>：所有敏感凭证存储在 Vault，通过 ESO 注入，不出现在 Git 仓库或 Pod 环境变量明文中</li>
+<li><strong>Runner 隔离</strong>：每个 Job 使用独立的 Ephemeral Pod，Job 间无状态共享</li>
+<li><strong>镜像来源受控</strong>：imagepullsecret-patcher 确保只有授权的私有镜像仓库凭证被使用</li>
+<li><strong>GitOps 变更可审计</strong>：ARC 版本变更通过 Git PR → ArgoCD 同步，全程留有审计记录</li>
+</ul>
+<h3 id="74">7.4 常见问题<a class="headerlink" href="#74" title="Permanent link">&para;</a></h3>
+<p><strong>Q：Runner 长时间 Pending，Job 未执行？</strong></p>
+<p>可能原因：
+1. ARC Controller 未成功向 GitHub Actions Service 注册（检查 K8s Secret 是否同步）
+2. NPU 节点资源不足（检查 <code>kubectl describe node</code>）
+3. imagepullsecret-patcher 未同步，导致 Runner Pod 镜像拉取失败</p>
+<p><strong>Q：pip install 速度很慢？</strong></p>
+<p>检查 <code>PIP_INDEX_URL</code> 环境变量是否指向 <code>nginx-pypi-cache</code> 服务，以及 NFS <code>/pip-cache</code> 是否正常挂载。</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
