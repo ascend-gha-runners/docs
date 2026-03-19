@@ -1,0 +1,18 @@
+name: "💬 其他事项"
+description: "用于咨询、重构建议、微小修正或其他不属于上述分类的事项。"
+title: "[其他]: "
+labels: ["type:others"]
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: "详细描述"
+      description: "请详细说明您的想法或疑问。"
+      placeholder: "在这里输入内容..."
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: "建议方案 (可选)"
+      description: "如果您有初步的解决思路，请在此说明。"
