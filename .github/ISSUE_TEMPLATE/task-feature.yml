@@ -1,0 +1,44 @@
+name: "🛠️ 任务与功能 (开发者专用)"
+description: "用于开发者记录内部任务、环境搭建或计划开发的新功能。"
+title: "[任务/功能]: "
+labels: ["type:task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢记录此任务！请确保在下方列出具体的实施步骤，以便后续 Skill 自动追踪进度。
+  - type: textarea
+    id: context
+    attributes:
+      label: "背景与背景 (Context & Motivation)"
+      description: "为什么要执行这项任务？解决了什么问题？"
+      placeholder: "例如：为了支持 Ascend NPU 的某种新特性，我们需要更新现有的部署文档。"
+    validations:
+      required: true
+  - type: textarea
+    id: goals
+    attributes:
+      label: "预期目标 (Goals)"
+      description: "完成后应该达到什么效果？"
+      placeholder: "例如：完成全套部署流程的验证并发布到官方文档。"
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: "实施步骤 (Checklist)"
+      description: "请使用 - [ ] 格式列出子任务，Skill 将据此追踪进度。"
+      value: |
+        ### 任务拆解
+        - [ ] 任务准备与调研
+        - [ ] 初步方案设计
+        - [ ] 核心功能实现 / 文档初稿编写
+        - [ ] 内部评审与测试
+        - [ ] 正式发布
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: "备注 (Notes)"
+      description: "其他补充信息。"

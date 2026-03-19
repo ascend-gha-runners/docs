@@ -1,0 +1,41 @@
+name: "🐞 缺陷与需求 (用户反馈)"
+description: "用于用户报告文档错误 (Bug) 或提出新的文档/功能建议 (Requirement)。"
+title: "[缺陷/需求]: "
+labels: ["type:user-feedback"]
+body:
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: "反馈类型"
+      options:
+        - "缺陷 (Bug) - 现有文档有误或环境异常"
+        - "需求 (Requirement) - 希望增加新的文档或功能"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "问题描述 / 需求背景"
+      description: "请清晰地描述您遇到的问题或您的建议。"
+      placeholder: "例如：在按照文档执行第 X 步时报错，或者我希望看到关于 Y 的详细教程。"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "预期行为"
+      description: "您期望看到的结果是什么？"
+      placeholder: "例如：预期应该能够顺利通过编译，或者文档应该包含 Z 部分的内容。"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: "环境信息 (针对 Bug)"
+      description: "如果涉及到执行报错，请提供相关的 OS、Runner 版本或 Action URL。"
+      placeholder: "OS: Ubuntu 22.04\nRunner: v2.x.x\nURL: https://github.com/..."
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "截图 / 日志"
+      description: "如果有相关截图或错误日志，请在此贴出。"
