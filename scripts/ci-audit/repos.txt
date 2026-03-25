@@ -1,0 +1,6 @@
+sgl-project/sglang
+vllm-project/vllm-ascend
+modelscope/ms-swift
+verl-project/verl
+hiyouga/LlamaFactory
+tile-ai/tilelang-ascend
