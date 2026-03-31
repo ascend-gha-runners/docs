@@ -24,8 +24,9 @@ fi
 # PyPI 匹配关键词 (默认为内网缓存服务地址)
 PYPI_KEYWORD="${PYPI_CACHE_KEYWORD:-cache-service.nginx-pypi-cache.svc.cluster.local}"
 
-# APT 匹配模式 (匹配端口号或关键字)
-APT_PATTERN="${APT_CACHE_PATTERN:-:8081|apt.*cache-service}"
+# APT 匹配模式 (匹配特定的 sed 替换逻辑或代理配置)
+# 能够匹配: sed -Ei 's@(ports|archive).ubuntu.com@...:8081@g' ...
+APT_PATTERN="${APT_CACHE_PATTERN:-(ports|archive|ubuntu)\.com.*:8081|Acquire::http::Proxy.*:8081}"
 
 # 打印运行参数 (Print Runtime Parameters)
 echo "Audit Configuration:"
