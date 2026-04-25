@@ -18,6 +18,6 @@
 
 [modelscope/ms-swift](https://github.com/modelscope/ms-swift)
 
-[tile-ai/tilelang](https://github.com/tile-ai/tilelang)
+[tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend)
 
 [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend)
