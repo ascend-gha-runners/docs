@@ -47,9 +47,13 @@ nav:
   - Home:
     - Getting Started: index.md
     - Future Plans: "#future-plans"
-  - User Manual En:
-      - user-manual-en.md
-  - User Manual Zh:
-    - user-manual-zh.md
+  - GitHub Actions Guide En:
+    - user-manual-gha-en.md
+  - GitHub Actions Guide Zh:
+    - user-manual-gha-zh.md
+  - Buildkite Guide En:
+    - user-manual-buildkite-en.md
+  - Buildkite Guide Zh:
+    - user-manual-buildkite-zh.md
   - Integrated repo:
     - Repo.md

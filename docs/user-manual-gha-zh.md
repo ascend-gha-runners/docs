@@ -1,4 +1,4 @@
-# 用户手册
+# GitHub Actions 接入昇腾算力指导
 我们基于[ARC](https://github.com/actions/actions-runner-controller/)实现 GitHub Action 任务在昇腾集群节点上执行。
 
 ## Runner pod 类型及命名方式
