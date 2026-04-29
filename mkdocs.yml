@@ -53,3 +53,5 @@ nav:
     - user-manual-zh.md
   - Integrated repo:
     - Repo.md
+  - Developer Guide:      
+    - CI Infrastructure Deployment (ZH): ci-infrastructure-deployment-zh.md
