@@ -150,7 +150,7 @@ Job 完成 → Runner Pod 自动销毁
 ---
 
 ## 五、GitHub App 集成
-集成方案[user-manual-zh.md](user-manual-zh.md)
+集成方案[user-manual-gha-zh.md](user-manual-gha-zh.md)
 
 ---
 
