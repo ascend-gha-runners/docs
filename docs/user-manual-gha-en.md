@@ -10,7 +10,8 @@
 │ https://github.com/<org>/<repo>                                                │
 │ .github/workflows/*.yaml                                                       │
 └────────────────────────┬───────────────────────────────────────────────────────┘
-                         │ Webhook Trigger
+                         │ GitHub Event Trigger
+                         │ (push/PR/schedule, etc.)
                          ▼
 ┌────────────────────────────────────────────────────────────────────────────────┐
 │                        GitHub Actions Cloud                                     │
