@@ -11,7 +11,7 @@
 |--|--|--|--|--|
 |310P3|arm64|1|8|linux-aarch64-310p-x|
 |910C|arm64|2|16|linux-aarch64-910c-x|
-|910B4|arm64|4|8|linux-arm64-npu-x|
+|910B4|arm64|4|8|linux-aarch64-npu-x|
 |910B1|arm64|4|8|linux-aarch64-a2-x|
 
 ### 默认 runner pod 命名规范
@@ -19,11 +19,11 @@
 Runner pod 名称由以下部分组成：
 
 ```
-linux-arm64-npu-x
-^     ^     ^   ^
-|     |     |   |
-|     |     |   Number of NPUs Available
-|     |     NPU Designator
+linux-aarch64-npu-x
+^     ^       ^   ^
+|     |       |   |
+|     |       |   Number of NPUs Available
+|     |       NPU Designator
 |     Architecture
 Operating System
 ```
@@ -66,10 +66,10 @@ Operating System
                          │
                          ▼
 ┌───────────────────────────────────────────────────────┐
-│ 步骤 4: 提交激活申请                                   │
-│ 你：通过 Issue 或邮件提交申请                         │
-│ 我们：部署和配置 Runner                               │
-│ 验收：收到申请确认                                    │
+│ 步骤 4: 联系我们激活                                   │
+│ PAT 方式：发送邮件提供组织/仓库和 token               │
+│ GitHub App 方式：安装后我们直接协助接入               │
+│ 验收：Runner 部署确认                                 │
 └────────────────────────┬──────────────────────────────┘
                          │
                          ▼
@@ -140,25 +140,15 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 
 - GitHub App 已安装到目标组织
 
-### 提交申请激活组织
-
-**你需要做什么**：
-
-浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Organization`选择模板。
-![alt text](assets/user-manual-zh/image-17.png)
-填写3个配置参数后点击`Create`。如果您需要自定义 runner 名称，请在 issue 中说明。
-- `org-name`表示您的组织名称。
-- `runner-group-name`表示`Runner group`的名称，默认`Default`。
-- `runner-names`表示 Runner 的名称。
-![alt text](assets/user-manual-zh/image-1.png)
+### 激活
 
 **我们做什么**：
 
-- 收到申请后部署和配置 Runner
+GitHub App 安装完成后，我们团队将直接协助您完成接入，无需您提交任何申请。
 
 **怎么验证这步完成**：
 
-- Issue 已提交并收到确认回复
+- 在仓库 Settings → Actions → Runners 中 Runner 状态显示 Online
 
 ---
 
@@ -181,24 +171,15 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 
 - GitHub App 已安装到目标仓库
 
-### 提交申请激活仓库
-
-**你需要做什么**：
-
-浏览器访问[ascend-gha-runners/org-archive/issues][2]并且依次点击`New issue`, `Add Or Modify Repository`选择模板。
-![alt text](assets/user-manual-zh/image-20.png)
-填写2个配置参数后点击`Create`。如果您需要自定义 runner 名称，请在 issue 中说明。
-- `repo-name`表示您的仓库名称。
-- `runner-names`表示 Runner 的名称。
-![alt text](assets/user-manual-zh/image-2.png)
+### 激活
 
 **我们做什么**：
 
-- 收到申请后部署和配置 Runner
+GitHub App 安装完成后，我们团队将直接协助您完成接入，无需您提交任何申请。
 
 **怎么验证这步完成**：
 
-- Issue 已提交并收到确认回复
+- 在仓库 Settings → Actions → Runners 中 Runner 状态显示 Online
 
 ---
 
@@ -227,15 +208,13 @@ scopes 选择`admin:org`。
 
 **你需要做什么**：
 
-考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。如果您需要自定义 runner 名称，请在邮件中说明。
+考虑到token保密需求，申请方式是向`ascend-runner@huawei.com`发送邮件。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
-repo: https://github.com/my-org/
-runner-group: ascend-ci
+org: my-org
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
 
 **我们做什么**：
@@ -272,14 +251,13 @@ scopes 选择`repo`。
 
 **你需要做什么**：
 
-考虑到token保密需求，申请方式是向`gouzhonglin@huawei.com`发送邮件。如果您需要自定义 runner 名称，请在邮件中说明。
+考虑到token保密需求，申请方式是向`ascend-runner@huawei.com`发送邮件。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
 
 **我们做什么**：

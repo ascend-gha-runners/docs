@@ -10,7 +10,7 @@ Ascend clusters create runner pods to execute GitHub Action jobs. We offer the f
 |--|--|--|--|--|
 |310P3|arm64|1|8|linux-aarch64-310p-x|
 |910C|arm64|2|16|linux-aarch64-910c-x|
-|910B4|arm64|4|8|linux-arm64-npu-x|
+|910B4|arm64|4|8|linux-aarch64-npu-x|
 |910B1|arm64|4|8|linux-aarch64-a2-x|
 
 ### Runner Naming Convention
@@ -18,11 +18,11 @@ Ascend clusters create runner pods to execute GitHub Action jobs. We offer the f
 The naming convention for runner pod is composed of the following parts:
 
 ```
-linux-arm64-npu-x
-^     ^     ^   ^
-|     |     |   |
-|     |     |   Number of NPUs Available
-|     |     NPU Designator
+linux-aarch64-npu-x
+^     ^       ^   ^
+|     |       |   |
+|     |       |   Number of NPUs Available
+|     |       NPU Designator
 |     Architecture
 Operating System
 ```
@@ -65,10 +65,10 @@ Operating System
                          │
                          ▼
 ┌───────────────────────────────────────────────────────┐
-│ Step 4: Submit Activation Request                     │
-│ You: Submit request via Issue or email                │
-│ We: Deploy and configure Runner                       │
-│ Acceptance: Request confirmation received             │
+│ Step 4: Contact Us for Activation                     │
+│ PAT only: Send email with org/repo and token          │
+│ GitHub App: We assist directly after installation     │
+│ Acceptance: Runner deployment confirmed               │
 └────────────────────────┬──────────────────────────────┘
                          │
                          ▼
@@ -138,25 +138,15 @@ Select organization, choose `All repositories`, click `Install`.
 
 - GitHub App installed to target organization
 
-### Submit Activation Request
-
-**What you need to do**:
-
-Visit [ascend-gha-runners/org-archive/issues][2] in browser and click `New issue`, select `Add Or Modify Organization` template.
-![alt text](assets/user-manual-zh/image-17.png)
-Fill in 3 configuration parameters and click `Create`. Specify custom runner name if needed.
-- `org-name`: Organization name
-- `runner-group-name`: Runner group name (default: `Default`)
-- `runner-names`: Runner names
-![alt text](assets/user-manual-zh/image-1.png)
+### Activation
 
 **What we do**:
 
-- Deploy and configure Runner after receiving request
+After GitHub App is installed, our team will directly assist with onboarding. No action required from you.
 
 **How to verify**:
 
-- Issue submitted and confirmation received
+- Runner status shows Online in repository Settings → Actions → Runners
 
 ---
 
@@ -179,24 +169,15 @@ Select organization, choose `Only select repositories`, select target repository
 
 - GitHub App installed to target repository
 
-### Submit Activation Request
-
-**What you need to do**:
-
-Visit [ascend-gha-runners/org-archive/issues][2] in browser and click `New issue`, select `Add Or Modify Repository` template.
-![alt text](assets/user-manual-zh/image-20.png)
-Fill in 2 configuration parameters and click `Create`. Specify custom runner name if needed.
-- `repo-name`: Repository name
-- `runner-names`: Runner names
-![alt text](assets/user-manual-zh/image-2.png)
+### Activation
 
 **What we do**:
 
-- Deploy and configure Runner after receiving request
+After GitHub App is installed, our team will directly assist with onboarding. No action required from you.
 
 **How to verify**:
 
-- Issue submitted and confirmation received
+- Runner status shows Online in repository Settings → Actions → Runners
 
 ---
 
@@ -225,15 +206,13 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 **What you need to do**:
 
-For token security, send email to `gouzhonglin@huawei.com`. Specify custom runner name if needed.
+For token security, send email to `ascend-runner@huawei.com`.
 **Email subject**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
-repo: https://github.com/my-org/
-runner-group: ascend-ci
+org: my-org
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
 
 **What we do**:
@@ -270,14 +249,13 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 **What you need to do**:
 
-For token security, send email to `gouzhonglin@huawei.com`. Specify custom runner name if needed.
+For token security, send email to `ascend-runner@huawei.com`.
 **Email subject**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
 
 **What we do**:
