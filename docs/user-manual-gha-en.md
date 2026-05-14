@@ -1,158 +1,296 @@
 # GitHub Actions Integration Guide
+
 We implement GitHub Action tasks on Ascend cluster nodes based on [ARC](https://github.com/actions/actions-runner-controller/).
 
-
 ## Runner Pod Types and Naming Methods
-Ascend clusters create runner pods to execute GitHub Action jobs.We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
 
+Ascend clusters create runner pods to execute GitHub Action jobs. We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
 
 |Type|Architecture|Number of Nodes|Number of chips per Node|Default name(x = chip count)|
 |--|--|--|--|--|
 |310P3|arm64|1|8|linux-aarch64-310p-x|
 |910C|arm64|2|16|linux-aarch64-910c-x|
-|910B4|arm64|4|8|linux-arm64-npu-x|
+|910B4|arm64|4|8|linux-aarch64-npu-x|
 |910B1|arm64|4|8|linux-aarch64-a2-x|
 
-
 ### Runner Naming Convention
+
 The naming convention for runner pod is composed of the following parts:
+
 ```
-linux-amd64-npu-x
-^     ^     ^   ^
-|     |     |   |
-|     |     |   Number of NPUs Available
-|     |     NPU Designator
+linux-aarch64-npu-x
+^     ^       ^   ^
+|     |       |   |
+|     |       |   Number of NPUs Available
+|     |       NPU Designator
 |     Architecture
 Operating System
 ```
 
-# Installation
-We introduce the installation methods based on the installation scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method for installation or combine multiple methods.
+## Onboarding Flowchart
+
+```
+                       Start
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 1: Choose Installation Scope and Authentication │
+│ You: Determine organization or repository level       │
+│ You: Choose GitHub App or PAT authentication         │
+│ Acceptance: Installation plan clarified              │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 2: Prepare Permissions                           │
+│ You: Obtain organization or repository admin          │
+│ Acceptance: Necessary permissions ready               │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ├─────────┬─────────┬─────────┐
+                         │         │         │         │
+                         ▼         ▼         ▼         ▼
+                    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+                    │Org+App │ │Repo+App│ │Org+PAT │ │Repo+PAT│
+                    └────────┘ └────────┘ └────────┘ └────────┘
+                         │         │         │         │
+                         └─────────┴─────────┴─────────┴─────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 3: Install GitHub App or Create PAT              │
+│ You: Execute installation or creation                 │
+│ Acceptance: App installed or PAT generated            │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 4: Contact Us for Activation                     │
+│ PAT only: Send email with org/repo and token          │
+│ GitHub App: We assist directly after installation     │
+│ Acceptance: Runner deployment confirmed               │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 5: Validate Runner Availability                  │
+│ You: Check Runner status in Settings                  │
+│ Acceptance: Runner status shows Online                │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 6: Use Runner in Workflow                        │
+│ You: Write workflow and specify Runner label          │
+│ Acceptance: Workflow runs successfully                │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+                Integration Complete
+```
+
+## Installation
+
+We introduce installation methods based on scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method or combine multiple methods.
+If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner.
+GitHub App is more secure but requires organization admin permissions. If difficult to obtain organization-level approval, you can choose PAT permissions.
 If you encounter any issues during installation/usage, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions).
 
 ||Organization|Repository|
 |--|--|--|
-|GitHub App|[Instalation Method](#install-runner-to-organization-via-github-app)|[Instalation Method](#install-runner-to-organization-via-pat)|
-|PAT|[Instalation Method](#install-runner-to-organization-via-pat)|[Instalation Method](#install-runner-to-repository-via-pat)|
+|GitHub App|[Installation Method](#install-runner-to-organization-via-github-app)|[Installation Method](#install-runner-to-repository-via-github-app)|
+|PAT|[Installation Method](#install-runner-to-organization-via-pat)|[Installation Method](#install-runner-to-repository-via-pat)|
 
 ---
 
 ## Install Runner to Organization via GitHub App
+
 ### Prerequisites
-Requires administrative permissions for the organization.
+
+Requires organization admin permissions.
 
 ### Optional: Install Runner Group
-Runners installed at the organization level are managed by runner groups.
-Runner groups have three configuration options to control which repository workflows can use the runner:
-1. Repositories: All repositories in the organization / Specific repositories.
-2. Repository access: private / public.
-3. Workflow: All workflows / Specific workflows.
-Repositories meeting all three configurations can use the organization's runners.
 
-If no runner group is specified, the `default` runner group will be used with the following configurations:
-1. Repositories: All repositories selected.
-2. Repository access: private.
-3. Workflow: All workflows selected.
+Runners installed at organization level are managed by runner groups.
+Runner groups have 3 configuration options to control repository workflow access:
+1. Repositories: All repositories / Specific repositories
+2. Repository access: private / public
+3. Workflow: All workflows / Specific workflows
+Repositories meeting all 3 configurations can use organization runners.
 
-You may use and modify the `default` runner group to manage runners (skip [Create New Runner Group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)). If the default runner group is already managing runners with permissions different from the new runners, create a custom runner group (refer to [Create New Runner Group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)).
+If no runner group specified, default runner group is used with configuration:
+1. Repositories: All repositories
+2. Repository access: private
+3. Workflow: All workflows
+
+You can use and modify default runner group (skip [Create New Runner Group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)). If default runner group is managing runners with different permissions, create custom runner group.
 
 ### Install GitHub App
-Visit [apps/ascend-runner-mgmt][1] in your browser and click `Install`.
+
+**What you need to do**:
+
+Visit [apps/ascend-runner-mgmt][1] in browser and click `Install`.
 ![alt text](assets/user-manual-zh/image-3.png)
-Select the organization, choose `All repositories`, and click `Install`.
+Select organization, choose `All repositories`, click `Install`.
 ![alt text](assets/user-manual-zh/image-19.png)
-### Submit Request to Activate Organization
-Visit [ascend-gha-runners/org-archive/issues][2] in your browser and click `New issue` → `Add Or Modify Organization` template.
-![alt text](assets/user-manual-zh/image-17.png)
-Fill in the three configuration parameters and click `Create`.If you need to customize the runner name, please specify it in your issue.
-- `org-name`: Your organization name.
-- `runner-group-name`: Runner group name (default: `Default`).
-- `runner-names`: Names of runner set.
-![alt text](assets/user-manual-zh/image-1.png)
+
+**How to verify**:
+
+- GitHub App installed to target organization
+
+### Activation
+
+**What we do**:
+
+After GitHub App is installed, our team will directly assist with onboarding. No action required from you.
+
+**How to verify**:
+
+- Runner status shows Online in repository Settings → Actions → Runners
 
 ---
 
 ## Install Runner to Repository via GitHub App
+
 ### Prerequisites
-Requires administrative permissions for both the organization and repository.
+
+Requires organization and repository admin permissions.
 
 ### Install GitHub App
-Visit [apps/ascend-runner-mgmt][1] in your browser and click `Install`.
+
+**What you need to do**:
+
+Visit [apps/ascend-runner-mgmt][1] in browser and click `Install`.
 ![alt text](assets/user-manual-zh/image-3.png)
-Select the organization, choose `Only select repositories`, select your repositories, and click `Install`.
+Select organization, choose `Only select repositories`, select target repository, click `Install`.
 ![alt text](assets/user-manual-zh/image-18.png)
 
-### Submit Request to Activate Repository
-Visit [ascend-gha-runners/org-archive/issues][2] in your browser and click `New issue` → `Add Or Modify Repository` template.
-![alt text](assets/user-manual-zh/image-20.png)
-Fill in the two configuration parameters and click `Create`.If you need to customize the runner name, please specify it in your issue.
-- `repo-name`: Your repository name.
-- `runner-names`: Names of runner set.
-![alt text](assets/user-manual-en/image.png)
+**How to verify**:
+
+- GitHub App installed to target repository
+
+### Activation
+
+**What we do**:
+
+After GitHub App is installed, our team will directly assist with onboarding. No action required from you.
+
+**How to verify**:
+
+- Runner status shows Online in repository Settings → Actions → Runners
 
 ---
 
 ## Install Runner to Organization via PAT
-### Prerequisites
-Requires administrative permissions for the organization.
 
-### [Optional: install runner group](#optional-install-runner-group)
+### Prerequisites
+
+Requires organization admin permissions.
+
+### [Optional: Install Runner Group](#optional-install-runner-group)
 
 ### Create Token
-Create a token following [GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+
+**What you need to do**:
+
+Create token following [GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
 Select `admin:org` for scopes.
-**Note**: After the token expires, the Runner scale set will disappear from the repository, and workflows will fail. Regenerate a valid token when expired.
+Note token expiration - after expiration, Runner scale set won't display in repository and workflows cannot execute. Regenerate valid token when expired.
 ![alt text](assets/user-manual-zh/image-23.png)
 
-### Submit Request to Activate Organization
-For token security, send an email to `gouzhonglin@huawei.com`.If you need to customize the runner name, please specify it in your email.
-**Email Subject**: `Request Ascend NPU Runners`
-**Email Content**:
+**How to verify**:
+
+- PAT created and securely saved
+
+### Submit Activation Request
+
+**What you need to do**:
+
+For token security, send email to `ascend-runner@huawei.com`.
+**Email subject**: `Request Ascend NPU Runners`
+**Email content template**:
 ```yaml
-repo: https://github.com/my-org/
-runner-group: ascend-ci
+org: my-org
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
+
+**What we do**:
+
+- Deploy and configure Runner after receiving request
+
+**How to verify**:
+
+- Email sent and confirmation received
 
 ---
 
 ## Install Runner to Repository via PAT
+
 ### Prerequisites
-Requires administrative permissions for the repository.
+
+Requires repository admin permissions.
 
 ### Create Token
-Create a token following [GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
+
+**What you need to do**:
+
+Create token following [GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic).
 Select `repo` for scopes.
-**Note**: After the token expires, the Runner scale set will disappear from the repository, and workflows will fail. Regenerate a valid token when expired.
+Note token expiration - after expiration, Runner scale set won't display in repository and workflows cannot execute. Regenerate valid token when expired.
+
 ![alt text](assets/user-manual-zh/image-16.png)
 
-### Submit Request to Activate Repository
-For token security, send an email to `gouzhonglin@huawei.com`.If you need to customize the runner name, please specify it in your email.
-**Email Subject**: `Request Ascend NPU Runners`
-**Email Content**:
+**How to verify**:
+
+- PAT created and securely saved
+
+### Submit Activation Request
+
+**What you need to do**:
+
+For token security, send email to `ascend-runner@huawei.com`.
+**Email subject**: `Request Ascend NPU Runners`
+**Email content template**:
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
 expire-at: 30days
-runner-names: linux-arm64-npu-1
 ```
+
+**What we do**:
+
+- Deploy and configure Runner after receiving request
+
+**How to verify**:
+
+- Email sent and confirmation received
 
 ---
 
 ## Usage
 
-### View Runners
-Whether installed at the repository or organization level, runners are triggered by repository workflows. Navigate to your repository → `Settings` → `Actions` → `Runners`.
-- `Runner scale set`: Runners configured for the repository.
-- `Shared with this repository`: Organization runners accessible to the repository.
-Status `Online` indicates availability.
+### View Runner
+
+**What you need to do**:
+
+Whether installed to repository or organization, runners are triggered by repository workflows. Navigate to repository → `Settings` → `Actions` → `Runners`.
+- `Runner scale set`: Runners configured for repository
+- `Shared with this repository`: Organization runners accessible to repository
+- `Status` showing `Online` indicates availability
 ![alt text](assets/user-manual-zh/image-24.png)
 
+**How to verify Runner availability**:
+
+- Runner status shows **Online** (green dot)
+
 ### Use NPU Runners in Workflows
-To utilize Ascend NPUs in a job, specify the `container.image` field. Otherwise, NPU resources won't be allocated to runner pod.
-**Example Workflow**:
+
+**What you need to do**:
+
+To use Ascend chips in job, specify `container.image` field. Otherwise NPU resources won't be allocated.
+Example showing how GitHub Action workflow uses NPU Runners.
+
 ```yaml
 name: Test NPU Runner
 on:
@@ -168,6 +306,56 @@ jobs:
         run: |
           npu-smi info
 ```
+
+**How to verify Workflow runs correctly**:
+
+- Workflow successfully triggered and running
+- Logs show NPU information
+
+---
+
+## FAQ
+
+**Q1: How do I know if my organization has permission to install GitHub App?**
+
+Requires organization Owner permission. If unsure, contact your organization administrator.
+
+**Q2: What if Runner status stays Offline?**
+
+- Check if GitHub App is correctly installed
+- Check if PAT is valid and not expired
+- Confirm Runner Group permission configuration
+- Contact infrastructure team for troubleshooting
+
+**Q3: Workflow keeps waiting for Runner, cannot run?**
+
+- Confirm `runs-on` field matches requested Runner name exactly
+- Check if Runner status is Online
+- Confirm repository has access to Runner (Runner Group configuration)
+
+**Q4: What to do when PAT expires?**
+
+- Regenerate PAT
+- Send new Token to infrastructure team via email
+- Wait for infrastructure team to update configuration
+
+**Q5: How to share Runner across multiple repositories?**
+
+- Use organization-level installation (install to organization via GitHub App or PAT)
+- Control repository access via Runner Group
+
+---
+
+## Feedback & Support
+
+If you encounter any issues during installation/usage, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions).
+
+When submitting, please provide:
+- Project name and Git repository URL
+- Issue description and error information
+- Installation method used (GitHub App or PAT)
+
+---
 
 [1]: https://github.com/apps/ascend-runner-mgmt
 [2]: https://github.com/ascend-gha-runners/org-archive/issues
