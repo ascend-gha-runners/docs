@@ -208,7 +208,7 @@ scopes 选择`admin:org`。
 
 **你需要做什么**：
 
-考虑到token保密需求，申请方式是向`ascend-runner@huawei.com`发送邮件。
+考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml
@@ -251,7 +251,7 @@ scopes 选择`repo`。
 
 **你需要做什么**：
 
-考虑到token保密需求，申请方式是向`ascend-runner@huawei.com`发送邮件。
+考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
 邮件主题模板：`Request Ascend NPU Runners`
 邮件内容模板：
 ```yaml

@@ -206,7 +206,7 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 **What you need to do**:
 
-For token security, send email to `ascend-runner@huawei.com`.
+For token security, send email to `ascendinfra@huawei.com`.
 **Email subject**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
@@ -249,7 +249,7 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 **What you need to do**:
 
-For token security, send email to `ascend-runner@huawei.com`.
+For token security, send email to `ascendinfra@huawei.com`.
 **Email subject**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
