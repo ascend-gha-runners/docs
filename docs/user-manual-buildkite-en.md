@@ -116,8 +116,7 @@ What you need to do:
 
 How to send the Token to us:
 
-- Send the Token to an infrastructure team member through a secure channel (e.g., encrypted messaging, private ticket).
-- **Do not** share the Token through public channels, plain-text emails, or code repositories.
+For Token security, send email to `ascendinfra@huawei.com`.
 
 How to verify this step is complete:
 
