@@ -11,7 +11,7 @@
 |--|--|--|--|--|
 |310P3|arm64|1|8|linux-aarch64-310p-x|
 |910C|arm64|2|16|linux-aarch64-a3-x|
-|910B1|arm64|4|8|linux-aarch64-a2-x|
+|910B3|arm64|4|8|linux-aarch64-a2-x|
 |910B3|arm64|4|8|linux-aarch64-a2b3-x|
 
 ### Runner pod 资源配额
