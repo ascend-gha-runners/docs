@@ -14,6 +14,27 @@
 |910B4|arm64|4|8|linux-aarch64-npu-x|
 |910B1|arm64|4|8|linux-aarch64-a2-x|
 
+### Runner pod 资源配额
+
+每个 runner pod 的 CPU 和内存配额按申请的 NPU 卡数等比例分配，具体如下：
+
+|Runner 名称|NPU 卡数|CPU(核)|内存|
+|--|--|--|--|
+|linux-aarch64-310p-1|1|11|40Gi|
+|linux-aarch64-310p-2|2|22|80Gi|
+|linux-aarch64-310p-4|4|44|160Gi|
+|linux-aarch64-910c-2|2|39|64Gi|
+|linux-aarch64-910c-4|4|78|128Gi|
+|linux-aarch64-910c-8|8|156|256Gi|
+|linux-aarch64-910c-16|16|312|512Gi|
+|linux-aarch64-npu-1|1|23|64Gi|
+|linux-aarch64-npu-2|2|46|128Gi|
+|linux-aarch64-npu-4|4|92|256Gi|
+|linux-aarch64-a2-1|1|23|64Gi|
+|linux-aarch64-a2-2|2|46|128Gi|
+|linux-aarch64-a2-4|4|92|256Gi|
+|linux-aarch64-a2-8|8|184|512Gi|
+
 ### 默认 runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
