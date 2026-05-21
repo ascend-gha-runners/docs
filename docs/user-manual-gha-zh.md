@@ -7,12 +7,12 @@
 昇腾集群创建 runner pod 执行 Github Action job。
 我们提供如下类型的昇腾芯片。如果您未指定名称，我们将使用默认命名。
 
-|类型|架构|节点数|每台节点卡数|默认命名(x表示卡数)|
-|--|--|--|--|--|
-|310P3|arm64|1|8|linux-aarch64-310p-x|
-|910C|arm64|2|16|linux-aarch64-a3-x|
-|910B3|arm64|4|8|linux-aarch64-a2-x|
-|910B3|arm64|4|8|linux-aarch64-a2b3-x|
+|类型|架构|每台节点卡数|默认命名(x表示卡数)|
+|--|--|--|--|
+|310P3|arm64|8|linux-aarch64-310p-x|
+|A3|arm64|16|linux-aarch64-a3-x|
+|910B3|arm64|8|linux-aarch64-a2-x|
+|910B3|arm64|8|linux-aarch64-a2b3-x|
 
 ### Runner pod 资源配额
 
