@@ -36,7 +36,7 @@
 |linux-aarch64-a2b3-4|4|92|256Gi|
 |linux-aarch64-a2b3-8|8|184|512Gi|
 
-### 默认 runner pod 命名规范
+### Runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
 
@@ -114,7 +114,7 @@ Operating System
 
 ## 安装
 
-我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种种方式安装，也可以搭配多种方式混合安装。
+我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种方式安装，也可以搭配多种方式混合安装。
 如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。
 GitHub App 权限更安全，但是需要组织管理者权限。如果觉得很难获取组织层面的许可，可以选择 PAT 权限。
 如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
@@ -146,7 +146,7 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 2. 仓库访问权限： private。
 3. workflow: 选择所有 workflow。
 
-您可以使用并更改默认 runner group 来管理 runner，跳过[新建 runner group](#新建-runner-group)。
+您可以使用并更改默认 runner group 来管理 runner。
 如果默认 runner group 已经管理 runner 并且其权限与新 runner 不同，您可以参考[新建 runner group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)创建自定义 runner group 来管理 runner。
 
 ### 安装 GitHub App
@@ -231,8 +231,8 @@ scopes 选择`admin:org`。
 **你需要做什么**：
 
 考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
-邮件主题模板：`Request Ascend NPU Runners`
-邮件内容模板：
+**邮件主题模板**：`Request Ascend NPU Runners`
+**邮件内容模板**：
 ```yaml
 org: my-org
 token: ghp_xxx
@@ -274,8 +274,8 @@ scopes 选择`repo`。
 **你需要做什么**：
 
 考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
-邮件主题模板：`Request Ascend NPU Runners`
-邮件内容模板：
+**邮件主题模板**：`Request Ascend NPU Runners`
+**邮件内容模板**：
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
@@ -308,7 +308,7 @@ expire-at: 30days
 
 - Runner 状态显示为 **Online**（绿色圆点）
 
-### 在workflow中使用NPU Runners
+### 在 workflow 中使用 NPU Runners
 
 **你需要做什么**：
 

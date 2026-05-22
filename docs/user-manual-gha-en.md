@@ -224,12 +224,12 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 - PAT created and securely saved
 
-### Submit Activation Request
+### Submit Activation Request for Organization
 
 **What you need to do**:
 
 For token security, send email to `ascendinfra@huawei.com`.
-**Email subject**: `Request Ascend NPU Runners`
+**Email subject template**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
 org: my-org
@@ -267,12 +267,12 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 - PAT created and securely saved
 
-### Submit Activation Request
+### Submit Activation Request for Repository
 
 **What you need to do**:
 
 For token security, send email to `ascendinfra@huawei.com`.
-**Email subject**: `Request Ascend NPU Runners`
+**Email subject template**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
 repo: https://github.com/my-org/my-repo
