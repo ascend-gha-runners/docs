@@ -6,12 +6,11 @@ We implement GitHub Action tasks on Ascend cluster nodes based on [ARC](https://
 
 Ascend clusters create runner pods to execute GitHub Action jobs. We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
 
-|Type|Architecture|Number of chips per Node|Default name(x = chip count)|
-|--|--|--|--|
-|310P3|arm64|8|linux-aarch64-310p-x|
-|A3|arm64|16|linux-aarch64-a3-x|
-|910B3|arm64|8|linux-aarch64-a2-x|
-|910B3|arm64|8|linux-aarch64-a2b3-x|
+|Type|Architecture|Default name(x = chip count)|
+|--|--|--|
+|Atlas 300I DUO|arm64|linux-aarch64-310p-x|
+|Atlas 800 A3|arm64|linux-aarch64-a3-x|
+|Atlas 800 A2|arm64|linux-aarch64-a2-x or linux-aarch64-a2b3-x|
 
 ### Runner Pod Resource Quota
 
