@@ -6,22 +6,43 @@ We implement GitHub Action tasks on Ascend cluster nodes based on [ARC](https://
 
 Ascend clusters create runner pods to execute GitHub Action jobs. We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
 
-|Type|Architecture|Number of Nodes|Number of chips per Node|Default name(x = chip count)|
-|--|--|--|--|--|
-|310P3|arm64|1|8|linux-aarch64-310p-x|
-|910C|arm64|2|16|linux-aarch64-910c-x|
-|910B4|arm64|4|8|linux-aarch64-npu-x|
-|910B1|arm64|4|8|linux-aarch64-a2-x|
+|Type|Architecture|Default name(x = chip count)|
+|--|--|--|
+|Atlas 300I DUO|arm64|linux-aarch64-310p-x|
+|Atlas 800 A3|arm64|linux-aarch64-a3-x|
+|Atlas 800 A2|arm64|linux-aarch64-a2-x or linux-aarch64-a2b3-x|
+
+### Runner Pod Resource Quota
+
+CPU and memory quota of each runner pod scales proportionally with the number of NPU chips requested:
+
+|Runner Name|NPU Chips|CPU (cores)|Memory|
+|--|--|--|--|
+|linux-aarch64-310p-1|1|11|40Gi|
+|linux-aarch64-310p-2|2|22|80Gi|
+|linux-aarch64-310p-4|4|44|160Gi|
+|linux-aarch64-a3-2|2|39|64Gi|
+|linux-aarch64-a3-4|4|78|128Gi|
+|linux-aarch64-a3-8|8|156|256Gi|
+|linux-aarch64-a3-16|16|312|512Gi|
+|linux-aarch64-a2-1|1|23|64Gi|
+|linux-aarch64-a2-2|2|46|128Gi|
+|linux-aarch64-a2-4|4|92|256Gi|
+|linux-aarch64-a2-8|8|184|512Gi|
+|linux-aarch64-a2b3-1|1|23|64Gi|
+|linux-aarch64-a2b3-2|2|46|128Gi|
+|linux-aarch64-a2b3-4|4|92|256Gi|
+|linux-aarch64-a2b3-8|8|184|512Gi|
 
 ### Runner Naming Convention
 
 The naming convention for runner pod is composed of the following parts:
 
 ```
-linux-aarch64-npu-x
-^     ^       ^   ^
-|     |       |   |
-|     |       |   Number of NPUs Available
+linux-aarch64-a2-x
+^     ^       ^  ^
+|     |       |  |
+|     |       |  Number of NPUs Available
 |     |       NPU Designator
 |     Architecture
 Operating System
@@ -202,12 +223,12 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 - PAT created and securely saved
 
-### Submit Activation Request
+### Submit Activation Request for Organization
 
 **What you need to do**:
 
 For token security, send email to `ascendinfra@huawei.com`.
-**Email subject**: `Request Ascend NPU Runners`
+**Email subject template**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
 org: my-org
@@ -245,12 +266,12 @@ Note token expiration - after expiration, Runner scale set won't display in repo
 
 - PAT created and securely saved
 
-### Submit Activation Request
+### Submit Activation Request for Repository
 
 **What you need to do**:
 
 For token security, send email to `ascendinfra@huawei.com`.
-**Email subject**: `Request Ascend NPU Runners`
+**Email subject template**: `Request Ascend NPU Runners`
 **Email content template**:
 ```yaml
 repo: https://github.com/my-org/my-repo
@@ -297,7 +318,7 @@ on:
   workflow_dispatch:
 jobs:
   job_0:
-    runs-on: linux-arm64-npu-1
+    runs-on: linux-aarch64-a2-1
     container:
       image: ascendai/cann:latest
       

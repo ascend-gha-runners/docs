@@ -7,22 +7,43 @@
 昇腾集群创建 runner pod 执行 Github Action job。
 我们提供如下类型的昇腾芯片。如果您未指定名称，我们将使用默认命名。
 
-|类型|架构|节点数|每台节点卡数|默认命名(x表示卡数)|
-|--|--|--|--|--|
-|310P3|arm64|1|8|linux-aarch64-310p-x|
-|910C|arm64|2|16|linux-aarch64-910c-x|
-|910B4|arm64|4|8|linux-aarch64-npu-x|
-|910B1|arm64|4|8|linux-aarch64-a2-x|
+|类型|架构|默认命名(x表示卡数)|
+|--|--|--|
+|Atlas 300I DUO|arm64|linux-aarch64-310p-x|
+|Atlas 800 A3|arm64|linux-aarch64-a3-x|
+|Atlas 800 A2|arm64|linux-aarch64-a2-x 或 linux-aarch64-a2b3-x|
 
-### 默认 runner pod 命名规范
+### Runner pod 资源配额
+
+每个 runner pod 的 CPU 和内存配额按申请的 NPU 卡数等比例分配，具体如下：
+
+|Runner 名称|NPU 卡数|CPU(核)|内存|
+|--|--|--|--|
+|linux-aarch64-310p-1|1|11|40Gi|
+|linux-aarch64-310p-2|2|22|80Gi|
+|linux-aarch64-310p-4|4|44|160Gi|
+|linux-aarch64-a3-2|2|39|64Gi|
+|linux-aarch64-a3-4|4|78|128Gi|
+|linux-aarch64-a3-8|8|156|256Gi|
+|linux-aarch64-a3-16|16|312|512Gi|
+|linux-aarch64-a2-1|1|23|64Gi|
+|linux-aarch64-a2-2|2|46|128Gi|
+|linux-aarch64-a2-4|4|92|256Gi|
+|linux-aarch64-a2-8|8|184|512Gi|
+|linux-aarch64-a2b3-1|1|23|64Gi|
+|linux-aarch64-a2b3-2|2|46|128Gi|
+|linux-aarch64-a2b3-4|4|92|256Gi|
+|linux-aarch64-a2b3-8|8|184|512Gi|
+
+### Runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
 
 ```
-linux-aarch64-npu-x
-^     ^       ^   ^
-|     |       |   |
-|     |       |   Number of NPUs Available
+linux-aarch64-a2-x
+^     ^       ^  ^
+|     |       |  |
+|     |       |  Number of NPUs Available
 |     |       NPU Designator
 |     Architecture
 Operating System
@@ -92,7 +113,7 @@ Operating System
 
 ## 安装
 
-我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种种方式安装，也可以搭配多种方式混合安装。
+我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种方式安装，也可以搭配多种方式混合安装。
 如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。
 GitHub App 权限更安全，但是需要组织管理者权限。如果觉得很难获取组织层面的许可，可以选择 PAT 权限。
 如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
@@ -124,7 +145,7 @@ runner group 有3个配置选项以控制仓库的 workflow 是否可以使用 r
 2. 仓库访问权限： private。
 3. workflow: 选择所有 workflow。
 
-您可以使用并更改默认 runner group 来管理 runner，跳过[新建 runner group](#新建-runner-group)。
+您可以使用并更改默认 runner group 来管理 runner。
 如果默认 runner group 已经管理 runner 并且其权限与新 runner 不同，您可以参考[新建 runner group](https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization)创建自定义 runner group 来管理 runner。
 
 ### 安装 GitHub App
@@ -209,8 +230,8 @@ scopes 选择`admin:org`。
 **你需要做什么**：
 
 考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
-邮件主题模板：`Request Ascend NPU Runners`
-邮件内容模板：
+**邮件主题模板**：`Request Ascend NPU Runners`
+**邮件内容模板**：
 ```yaml
 org: my-org
 token: ghp_xxx
@@ -252,8 +273,8 @@ scopes 选择`repo`。
 **你需要做什么**：
 
 考虑到token保密需求，申请方式是向`ascendinfra@huawei.com`发送邮件。
-邮件主题模板：`Request Ascend NPU Runners`
-邮件内容模板：
+**邮件主题模板**：`Request Ascend NPU Runners`
+**邮件内容模板**：
 ```yaml
 repo: https://github.com/my-org/my-repo
 token: ghp_xxx
@@ -286,7 +307,7 @@ expire-at: 30days
 
 - Runner 状态显示为 **Online**（绿色圆点）
 
-### 在workflow中使用NPU Runners
+### 在 workflow 中使用 NPU Runners
 
 **你需要做什么**：
 
@@ -299,7 +320,7 @@ on:
   workflow_dispatch:
 jobs:
   job_0:
-    runs-on: linux-arm64-npu-1
+    runs-on: linux-aarch64-a2-1
     container:
       image: ascendai/cann:latest
       
