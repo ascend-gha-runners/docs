@@ -196,6 +196,13 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
         sed -i 's/\x1b\[[0-9;]*m//g' "$log_file" 2>/dev/null || true
 
+        # Pre-check: skip jobs with no package installation activity at all
+        # (e.g. docs-check, lint-only jobs that use pre-built images)
+        if ! grep -qiE "pip install|pip config|apt-get|apt install|uv install|uv pip|dnf install|yum install|rustup|cargo" "$log_file" 2>/dev/null; then
+            rm -f "$log_file"
+            continue
+        fi
+
         # ---------- Search for PyPI cache evidence (正面 + 反面) ----------
         ev_pypi=""
         counter_evidence_pypi=""
