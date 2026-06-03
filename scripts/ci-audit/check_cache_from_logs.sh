@@ -42,7 +42,7 @@ fi
 PYPI_CACHE_HOST="${PYPI_CACHE_HOST:-cache-service.nginx-pypi-cache.svc.cluster.local}"
 APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
-RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,self-hosted}"
+RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-100}"
 PER_PAGE="${PER_PAGE:-30}"
 
