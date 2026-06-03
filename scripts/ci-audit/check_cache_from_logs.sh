@@ -198,7 +198,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
         # Pre-check: skip jobs with no package installation activity at all
         # (e.g. docs-check, lint-only jobs that use pre-built images)
-        if ! grep -qiE "pip install|pip config|apt-get|apt install|uv install|uv pip|dnf install|yum install|rustup|cargo" "$log_file" 2>/dev/null; then
+        if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install" "$log_file" 2>/dev/null; then
             rm -f "$log_file"
             continue
         fi
