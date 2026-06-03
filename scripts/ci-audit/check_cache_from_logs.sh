@@ -191,54 +191,70 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             continue
         fi
 
-        # Strip GitHub Actions log annotations
+        # Strip GitHub Actions log annotations, timestamps, and ANSI color codes
         sed -i 's/##\[group\]//g; s/##\[endgroup\]//g; s/##\[error\]//g; s/##\[warning\]//g; s/##\[notice\]//g; s/##\[command\]//g' "$log_file" 2>/dev/null || true
+        sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
+        sed -i 's/\x1b\[[0-9;]*m//g' "$log_file" 2>/dev/null || true
+
+        # Pre-check: skip jobs with no package installation activity at all
+        # (e.g. docs-check, lint-only jobs that use pre-built images)
+        if ! grep -qiE "pip install|pip config|apt-get|apt install|uv install|uv pip|dnf install|yum install|rustup|cargo" "$log_file" 2>/dev/null; then
+            rm -f "$log_file"
+            continue
+        fi
 
         # ---------- Search for PyPI cache evidence (正面 + 反面) ----------
         ev_pypi=""
         counter_evidence_pypi=""
-        # P1: "Looking in indexes" containing cache host → ✅
-        grep_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
-        if [ -n "$grep_line" ]; then
-            repo_pypi=true
-            ev_pypi="pip-index: ${grep_line:0:100}"
-        fi
 
-        if [ "$repo_pypi" = false ]; then
-            grep_line=$(grep -m1 -E "PIP_INDEX_URL|PIP_EXTRA_INDEX_URL" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
-            if [ -n "$grep_line" ]; then
+        # 第一步：检查运行时实际使用的 index（最高优先级，能覆盖所有配置）
+        # "Looking in indexes:" 是 pip 实际执行时打印的，反映真实行为
+        actual_index_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null || true)
+
+        if [ -n "$actual_index_line" ]; then
+            # 有运行时证据，直接用它判断，不再看配置文件
+            if echo "$actual_index_line" | grep -q "$PYPI_CACHE_HOST"; then
                 repo_pypi=true
-                ev_pypi="pip-env: ${grep_line:0:100}"
-            fi
-        fi
-
-        if [ "$repo_pypi" = false ]; then
-            grep_line=$(grep -m1 -iE "index-url|extra-index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
-            if [ -n "$grep_line" ]; then
-                repo_pypi=true
-                ev_pypi="pip-config: ${grep_line:0:100}"
-            fi
-        fi
-
-        if [ "$repo_pypi" = false ]; then
-            grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_pypi=true
-                ev_pypi="pip-broad: ${grep_line:0:100}"
-            fi
-        fi
-
-        # Counter-evidence: pip index URL without cache host (proves NOT using cache)
-        if [ "$repo_pypi" = false ]; then
-            # Show what pip IS actually using
-            grep_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                counter_evidence_pypi="pip uses: ${grep_line:0:120}"
+                ev_pypi="pip实际用缓存: ${actual_index_line:0:200}"
             else
-                # Fallback: show pip config output
-                grep_line=$(grep -m1 -i "pip config" "$log_file" 2>/dev/null || true)
+                # 运行时用的不是缓存地址，直接判 ❌，不管配置怎么写
+                counter_evidence_pypi="实际用: ${actual_index_line:0:200}"
+            fi
+        else
+            # 没有 "Looking in indexes:" 输出（uv 静默下载 / 未安装包）
+            # 退回到配置层面判断，标记为弱证据(配置)
+
+            # uv 尊重 pip config，检测 "pip config set global.index-url <cache>" 作为弱证据
+            grep_line=$(grep -m1 -iE "pip config set.*index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
+            if [ -n "$grep_line" ]; then
+                repo_pypi=true
+                ev_pypi="uv/pip-config(配置,无运行时证据): ${grep_line:0:200}"
+            fi
+
+            if [ "$repo_pypi" = false ]; then
+                grep_line=$(grep -m1 -E "PIP_INDEX_URL=.*$PYPI_CACHE_HOST|PIP_EXTRA_INDEX_URL=.*$PYPI_CACHE_HOST|UV_INDEX_URL=.*$PYPI_CACHE_HOST|UV_DEFAULT_INDEX=.*$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
                 if [ -n "$grep_line" ]; then
-                    counter_evidence_pypi="pip config: ${grep_line:0:120}"
+                    repo_pypi=true
+                    ev_pypi="pip/uv-env(配置,无运行时证据): ${grep_line:0:200}"
+                fi
+            fi
+
+            if [ "$repo_pypi" = false ]; then
+                grep_line=$(grep -m1 -iE "index-url|extra-index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
+                # 只有不含 "pip config set"（配置命令）时才算，避免误判执行配置操作为实际使用
+                if [ -n "$grep_line" ] && ! echo "$grep_line" | grep -qi "pip config set"; then
+                    repo_pypi=true
+                    ev_pypi="pip-config(配置,无运行时证据): ${grep_line:0:200}"
+                fi
+            fi
+
+            if [ "$repo_pypi" = false ]; then
+                # 排除 apt/sed 相关行，避免把 apt 配置命令误判为 pip 证据
+                grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null \
+                    | grep -viE "apt|sed|sources\.list|Get:|Hit:|Ign:" || true)
+                if [ -n "$grep_line" ]; then
+                    repo_pypi=true
+                    ev_pypi="pip-broad(配置): ${grep_line:0:200}"
                 fi
             fi
         fi
@@ -249,14 +265,14 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         grep_line=$(grep -m1 -iE "^Get:|^Hit:|^Ign:" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
         if [ -n "$grep_line" ]; then
             repo_apt=true
-            ev_apt="apt-get: ${grep_line:0:100}"
+            ev_apt="apt-get: ${grep_line:0:200}"
         fi
 
         if [ "$repo_apt" = false ]; then
             grep_line=$(grep -m1 -i "Acquire::http" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-proxy: ${grep_line:0:100}"
+                ev_apt="apt-proxy: ${grep_line:0:200}"
             fi
         fi
 
@@ -264,7 +280,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 -iE "sed.*${APT_PATTERN}" "$log_file" 2>/dev/null || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-sed: ${grep_line:0:100}"
+                ev_apt="apt-sed: ${grep_line:0:200}"
             fi
         fi
 
@@ -272,7 +288,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 -E "$APT_PATTERN" "$log_file" 2>/dev/null | grep -iE "apt|sources|mirror|repo" || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-broad: ${grep_line:0:100}"
+                ev_apt="apt-broad: ${grep_line:0:200}"
             fi
         fi
 
@@ -280,11 +296,11 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         if [ "$repo_apt" = false ]; then
             grep_line=$(grep -m1 -iE "^Get:|^Hit:" "$log_file" 2>/dev/null | grep -vE "$APT_PATTERN|$PYPI_CACHE_HOST" || true)
             if [ -n "$grep_line" ]; then
-                counter_evidence_apt="apt source: ${grep_line:0:120}"
+                counter_evidence_apt="实际用: ${grep_line:0:200}"
             else
                 grep_line=$(grep -m1 -iE "apt-get install|apt-get update" "$log_file" 2>/dev/null || true)
                 if [ -n "$grep_line" ]; then
-                    counter_evidence_apt="apt cmd: ${grep_line:0:120}"
+                    counter_evidence_apt="apt cmd: ${grep_line:0:200}"
                 fi
             fi
         fi
@@ -294,6 +310,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         # Got a usable log — record which job it came from
         repo_run="${c_run_branch}/${c_run_name}"
         repo_runner="$c_job_labels"
+        repo_job_url="https://github.com/${REPO}/actions/runs/${c_run_id}/job/${c_job_id}"
         log_ok=true
         break
 
@@ -303,38 +320,52 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     if [ "$log_ok" = false ]; then
         # Found NPU jobs but ALL logs expired/unavailable
         first_candidate=$(echo "$candidates" | grep -v '^$' | head -1)
+        first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
+        first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
-        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) |"
+        first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
+        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
         STAT_ERROR=$((STAT_ERROR + 1))
         continue
     fi
 
-    pypi_mark="❌"
-    apt_mark="❌"
+    job_link="[日志](${repo_job_url})"
+
+    # 每个缓存类型独立判断，区分三种状态：
+    #   ✅ 找到正面证据（确认使用了缓存）
+    #   ❌ 找到反面证据（发现使用了其他地址，确认未使用缓存）
+    #   ⚙️  无证据（日志中未出现相关输出，无法判断）
+
     if [ "$repo_pypi" = true ]; then
         pypi_mark="✅"
+        pypi_detail="${ev_pypi}"
         STAT_PYPI=$((STAT_PYPI + 1))
+    elif [ -n "$counter_evidence_pypi" ]; then
+        pypi_mark="❌"
+        pypi_detail="反面证据: ${counter_evidence_pypi}"
+        STAT_NO_CACHE=$((STAT_NO_CACHE + 1))
+    else
+        pypi_mark="⚙️"
+        pypi_detail="无证据(日志中未出现 pip index 相关输出)"
     fi
+
     if [ "$repo_apt" = true ]; then
         apt_mark="✅"
+        apt_detail="${ev_apt}"
         STAT_APT=$((STAT_APT + 1))
-    fi
-
-    repo_evidence="${ev_pypi}; ${ev_apt}"
-    repo_evidence="${repo_evidence# ; }"
-    repo_evidence="${repo_evidence% ; }"
-
-    # Build counter-evidence string (反面证据) for ❌ case
-    counter_ev="${counter_evidence_pypi}; ${counter_evidence_apt}"
-    counter_ev="${counter_ev# ; }"
-    counter_ev="${counter_ev% ; }"
-
-    if [ "$repo_pypi" = true ] || [ "$repo_apt" = true ]; then
-        echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${repo_evidence:0:200} |"
+    elif [ -n "$counter_evidence_apt" ]; then
+        apt_mark="❌"
+        apt_detail="反面证据: ${counter_evidence_apt}"
     else
-        echo "| $REPO | $repo_run | $repo_runner | ❌ | ❌ | 未用缓存: ${counter_ev:0:200} |"
-        STAT_NO_CACHE=$((STAT_NO_CACHE + 1))
+        apt_mark="⚙️"
+        apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
     fi
+
+    evidence="${pypi_detail}; ${apt_detail}"
+    evidence="${evidence# ; }"
+    evidence="${evidence% ; }"
+
+    echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${evidence:0:400} $job_link |"
 
     rm -f "$LOG_DIR/${REPO//\//_}"*.log
 
