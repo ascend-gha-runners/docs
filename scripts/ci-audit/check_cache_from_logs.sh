@@ -102,10 +102,16 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
     while [ "$page" -le "$max_pages" ]; do
         if [ -n "$WORKFLOW_FILTER" ]; then
-            runs_json=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page" 2>/dev/null) || true
+            runs_success=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
+            runs_failure=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
         else
-            runs_json=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page" 2>/dev/null) || true
+            runs_success=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
+            runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
         fi
+        # 合并两次结果，按 run id 降序排列（新的优先）
+        runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
+            {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
+        ' 2>/dev/null) || true
 
         if [ -z "$runs_json" ]; then
             break
