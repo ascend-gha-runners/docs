@@ -221,12 +221,22 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
                 counter_evidence_pypi="实际用: ${actual_index_line:0:200}"
             fi
         else
-            # 没有 "Looking in indexes:" 输出（uv 或未安装包），退回到配置层面判断
-            # 这类证据只能说明"配置了"，不能证明"实际走了缓存"，标记为弱证据
-            grep_line=$(grep -m1 -E "PIP_INDEX_URL=.*$PYPI_CACHE_HOST|PIP_EXTRA_INDEX_URL=.*$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
+            # 没有 "Looking in indexes:" 输出（uv 静默下载 / 未安装包）
+            # 退回到配置层面判断，标记为弱证据(配置)
+
+            # uv 尊重 pip config，检测 "pip config set global.index-url <cache>" 作为弱证据
+            grep_line=$(grep -m1 -iE "pip config set.*index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
             if [ -n "$grep_line" ]; then
                 repo_pypi=true
-                ev_pypi="pip-env(配置): ${grep_line:0:200}"
+                ev_pypi="uv/pip-config(配置,无运行时证据): ${grep_line:0:200}"
+            fi
+
+            if [ "$repo_pypi" = false ]; then
+                grep_line=$(grep -m1 -E "PIP_INDEX_URL=.*$PYPI_CACHE_HOST|PIP_EXTRA_INDEX_URL=.*$PYPI_CACHE_HOST|UV_INDEX_URL=.*$PYPI_CACHE_HOST|UV_DEFAULT_INDEX=.*$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
+                if [ -n "$grep_line" ]; then
+                    repo_pypi=true
+                    ev_pypi="pip/uv-env(配置,无运行时证据): ${grep_line:0:200}"
+                fi
             fi
 
             if [ "$repo_pypi" = false ]; then
@@ -234,7 +244,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
                 # 只有不含 "pip config set"（配置命令）时才算，避免误判执行配置操作为实际使用
                 if [ -n "$grep_line" ] && ! echo "$grep_line" | grep -qi "pip config set"; then
                     repo_pypi=true
-                    ev_pypi="pip-config(配置): ${grep_line:0:200}"
+                    ev_pypi="pip-config(配置,无运行时证据): ${grep_line:0:200}"
                 fi
             fi
 
