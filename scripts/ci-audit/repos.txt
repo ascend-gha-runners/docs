@@ -1,5 +1,5 @@
 sgl-project/sglang|pr-test-npu.yml
-vllm-project/vllm-ascend|schedule_nightly_test_a2.yaml
+vllm-project/vllm-ascend|pr_test_full.yaml
 modelscope/ms-swift|citest_npu.yaml
 verl-project/verl|e2e_ascend.yml
 hiyouga/LlamaFactory|tests_npu.yml
