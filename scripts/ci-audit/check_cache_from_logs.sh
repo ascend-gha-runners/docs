@@ -191,8 +191,9 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             continue
         fi
 
-        # Strip GitHub Actions log annotations
+        # Strip GitHub Actions log annotations and timestamps
         sed -i 's/##\[group\]//g; s/##\[endgroup\]//g; s/##\[error\]//g; s/##\[warning\]//g; s/##\[notice\]//g; s/##\[command\]//g' "$log_file" 2>/dev/null || true
+        sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
 
         # ---------- Search for PyPI cache evidence (正面 + 反面) ----------
         ev_pypi=""
@@ -201,14 +202,14 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         grep_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
         if [ -n "$grep_line" ]; then
             repo_pypi=true
-            ev_pypi="pip-index: ${grep_line:0:100}"
+            ev_pypi="pip-index: ${grep_line:0:200}"
         fi
 
         if [ "$repo_pypi" = false ]; then
             grep_line=$(grep -m1 -E "PIP_INDEX_URL|PIP_EXTRA_INDEX_URL" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
             if [ -n "$grep_line" ]; then
                 repo_pypi=true
-                ev_pypi="pip-env: ${grep_line:0:100}"
+                ev_pypi="pip-env: ${grep_line:0:200}"
             fi
         fi
 
@@ -216,7 +217,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 -iE "index-url|extra-index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
             if [ -n "$grep_line" ]; then
                 repo_pypi=true
-                ev_pypi="pip-config: ${grep_line:0:100}"
+                ev_pypi="pip-config: ${grep_line:0:200}"
             fi
         fi
 
@@ -224,21 +225,19 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
             if [ -n "$grep_line" ]; then
                 repo_pypi=true
-                ev_pypi="pip-broad: ${grep_line:0:100}"
+                ev_pypi="pip-broad: ${grep_line:0:200}"
             fi
         fi
 
         # Counter-evidence: pip index URL without cache host (proves NOT using cache)
         if [ "$repo_pypi" = false ]; then
-            # Show what pip IS actually using
             grep_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null || true)
             if [ -n "$grep_line" ]; then
-                counter_evidence_pypi="pip uses: ${grep_line:0:120}"
+                counter_evidence_pypi="实际用: ${grep_line:0:200}"
             else
-                # Fallback: show pip config output
                 grep_line=$(grep -m1 -i "pip config" "$log_file" 2>/dev/null || true)
                 if [ -n "$grep_line" ]; then
-                    counter_evidence_pypi="pip config: ${grep_line:0:120}"
+                    counter_evidence_pypi="pip config: ${grep_line:0:200}"
                 fi
             fi
         fi
@@ -249,14 +248,14 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         grep_line=$(grep -m1 -iE "^Get:|^Hit:|^Ign:" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
         if [ -n "$grep_line" ]; then
             repo_apt=true
-            ev_apt="apt-get: ${grep_line:0:100}"
+            ev_apt="apt-get: ${grep_line:0:200}"
         fi
 
         if [ "$repo_apt" = false ]; then
             grep_line=$(grep -m1 -i "Acquire::http" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-proxy: ${grep_line:0:100}"
+                ev_apt="apt-proxy: ${grep_line:0:200}"
             fi
         fi
 
@@ -264,7 +263,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 -iE "sed.*${APT_PATTERN}" "$log_file" 2>/dev/null || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-sed: ${grep_line:0:100}"
+                ev_apt="apt-sed: ${grep_line:0:200}"
             fi
         fi
 
@@ -272,7 +271,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             grep_line=$(grep -m1 -E "$APT_PATTERN" "$log_file" 2>/dev/null | grep -iE "apt|sources|mirror|repo" || true)
             if [ -n "$grep_line" ]; then
                 repo_apt=true
-                ev_apt="apt-broad: ${grep_line:0:100}"
+                ev_apt="apt-broad: ${grep_line:0:200}"
             fi
         fi
 
@@ -280,11 +279,11 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         if [ "$repo_apt" = false ]; then
             grep_line=$(grep -m1 -iE "^Get:|^Hit:" "$log_file" 2>/dev/null | grep -vE "$APT_PATTERN|$PYPI_CACHE_HOST" || true)
             if [ -n "$grep_line" ]; then
-                counter_evidence_apt="apt source: ${grep_line:0:120}"
+                counter_evidence_apt="实际用: ${grep_line:0:200}"
             else
                 grep_line=$(grep -m1 -iE "apt-get install|apt-get update" "$log_file" 2>/dev/null || true)
                 if [ -n "$grep_line" ]; then
-                    counter_evidence_apt="apt cmd: ${grep_line:0:120}"
+                    counter_evidence_apt="apt cmd: ${grep_line:0:200}"
                 fi
             fi
         fi
@@ -294,6 +293,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         # Got a usable log — record which job it came from
         repo_run="${c_run_branch}/${c_run_name}"
         repo_runner="$c_job_labels"
+        repo_job_url="https://github.com/${REPO}/actions/runs/${c_run_id}/job/${c_job_id}"
         log_ok=true
         break
 
@@ -303,8 +303,11 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     if [ "$log_ok" = false ]; then
         # Found NPU jobs but ALL logs expired/unavailable
         first_candidate=$(echo "$candidates" | grep -v '^$' | head -1)
+        first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
+        first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
-        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) |"
+        first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
+        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
         STAT_ERROR=$((STAT_ERROR + 1))
         continue
     fi
@@ -329,10 +332,12 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     counter_ev="${counter_ev# ; }"
     counter_ev="${counter_ev% ; }"
 
+    job_link="[日志](${repo_job_url})"
+
     if [ "$repo_pypi" = true ] || [ "$repo_apt" = true ]; then
-        echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${repo_evidence:0:200} |"
+        echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${repo_evidence:0:300} $job_link |"
     else
-        echo "| $REPO | $repo_run | $repo_runner | ❌ | ❌ | 未用缓存: ${counter_ev:0:200} |"
+        echo "| $REPO | $repo_run | $repo_runner | ❌ | ❌ | 未用缓存: ${counter_ev:0:300} $job_link |"
         STAT_NO_CACHE=$((STAT_NO_CACHE + 1))
     fi
 
