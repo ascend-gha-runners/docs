@@ -100,7 +100,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     page=1
     max_pages=$(( (max_runs + PER_PAGE - 1) / PER_PAGE ))
 
-    while [ "$page" -le "$max_pages" ] && [ "$npu_found" = false ]; do
+    while [ "$page" -le "$max_pages" ]; do
         if [ -n "$WORKFLOW_FILTER" ]; then
             # Targeted: search only runs of the specified workflow
             runs_json=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=completed" 2>/dev/null) || true
