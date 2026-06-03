@@ -313,34 +313,43 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         continue
     fi
 
-    pypi_mark="❌"
-    apt_mark="❌"
-    if [ "$repo_pypi" = true ]; then
-        pypi_mark="✅"
-        STAT_PYPI=$((STAT_PYPI + 1))
-    fi
-    if [ "$repo_apt" = true ]; then
-        apt_mark="✅"
-        STAT_APT=$((STAT_APT + 1))
-    fi
-
-    repo_evidence="${ev_pypi}; ${ev_apt}"
-    repo_evidence="${repo_evidence# ; }"
-    repo_evidence="${repo_evidence% ; }"
-
-    # Build counter-evidence string (反面证据) for ❌ case
-    counter_ev="${counter_evidence_pypi}; ${counter_evidence_apt}"
-    counter_ev="${counter_ev# ; }"
-    counter_ev="${counter_ev% ; }"
-
     job_link="[日志](${repo_job_url})"
 
-    if [ "$repo_pypi" = true ] || [ "$repo_apt" = true ]; then
-        echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${repo_evidence:0:300} $job_link |"
-    else
-        echo "| $REPO | $repo_run | $repo_runner | ❌ | ❌ | 未用缓存: ${counter_ev:0:300} $job_link |"
+    # 每个缓存类型独立判断，区分三种状态：
+    #   ✅ 找到正面证据（确认使用了缓存）
+    #   ❌ 找到反面证据（发现使用了其他地址，确认未使用缓存）
+    #   ⚙️  无证据（日志中未出现相关输出，无法判断）
+
+    if [ "$repo_pypi" = true ]; then
+        pypi_mark="✅"
+        pypi_detail="${ev_pypi}"
+        STAT_PYPI=$((STAT_PYPI + 1))
+    elif [ -n "$counter_evidence_pypi" ]; then
+        pypi_mark="❌"
+        pypi_detail="反面证据: ${counter_evidence_pypi}"
         STAT_NO_CACHE=$((STAT_NO_CACHE + 1))
+    else
+        pypi_mark="⚙️"
+        pypi_detail="无证据(日志中未出现 pip index 相关输出)"
     fi
+
+    if [ "$repo_apt" = true ]; then
+        apt_mark="✅"
+        apt_detail="${ev_apt}"
+        STAT_APT=$((STAT_APT + 1))
+    elif [ -n "$counter_evidence_apt" ]; then
+        apt_mark="❌"
+        apt_detail="反面证据: ${counter_evidence_apt}"
+    else
+        apt_mark="⚙️"
+        apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
+    fi
+
+    evidence="${pypi_detail}; ${apt_detail}"
+    evidence="${evidence# ; }"
+    evidence="${evidence% ; }"
+
+    echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${evidence:0:400} $job_link |"
 
     rm -f "$LOG_DIR/${REPO//\//_}"*.log
 
