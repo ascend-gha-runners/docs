@@ -12,25 +12,27 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PYPI_CACHE_KEYWORD: ${{ vars.PYPI_CACHE_KEYWORD || 'cache-service.nginx-pypi-cache.svc.cluster.local' }}
-      APT_CACHE_PATTERN: ${{ vars.APT_CACHE_PATTERN || '(ports|archive|ubuntu)\.com.*:8081|Acquire::http::Proxy.*:8081' }}
+      GH_TOKEN: ${{ secrets.CACHE_AUDIT_TOKEN }}
+      PYPI_CACHE_HOST: ${{ vars.PYPI_CACHE_HOST || 'cache-service.nginx-pypi-cache.svc.cluster.local' }}
+      APT_CACHE_PORT: ${{ vars.APT_CACHE_PORT || '8081' }}
+      RUNNER_FILTER: ${{ vars.RUNNER_FILTER || 'linux-aarch64,self-hosted' }}
+      MAX_NPU_SEARCH: ${{ vars.MAX_NPU_SEARCH || '50' }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install jq
+      - name: Install dependencies
         run: sudo apt-get install -y jq
 
-      - name: Run cache audit
+      - name: Run log-based cache audit
         id: audit
         run: |
-          bash scripts/ci-audit/check_cache.sh scripts/ci-audit/repos.txt | tee audit_result.md
+          bash scripts/ci-audit/check_cache_from_logs.sh scripts/ci-audit/repos.txt | tee audit_result.md
 
       - name: Write job summary
         if: always()
         run: |
-          echo "## CI 缓存审计报告" >> $GITHUB_STEP_SUMMARY
+          echo "## CI 缓存审计报告（基于运行日志）" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "运行时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (CST)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
