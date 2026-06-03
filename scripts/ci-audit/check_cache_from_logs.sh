@@ -191,9 +191,10 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             continue
         fi
 
-        # Strip GitHub Actions log annotations and timestamps
+        # Strip GitHub Actions log annotations, timestamps, and ANSI color codes
         sed -i 's/##\[group\]//g; s/##\[endgroup\]//g; s/##\[error\]//g; s/##\[warning\]//g; s/##\[notice\]//g; s/##\[command\]//g' "$log_file" 2>/dev/null || true
         sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
+        sed -i 's/\x1b\[[0-9;]*m//g' "$log_file" 2>/dev/null || true
 
         # ---------- Search for PyPI cache evidence (正面 + 反面) ----------
         ev_pypi=""
