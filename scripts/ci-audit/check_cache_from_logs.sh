@@ -239,7 +239,9 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             fi
 
             if [ "$repo_pypi" = false ]; then
-                grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
+                # 排除 apt/sed 相关行，避免把 apt 配置命令误判为 pip 证据
+                grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null \
+                    | grep -viE "apt|sed|sources\.list|Get:|Hit:|Ign:" || true)
                 if [ -n "$grep_line" ]; then
                     repo_pypi=true
                     ev_pypi="pip-broad(配置): ${grep_line:0:200}"
