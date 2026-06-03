@@ -1,3 +1,5 @@
+# workflow 文件映射（格式：org/repo|workflow-file.yml）
+# 未在此列出的仓库会自动搜索所有 run
 sgl-project/sglang|pr-test-npu.yml
 vllm-project/vllm-ascend|pr_test_full.yaml
 modelscope/ms-swift|citest_npu.yaml
