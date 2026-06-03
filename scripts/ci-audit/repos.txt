@@ -1,6 +1,6 @@
-sgl-project/sglang
-vllm-project/vllm-ascend
-modelscope/ms-swift
-verl-project/verl
-hiyouga/LlamaFactory
-tile-ai/tilelang-ascend
+sgl-project/sglang|pr-test-npu.yml
+vllm-project/vllm-ascend|schedule_nightly_test_a2.yaml
+modelscope/ms-swift|citest_npu.yaml
+verl-project/verl|e2e_ascend.yml
+hiyouga/LlamaFactory|tests_npu.yml
+tile-ai/tilelang-ascend|ci_npuir.yml
