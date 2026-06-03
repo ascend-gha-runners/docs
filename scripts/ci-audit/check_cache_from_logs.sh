@@ -102,11 +102,9 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
     while [ "$page" -le "$max_pages" ]; do
         if [ -n "$WORKFLOW_FILTER" ]; then
-            # Targeted: search only runs of the specified workflow
-            runs_json=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=completed" 2>/dev/null) || true
+            runs_json=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page" 2>/dev/null) || true
         else
-            # Auto: search all completed runs
-            runs_json=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=completed" 2>/dev/null) || true
+            runs_json=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page" 2>/dev/null) || true
         fi
 
         if [ -z "$runs_json" ]; then
@@ -134,7 +132,11 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
             filtered=$(echo "$jobs_json" | jq -r "
                 .jobs[]
-                | select(.labels | any(test(\"$RUNNER_REGEX\")))
+                | select(
+                    (.labels | any(test(\"$RUNNER_REGEX\"))) and
+                    .conclusion != \"skipped\" and
+                    .status == \"completed\"
+                )
                 | [\"$run_id\", \"$run_branch\", \"$run_name\", .id, .name, (.labels | join(\",\"))] | join(\"|\")
             " 2>/dev/null) || true
 
