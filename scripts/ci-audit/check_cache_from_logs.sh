@@ -42,7 +42,7 @@ fi
 PYPI_CACHE_HOST="${PYPI_CACHE_HOST:-cache-service.nginx-pypi-cache.svc.cluster.local}"
 APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
-RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,self-hosted}"
+RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-100}"
 PER_PAGE="${PER_PAGE:-30}"
 
@@ -100,14 +100,18 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     page=1
     max_pages=$(( (max_runs + PER_PAGE - 1) / PER_PAGE ))
 
-    while [ "$page" -le "$max_pages" ] && [ "$npu_found" = false ]; do
+    while [ "$page" -le "$max_pages" ]; do
         if [ -n "$WORKFLOW_FILTER" ]; then
-            # Targeted: search only runs of the specified workflow
-            runs_json=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=completed" 2>/dev/null) || true
+            runs_success=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
+            runs_failure=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
         else
-            # Auto: search all completed runs
-            runs_json=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=completed" 2>/dev/null) || true
+            runs_success=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
+            runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
         fi
+        # 合并两次结果，按 run id 降序排列（新的优先）
+        runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
+            {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
+        ' 2>/dev/null) || true
 
         if [ -z "$runs_json" ]; then
             break
@@ -134,7 +138,11 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
             filtered=$(echo "$jobs_json" | jq -r "
                 .jobs[]
-                | select(.labels | any(test(\"$RUNNER_REGEX\")))
+                | select(
+                    (.labels | any(test(\"$RUNNER_REGEX\"))) and
+                    .conclusion != \"skipped\" and
+                    .status == \"completed\"
+                )
                 | [\"$run_id\", \"$run_branch\", \"$run_name\", .id, .name, (.labels | join(\",\"))] | join(\"|\")
             " 2>/dev/null) || true
 
@@ -198,7 +206,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
         # Pre-check: skip jobs with no package installation activity at all
         # (e.g. docs-check, lint-only jobs that use pre-built images)
-        if ! grep -qiE "pip install|pip config|apt-get|apt install|uv install|uv pip|dnf install|yum install|rustup|cargo" "$log_file" 2>/dev/null; then
+        if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install" "$log_file" 2>/dev/null; then
             rm -f "$log_file"
             continue
         fi
