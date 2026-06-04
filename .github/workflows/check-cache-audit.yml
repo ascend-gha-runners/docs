@@ -3,10 +3,10 @@ name: CI Cache Audit
 on:
   schedule:
     - cron: "24 2 * * *" # 每天 10:24 北京时间 (UTC+8)
-  workflow_dispatch: # 支持手动触发
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   audit:
@@ -20,18 +20,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CACHE_AUDIT_TOKEN }}
 
       - name: Install dependencies
         run: sudo apt-get install -y jq
 
       - name: Generate repos list from Repo.md
         run: |
-          # 从 Repo.md 提取所有 org/repo
           REPOS=$(grep -oE '\[([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\]\(https://github\.com/' docs/Repo.md \
             | grep -oE '[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+')
 
-          # repos.txt 作为 workflow 文件映射（格式：org/repo|workflow-file.yml）
-          # 有映射的用指定 workflow 文件，没有映射的用自动搜索模式
           > /tmp/audit_repos.txt
           while IFS= read -r REPO; do
             MAPPING=$(grep "^${REPO}|" scripts/ci-audit/repos.txt 2>/dev/null || true)
@@ -49,6 +48,25 @@ jobs:
         id: audit
         run: |
           bash scripts/ci-audit/check_cache_from_logs.sh /tmp/audit_repos.txt | tee audit_result.md
+
+      - name: Update Repo.md with audit results
+        run: |
+          python3 scripts/ci-audit/update_repo_md.py \
+            audit_result.md \
+            scripts/ci-audit/repos.txt \
+            docs/Repo.md
+
+      - name: Commit updated Repo.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/Repo.md
+          if git diff --cached --quiet; then
+            echo "No changes to Repo.md"
+          else
+            git commit -m "docs: update cache audit status in Repo.md [skip ci]"
+            git push
+          fi
 
       - name: Write job summary
         if: always()
