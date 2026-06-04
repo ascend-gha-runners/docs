@@ -9,9 +9,9 @@
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | ✅ | ✅ | 2026-06-04 |
 | [Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI) | ❌ | ❌ | 2026-06-04 |
 | [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | 2026-06-04 |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ❌ | ✅ | 2026-06-04 |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | 2026-06-04 |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | 2026-06-04 |
-| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | 2026-06-04 |
+| [volcengine/verl](https://github.com/volcengine/verl) | ❌ | ✅ | 2026-06-04 |
 | [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | 2026-06-04 |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ❌ | ✅ | 2026-06-04 |
 | [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | 2026-06-04 |
