@@ -64,7 +64,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to Repo.md"
           else
-            git commit -m "docs: update cache audit status in Repo.md [skip ci]"
+            git commit -m "docs: update cache audit status in Repo.md"
             git push "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
           fi
 
