@@ -3,7 +3,7 @@
 # 审计确认的 ✅ 或 ❌ 优先级高于默认值
 sgl-project/sglang|pr-test-npu.yml||
 vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅
-vllm-project/vllm-omni||✅|✅
+vllm-project/vllm-omni||||
 Ascend/Ascend-CI||||
 pytorch-fdn/accelerator-integration-wg||||
 sgl-project/sgl-kernel-npu||✅|✅
