@@ -11,11 +11,11 @@
 | [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | 2026-06-05 |
 | [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | 2026-06-05 |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | 2026-06-05 |
-| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | 2026-06-05 |
+| [volcengine/verl](https://github.com/volcengine/verl) | ❌ | ✅ | 2026-06-05 |
 | [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | 2026-06-05 |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ❌ | ✅ | 2026-06-05 |
 | [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | 2026-06-05 |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ❌ | - | 2026-06-05 |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | - | 2026-06-05 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
 > Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
