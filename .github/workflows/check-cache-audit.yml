@@ -54,7 +54,8 @@ jobs:
           python3 scripts/ci-audit/update_repo_md.py \
             audit_result.md \
             scripts/ci-audit/repos.txt \
-            docs/Repo.md
+            docs/Repo.md \
+            "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Commit updated Repo.md
         run: |

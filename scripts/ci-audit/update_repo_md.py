@@ -3,7 +3,7 @@
 从审计结果更新 docs/Repo.md 中的缓存状态表格。
 
 用法：
-  python3 update_repo_md.py <audit_result.md> <repos.txt> <docs/Repo.md>
+  python3 update_repo_md.py <audit_result.md> <repos.txt> <docs/Repo.md> [run_url]
 """
 
 import re
@@ -13,6 +13,7 @@ from datetime import datetime, timezone, timedelta
 AUDIT_FILE = sys.argv[1]
 REPOS_FILE = sys.argv[2]
 REPO_MD    = sys.argv[3]
+RUN_URL    = sys.argv[4] if len(sys.argv) > 4 else None
 
 CST = timezone(timedelta(hours=8))
 TODAY = datetime.now(CST).strftime("%Y-%m-%d")
@@ -126,6 +127,14 @@ for repo in repos_ordered:
 
 new_table = "\n".join([TABLE_START] + rows + [TABLE_END])
 
+# 构建注释行
+if RUN_URL:
+    footer = f"> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · [Latest audit run]({RUN_URL})"
+else:
+    footer = "> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown"
+
+FOOTER_RE = re.compile(r'^> Cache audit runs daily\..*$', re.MULTILINE)
+
 # ---------- 替换 Repo.md 中的表格区域 ----------
 if TABLE_START in content and TABLE_END in content:
     new_content = re.sub(
@@ -135,8 +144,13 @@ if TABLE_START in content and TABLE_END in content:
         flags=re.DOTALL
     )
 else:
-    # 第一次运行，把整个内容替换成带表格的版本
     new_content = content.rstrip() + "\n\n" + new_table + "\n"
+
+# 替换或添加 footer
+if FOOTER_RE.search(new_content):
+    new_content = FOOTER_RE.sub(footer, new_content)
+else:
+    new_content = new_content.rstrip() + "\n\n" + footer + "\n"
 
 with open(REPO_MD, "w") as f:
     f.write(new_content)
