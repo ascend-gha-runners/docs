@@ -13,9 +13,10 @@
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | 2026-06-08 |
 | [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | 2026-06-08 |
 | [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | 2026-06-08 |
-| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ❌ | ✅ | 2026-06-08 |
+| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | 2026-06-08 |
 | [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | 2026-06-08 |
 | [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | - | 2026-06-08 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · [Latest audit run](https://github.com/ascend-gha-runners/docs/actions/runs/27121641803)
+> 缓存状态每日自动审计更新。若对结果有疑问，可查看 [最新审计日志](https://github.com/ascend-gha-runners/docs/actions/runs/27124041452) 了解详情。
+> ✅ = 已确认接入 · ❌ = 已确认未接入 · - = 暂无数据
