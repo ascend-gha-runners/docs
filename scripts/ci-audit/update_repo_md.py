@@ -129,11 +129,11 @@ new_table = "\n".join([TABLE_START] + rows + [TABLE_END])
 
 # 构建注释行
 if RUN_URL:
-    footer = f"> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · [Latest audit run]({RUN_URL})"
+    footer = f"> 缓存状态每日自动审计更新。若对结果有疑问，可查看 [最新审计日志]({RUN_URL}) 了解详情。\n> ✅ = 已确认接入 · ❌ = 已确认未接入 · - = 暂无数据"
 else:
-    footer = "> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown"
+    footer = "> 缓存状态每日自动审计更新。\n> ✅ = 已确认接入 · ❌ = 已确认未接入 · - = 暂无数据"
 
-FOOTER_RE = re.compile(r'^> Cache audit runs daily\..*$', re.MULTILINE)
+FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新)\..*$', re.MULTILINE)
 
 # ---------- 替换 Repo.md 中的表格区域 ----------
 if TABLE_START in content and TABLE_END in content:
