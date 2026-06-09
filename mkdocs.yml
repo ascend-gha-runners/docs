@@ -57,3 +57,5 @@ nav:
     - user-manual-buildkite-zh.md
   - Integrated repo:
     - Repo.md
+  - Features:
+    - feature.md
