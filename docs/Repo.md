@@ -5,20 +5,20 @@
 <!-- CACHE_AUDIT_TABLE_START -->
 | Repository | PyPI Cache | APT Cache | Last Checked |
 | :--- | :---: | :---: | :--- |
-| [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | 2026-06-11 |
-| [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | 2026-06-11 |
-| [Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI) | ❌ | ❌ | 2026-06-11 |
-| [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | 2026-06-11 |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | 2026-06-11 |
-| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | 2026-06-11 |
-| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | 2026-06-11 |
-| [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | 2026-06-11 |
-| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ❌ | ✅ | 2026-06-11 |
-| [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | 2026-06-11 |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | - | 2026-06-11 |
+| [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | 2026-06-12 |
+| [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | 2026-06-12 |
+| [Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI) | ❌ | ❌ | 2026-06-12 |
+| [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | 2026-06-12 |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | 2026-06-12 |
+| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | 2026-06-12 |
+| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | 2026-06-12 |
+| [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | 2026-06-12 |
+| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ❌ | ✅ | 2026-06-12 |
+| [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | 2026-06-12 |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | - | 2026-06-12 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
 > 缓存状态每日自动审计更新。若对结果有疑问，可查看 [最新审计日志](https://github.com/ascend-gha-runners/docs/actions/runs/27124041452) 了解详情。
 > ✅ = 已确认接入 · ❌ = 已确认未接入 · - = 暂无数据
 
-> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/27330261206](https://github.com/ascend-gha-runners/docs/actions/runs/27330261206)
+> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/27400041234](https://github.com/ascend-gha-runners/docs/actions/runs/27400041234)
