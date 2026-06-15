@@ -55,5 +55,9 @@ nav:
     - user-manual-buildkite-en.md
   - Buildkite Guide Zh:
     - user-manual-buildkite-zh.md
+  - Package Cache Guide En:
+    - user-manual-cache-en.md
+  - Package Cache Guide Zh:
+    - user-manual-cache-zh.md
   - Integrated repo:
     - Repo.md
