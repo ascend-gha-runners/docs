@@ -1,14 +1,14 @@
-# org/repo|workflow-file.yml|pypi_default|apt_default
+# org/repo|workflow-file.yml|pypi_default|apt_default|ccache_default|uv_default
 # 默认值仅在审计无法确认时使用（⚙️/🔍/⚠️）
 # 审计确认的 ✅ 或 ❌ 优先级高于默认值
-sgl-project/sglang|pr-test-npu.yml||
-vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅
-vllm-project/vllm-omni||||
-Ascend/Ascend-CI||||
-pytorch-fdn/accelerator-integration-wg||||
-sgl-project/sgl-kernel-npu||✅|✅
-volcengine/verl|e2e_ascend.yml|✅|✅
-hiyouga/LLaMA-Factory|tests_npu.yml||
-modelscope/ms-swift|citest_npu.yaml||
-tile-ai/tilelang-ascend|ci_npuir.yml||
-triton-lang/triton-ascend||||
+sgl-project/sglang|pr-test-npu.yml||||
+vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅||
+vllm-project/vllm-omni||||||
+Ascend/Ascend-CI||||||
+pytorch-fdn/accelerator-integration-wg||||||
+sgl-project/sgl-kernel-npu||✅|✅||
+volcengine/verl|e2e_ascend.yml|✅|✅||
+hiyouga/LLaMA-Factory|tests_npu.yml||||
+modelscope/ms-swift|citest_npu.yaml||||
+tile-ai/tilelang-ascend|ci_npuir.yml||||
+triton-lang/triton-ascend|||✅||
