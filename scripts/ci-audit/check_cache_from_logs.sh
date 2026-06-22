@@ -20,6 +20,7 @@ set -euo pipefail
 #   MAX_NPU_SEARCH   — 自动模式最多搜多少个 run，默认 100
 #   PYPI_CACHE_HOST  — PyPI 缓存主机名
 #   APT_CACHE_PORT   — APT 缓存端口
+#   CCACHE_KEYWORD   — ccache 检测关键词（默认 "ccache"）
 # ==============================================================================
 
 if ! command -v jq &>/dev/null; then
@@ -42,6 +43,7 @@ fi
 PYPI_CACHE_HOST="${PYPI_CACHE_HOST:-cache-service.nginx-pypi-cache.svc.cluster.local}"
 APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
+CCACHE_KEYWORD="${CCACHE_KEYWORD:-ccache}"
 RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-100}"
 PER_PAGE="${PER_PAGE:-30}"
@@ -61,19 +63,22 @@ mkdir -p "$LOG_DIR"
 echo "Log-based Cache Audit Configuration:"
 echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
+echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
 echo " - Max NPU Search:   $MAX_NPU_SEARCH runs"
 echo "------------------------------------------------------------------"
 
 STAT_PYPI=0
 STAT_APT=0
+STAT_CCACHE=0
+STAT_UV=0
 STAT_NO_CACHE=0
 STAT_NO_NPU=0
 STAT_ERROR=0
 TOTAL=0
 
-echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | 证据 (Evidence) |"
-echo "| :--- | :--- | :--- | :---: | :---: | :--- |"
+echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 (Evidence) |"
+echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |"
 
 while IFS= read -r LINE || [ -n "$LINE" ]; do
     [[ -z "$LINE" || "$LINE" =~ ^[[:space:]]*# ]] && continue
@@ -160,6 +165,8 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     # ==================================================================
     repo_pypi=false
     repo_apt=false
+    repo_ccache=false
+    repo_uv=false
     repo_evidence=""
     repo_run=""
     repo_runner=""
@@ -167,10 +174,10 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
     if [ "$npu_found" = false ]; then
         if [ "$runs_scanned" -gt 0 ]; then
-            echo "| $REPO | (scanned $runs_scanned runs) | - | 🔍 | 🔍 | No NPU runner jobs found in last $runs_scanned runs |"
+            echo "| $REPO | (scanned $runs_scanned runs) | - | 🔍 | 🔍 | 🔍 | 🔍 | No NPU runner jobs found in last $runs_scanned runs |"
             STAT_NO_NPU=$((STAT_NO_NPU + 1))
         else
-            echo "| $REPO | - | - | ⚠️ | ⚠️ | No completed runs / no access |"
+            echo "| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | No completed runs / no access |"
             STAT_ERROR=$((STAT_ERROR + 1))
         fi
         continue
@@ -206,7 +213,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
 
         # Pre-check: skip jobs with no package installation activity at all
         # (e.g. docs-check, lint-only jobs that use pre-built images)
-        if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install" "$log_file" 2>/dev/null; then
+        if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake" "$log_file" 2>/dev/null; then
             rm -f "$log_file"
             continue
         fi
@@ -313,6 +320,75 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             fi
         fi
 
+        # ---------- Search for CCache evidence (正面 + 反面) ----------
+        ev_ccache=""
+        counter_evidence_ccache=""
+
+        # 最强证据：ccache --print-stats 或 --show-stats 输出，说明本次构建实际使用了 ccache
+        grep_line=$(grep -m1 -iE "cache hit|cache miss|Cache hit|Cache miss|cache_hit|cache_miss|cachehit|cachemiss" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_ccache=true
+            ev_ccache="ccache统计(运行时): ${grep_line:0:200}"
+        fi
+
+        # 次强证据：TRITON_BUILD_WITH_CCACHE 或 CMAKE_C_COMPILER_LAUNCHER=ccache 出现在日志里
+        if [ "$repo_ccache" = false ]; then
+            grep_line=$(grep -m1 -iE "TRITON_BUILD_WITH_CCACHE|CMAKE_C_COMPILER_LAUNCHER.*ccache|CMAKE_CXX_COMPILER_LAUNCHER.*ccache|CC=ccache|CXX=ccache" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                repo_ccache=true
+                ev_ccache="ccache-cmake(配置): ${grep_line:0:200}"
+            fi
+        fi
+
+        # 弱证据：CCACHE_* 环境变量或 ccache --zero-stats 出现（说明 workflow 配置了 ccache）
+        if [ "$repo_ccache" = false ]; then
+            grep_line=$(grep -m1 -iE "CCACHE_COMPRESS|CCACHE_DIR|ccache --zero-stats|ccache -z" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                repo_ccache=true
+                ev_ccache="ccache-env(配置): ${grep_line:0:200}"
+            fi
+        fi
+
+        # 宽泛匹配：日志中出现 ccache 字样（排除注释和纯路径行）
+        if [ "$repo_ccache" = false ]; then
+            grep_line=$(grep -m1 -iE "(^|[^a-z])ccache([^a-z]|$)" "$log_file" 2>/dev/null \
+                | grep -viE "^\s*#|/usr/share/doc" || true)
+            if [ -n "$grep_line" ]; then
+                repo_ccache=true
+                ev_ccache="ccache-broad: ${grep_line:0:200}"
+            fi
+        fi
+
+        # 反面证据：ccache 不适用，有没有用只能从正面证据判断
+
+        # ---------- Search for uv evidence ----------
+        ev_uv=""
+
+        # 最强证据：uv 实际执行安装命令
+        grep_line=$(grep -m1 -iE "^\s*uv (pip |sync|install|add|run pip)" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_uv=true
+            ev_uv="uv-cmd(运行时): ${grep_line:0:200}"
+        fi
+
+        # 次强证据：uv pip install / uv sync 出现在日志（非行首，可能是 shell 展开后的输出）
+        if [ "$repo_uv" = false ]; then
+            grep_line=$(grep -m1 -iE "uv pip install|uv sync|uv install|Resolved .* packages|Prepared .* packages|Installed .* packages" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                repo_uv=true
+                ev_uv="uv-output(运行时): ${grep_line:0:200}"
+            fi
+        fi
+
+        # 弱证据：UV_* 环境变量或 uv 工具安装步骤出现
+        if [ "$repo_uv" = false ]; then
+            grep_line=$(grep -m1 -iE "UV_INDEX_URL|UV_DEFAULT_INDEX|UV_CACHE_DIR|pip install uv|pipx install uv|curl.*uv.*install|astral-sh/uv" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                repo_uv=true
+                ev_uv="uv-setup(配置): ${grep_line:0:200}"
+            fi
+        fi
+
         rm -f "$log_file"
 
         # Got a usable log — record which job it came from
@@ -332,7 +408,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
         first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
-        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
+        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
         STAT_ERROR=$((STAT_ERROR + 1))
         continue
     fi
@@ -369,11 +445,29 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
     fi
 
-    evidence="${pypi_detail}; ${apt_detail}"
+    if [ "$repo_ccache" = true ]; then
+        ccache_mark="✅"
+        ccache_detail="${ev_ccache}"
+        STAT_CCACHE=$((STAT_CCACHE + 1))
+    else
+        ccache_mark="⚙️"
+        ccache_detail="无证据(日志中未出现 ccache 相关输出)"
+    fi
+
+    if [ "$repo_uv" = true ]; then
+        uv_mark="✅"
+        uv_detail="${ev_uv}"
+        STAT_UV=$((STAT_UV + 1))
+    else
+        uv_mark="⚙️"
+        uv_detail="无证据(日志中未出现 uv 相关输出)"
+    fi
+
+    evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
     evidence="${evidence# ; }"
     evidence="${evidence% ; }"
 
-    echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | ${evidence:0:400} $job_link |"
+    echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | ${evidence:0:400} $job_link |"
 
     rm -f "$LOG_DIR/${REPO//\//_}"*.log
 
@@ -388,6 +482,8 @@ echo ""
 echo "- Total repos checked: **$TOTAL**"
 echo "- PyPI cache hit: **$STAT_PYPI** / $TOTAL"
 echo "- APT cache hit: **$STAT_APT** / $TOTAL"
+echo "- CCache hit: **$STAT_CCACHE** / $TOTAL"
+echo "- uv hit: **$STAT_UV** / $TOTAL"
 echo "- NPU job found but no cache (❌): **$STAT_NO_CACHE** — need cache config"
 echo "- No NPU runner jobs found (🔍): **$STAT_NO_NPU** — repos don't use our NPU runners"
 echo "- Logs expired / unavailable (⚠️): **$STAT_ERROR**"

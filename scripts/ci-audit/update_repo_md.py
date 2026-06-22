@@ -33,7 +33,7 @@ INTRANET_PATTERNS = [
 INTRANET_RE = re.compile('|'.join(INTRANET_PATTERNS))
 
 # ---------- 读取 repos.txt 默认值 ----------
-defaults = {}  # repo -> (pypi_default, apt_default)
+defaults = {}  # repo -> (pypi_default, apt_default, ccache_default)
 workflow_map = {}  # repo -> workflow_file (unused here, for reference)
 
 with open(REPOS_FILE) as f:
@@ -42,16 +42,18 @@ with open(REPOS_FILE) as f:
         if not line or line.startswith("#"):
             continue
         parts = line.split("|")
-        repo = parts[0].strip()
-        wf   = parts[1].strip() if len(parts) > 1 else ""
-        pypi = parts[2].strip() if len(parts) > 2 else ""
-        apt  = parts[3].strip() if len(parts) > 3 else ""
+        repo    = parts[0].strip()
+        wf      = parts[1].strip() if len(parts) > 1 else ""
+        pypi    = parts[2].strip() if len(parts) > 2 else ""
+        apt     = parts[3].strip() if len(parts) > 3 else ""
+        ccache  = parts[4].strip() if len(parts) > 4 else ""
+        uv      = parts[5].strip() if len(parts) > 5 else ""
         workflow_map[repo] = wf
-        defaults[repo] = (pypi or None, apt or None)
+        defaults[repo] = (pypi or None, apt or None, ccache or None, uv or None)
 
 # ---------- 解析审计结果 ----------
-# 格式：| repo | run | runner | PyPI 缓存 | APT 缓存 | 证据 |
-audit_results = {}  # repo -> (pypi, apt)
+# 格式：| repo | run | runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 |
+audit_results = {}  # repo -> (pypi, apt, ccache, uv)
 
 UNDECIDED = {"⚙️", "⚠️", "🔍"}
 
@@ -60,11 +62,13 @@ with open(AUDIT_FILE) as f:
         if not line.startswith("| "):
             continue
         cols = [c.strip() for c in line.split("|")]
-        if len(cols) < 7:
+        if len(cols) < 9:
             continue
-        repo_col = cols[1]
-        pypi_col = cols[4]
-        apt_col  = cols[5]
+        repo_col   = cols[1]
+        pypi_col   = cols[4]
+        apt_col    = cols[5]
+        ccache_col = cols[6]
+        uv_col     = cols[7]
 
         # 提取 org/repo（去掉 markdown 链接格式）
         m = re.search(r'([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)', repo_col)
@@ -72,7 +76,7 @@ with open(AUDIT_FILE) as f:
             continue
         repo = m.group(1)
 
-        evidence_col = cols[6] if len(cols) > 6 else ""
+        evidence_col = cols[8] if len(cols) > 8 else ""
 
         def resolve(val, evidence, default):
             if val == "✅":
@@ -85,9 +89,17 @@ with open(AUDIT_FILE) as f:
             # ⚙️/⚠️/🔍 不确定，用默认值
             return default  # None = 不知道
 
-        pypi = resolve(pypi_col, evidence_col, defaults.get(repo, (None, None))[0])
-        apt  = resolve(apt_col,  evidence_col, defaults.get(repo, (None, None))[1])
-        audit_results[repo] = (pypi, apt)
+        def resolve_simple(val, default):
+            # 只有正面证据，⚙️/⚠️/🔍 均视为无数据
+            if val == "✅":
+                return "✅"
+            return default  # None = 不知道
+
+        pypi   = resolve(pypi_col, evidence_col, defaults.get(repo, (None, None, None, None))[0])
+        apt    = resolve(apt_col,  evidence_col, defaults.get(repo, (None, None, None, None))[1])
+        ccache = resolve_simple(ccache_col, defaults.get(repo, (None, None, None, None))[2])
+        uv     = resolve_simple(uv_col,     defaults.get(repo, (None, None, None, None))[3])
+        audit_results[repo] = (pypi, apt, ccache, uv)
 
 # ---------- 读取 Repo.md，提取仓库顺序 ----------
 with open(REPO_MD) as f:
@@ -110,19 +122,19 @@ def fmt(val):
     return val
 
 rows = []
-rows.append("| Repository | PyPI Cache | APT Cache | Last Checked |")
-rows.append("| :--- | :---: | :---: | :--- |")
+rows.append("| Repository | PyPI Cache | APT Cache | CCache | uv | Last Checked |")
+rows.append("| :--- | :---: | :---: | :---: | :---: | :--- |")
 
 for repo in repos_ordered:
-    pypi, apt = audit_results.get(repo, (None, None))
-    # 如果审计没拿到值，用默认值
-    if pypi is None:
-        pypi = defaults.get(repo, (None, None))[0]
-    if apt is None:
-        apt = defaults.get(repo, (None, None))[1]
+    pypi, apt, ccache, uv = audit_results.get(repo, (None, None, None, None))
+    defs = defaults.get(repo, (None, None, None, None))
+    if pypi   is None: pypi   = defs[0]
+    if apt    is None: apt    = defs[1]
+    if ccache is None: ccache = defs[2]
+    if uv     is None: uv     = defs[3]
     rows.append(
         f"| [{repo}](https://github.com/{repo}) "
-        f"| {fmt(pypi)} | {fmt(apt)} | {TODAY} |"
+        f"| {fmt(pypi)} | {fmt(apt)} | {fmt(ccache)} | {fmt(uv)} | {TODAY} |"
     )
 
 new_table = "\n".join([TABLE_START] + rows + [TABLE_END])
@@ -133,7 +145,7 @@ if RUN_URL:
 else:
     footer = "> 缓存状态每日自动审计更新。\n> ✅ = 已确认接入 · ❌ = 已确认未接入 · - = 暂无数据"
 
-FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新)\..*$', re.MULTILINE)
+FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新)[.。].*$', re.MULTILINE)
 
 # ---------- 替换 Repo.md 中的表格区域 ----------
 if TABLE_START in content and TABLE_END in content:
