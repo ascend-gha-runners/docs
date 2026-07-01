@@ -8,6 +8,8 @@ If your organization would like to use GitHub Actions runners, configure your or
 
 If your organization would like to use Buildkite CI with Ascend NPU, follow the [Buildkite CI Integration Guide](./user-manual-buildkite-en.md).
 
+To speed up your CI by caching PyPI, APT, yum/dnf and rustup packages inside the cluster, see the [Package Cache Guide](./user-manual-cache-en.md).
+
 If you encounter any issues while using the documentation, please submit an [issue](https://github.com/ascend-gha-runners/docs/issues).
 
 # Future Plans
