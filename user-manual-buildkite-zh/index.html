@@ -1,0 +1,2011 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/user-manual-buildkite-zh/">
+      
+      
+        <link rel="prev" href="../user-manual-buildkite-en/">
+      
+      
+        <link rel="next" href="../Repo/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Buildkite CI 接入昇腾算力指导 - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#buildkite-ci" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Buildkite CI 接入昇腾算力指导
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-gha-en/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-gha-zh/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-buildkite-en/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Repo/" class="md-tabs__link">
+          
+  
+  
+  Integrated repo
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../feature/" class="md-tabs__link">
+          
+  
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        接入全景图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        接入流程图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        详细步骤
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="详细步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-buildkite-agent-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：生成 Buildkite Agent Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：创建 Queue（队列）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-buildkite-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：在 Buildkite 官网创建 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：配置 Webhook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-pipeline-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：编写 Pipeline YAML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 6：验证接入完成
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        常见问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        反馈与支持
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated repo
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrated repo
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated Repositories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        接入全景图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        接入流程图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        详细步骤
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="详细步骤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-buildkite-agent-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 1：生成 Buildkite Agent Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 2：创建 Queue（队列）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-buildkite-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 3：在 Buildkite 官网创建 Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-webhook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 4：配置 Webhook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-pipeline-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 5：编写 Pipeline YAML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        步骤 6：验证接入完成
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        常见问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        反馈与支持
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/user-manual-buildkite-zh.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/user-manual-buildkite-zh.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="buildkite-ci">Buildkite CI 接入昇腾算力指导<a class="headerlink" href="#buildkite-ci" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>本文档面向开源社区管理员，指导你如何将项目接入 Buildkite CI 系统，使用昇腾（Ascend）NPU 算力运行 CI 任务。</p>
+</blockquote>
+<h2 id="_1">接入全景图<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<pre><code>┌────────────────────────────────────────────────────────────────────────────────┐
+│                             你的项目仓库 (GitHub)                              │
+│ https://github.com/&lt;org&gt;/&lt;repo&gt;                                                │
+│ .buildkite/pipeline.yaml                                                       │
+└────────────────────────┬───────────────────────────────────────────────────────┘
+                         │ Webhook 触发
+                         ▼
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                        Buildkite Cloud (buildkite.com)                         │
+│   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
+│   │  Pipeline   │───▶│   Queue     │───▶│   Agent     │───▶│    Job      │     │
+│   │  定义流程   │───▶│  任务队列   │───▶│  执行器     │───▶│  运行任务   │     │
+│   └─────────────┘    └─────────────┘    └──────┬──────┘    └─────────────┘     │
+└────────────────────────────────────────────────┼───────────────────────────────┘
+                                                 │ Token 注册
+                                                 ▼
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                            基础设施 Kubernetes 集群                            │
+│   ┌─────────────────────┐              ┌─────────────────────┐                 │
+│   │ CN12-001 集群       │              │  HK-001 集群        │                 │
+│   │  Ascend 910A3       │              │  Ascend 910A2B3     │                 │
+│   │  queue: ascend-a3   │              │ queue: ascend-a2b3  │                 │
+│   └─────────────────────┘              └─────────────────────┘                 │
+└────────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h2 id="_2">接入流程图<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre><code>                       开始
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 1: 生成 Buildkite Agent Token                    │
+│ 你：在 Buildkite 官网创建 Token                       │
+│ 我们：提供 Token 接收渠道                             │
+│ 验收：Token 已安全传递给基础设施团队                  │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 2: 创建 Queue（队列）                            │
+│ 你：告知组织创建者需要创建队列                        │
+│ 我们：提供队列名称规范，在集群部署 Agent              │
+│ 验收：Buildkite 官网 Queue 显示绿色 Connected         │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 3: 在 Buildkite 官网创建 Pipeline                │
+│ 你：在 Buildkite 官网创建 Pipeline，关联 GitHub 仓库  │
+│ 我们：提供 Pipeline 创建指引                          │
+│ 验收：Pipeline 已创建，关联到正确的仓库               │
+│      设置名称、默认分支、Pipeline 脚本文件路径等      │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 4: 配置 Webhook                                  │
+│ 你：在 Buildkite 官网获取 Webhook URL                 │
+│ 我们：提供 Webhook 配置指引                           │
+│ 验收：向仓库推送代码，能触发 Pipeline                 │
+│      在 GitHub 仓库 Settings 中配置 Webhook           │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 5: 编写 Pipeline YAML                            │
+│ 你：参考模板编写 .buildkite/pipeline.yaml             │
+│ 我们：提供模板和字段说明                              │
+│ 验收：Pipeline 语法正确，能在官网正常解析             │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ 步骤 6: 验证接入                                      │
+│ 你：提交代码，观察 Pipeline 运行状态                  │
+│ 我们：协助排查问题                                    │
+│ 验收：Job 在昇腾 NPU 上成功执行                       │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+                     完成接入
+</code></pre>
+<h2 id="_3">详细步骤<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="1-buildkite-agent-token">步骤 1：生成 Buildkite Agent Token<a class="headerlink" href="#1-buildkite-agent-token" title="Permanent link">&para;</a></h3>
+<p><strong>目标</strong>：创建一个 Token，让基础设施团队的 Agent 能够连接到你的 Buildkite 组织。</p>
+<p>你需要做什么：</p>
+<ol>
+<li><strong>确认你有权限</strong>：你需要是 Buildkite 组织的 <strong>管理员（Admin）</strong> 或 <strong>组织创建者</strong>。</li>
+<li>如果你不是管理员，请联系你项目的 Buildkite 组织创建者。</li>
+<li>
+<p>查看方式：登录 <a href="https://buildkite.com">buildkite.com</a>，进入你的组织，点击 <strong>Settings</strong> → <strong>Members</strong>，查看谁有 Admin 角色。
+  <img alt="生成 Agent Token" src="../assets/user-manual-zh/image-29.png" /></p>
+</li>
+<li>
+<p><strong>生成 Agent Token</strong>：</p>
+</li>
+<li>登录 <a href="https://buildkite.com">buildkite.com</a></li>
+<li>进入你的组织 → <strong>Agents</strong> → <strong>Agent tokens</strong></li>
+<li>点击 <strong>New Agent Token</strong></li>
+<li>填写描述，命名格式：<code>&lt;项目名&gt;_&lt;集群名&gt;</code><ul>
+<li>示例：<code>vllm_omni_cn12_001</code>、<code>vllm_omni_hk001</code></li>
+</ul>
+</li>
+<li>点击 <strong>Create Token</strong></li>
+<li><strong>立即复制保存 Token</strong>（Token 只显示一次，关闭后无法再次查看）
+  <img alt="生成 Agent Token" src="../assets/user-manual-zh/image-25.png" />
+  <img alt="生成 Agent Token" src="../assets/user-manual-zh/image-26.png" /></li>
+</ol>
+<p>怎么把 Token 发给我们：</p>
+<p>考虑到 Token 保密需求，申请方式是向 <code>ascendinfra@huawei.com</code> 发送邮件。</p>
+<p>怎么验证这步完成：</p>
+<ul>
+<li>你已将 Token 安全传递给基础设施团队。</li>
+<li>基础设施团队确认收到 Token。</li>
+</ul>
+<hr />
+<h3 id="2-queue">步骤 2：创建 Queue（队列）<a class="headerlink" href="#2-queue" title="Permanent link">&para;</a></h3>
+<p><strong>目标</strong>：创建一个队列，用于将 CI 任务路由到昇腾 NPU 集群执行。</p>
+<p>队列名称规范：</p>
+<table>
+<thead>
+<tr>
+<th>集群</th>
+<th>NPU 型号</th>
+<th>队列名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CN12-001</td>
+<td>Ascend 910A3</td>
+<td><code>ascend-a3</code></td>
+</tr>
+<tr>
+<td>HK-001</td>
+<td>Ascend 910A2B3</td>
+<td><code>ascend-a2b3</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>如果你的项目需要同时使用两个集群，需要创建两个 Token 和两个队列。</p>
+</blockquote>
+<p>你需要做什么：</p>
+<ol>
+<li>联系你的 Buildkite 组织创建者（管理员），请他在 Buildkite 官网创建队列：</li>
+<li>进入组织 → <strong>Queues</strong> → <strong>Create Queue</strong></li>
+<li>
+<p>队列名称必须使用基础设施团队提供的标准名称（如 <code>ascend-a3</code>）</p>
+</li>
+<li>
+<p>将以下信息告知基础设施团队：</p>
+</li>
+<li>项目名称</li>
+<li>Git 仓库地址</li>
+<li>步骤 1 中生成的 Token</li>
+</ol>
+<p>我们做什么：</p>
+<ul>
+<li>基础设施团队收到信息后，会在对应的 Kubernetes 集群中部署 Buildkite Agent。</li>
+<li>Agent 会使用你提供的 Token 注册到 Buildkite，并监听指定队列的任务。</li>
+</ul>
+<p>怎么验证这步完成：</p>
+<ul>
+<li>登录 <a href="https://buildkite.com">buildkite.com</a> → 进入你的组织 → <strong>Agents</strong></li>
+<li>找到对应的 Queue（如 <code>ascend-a3</code>）</li>
+<li>查看 Agent 状态：<strong>Connected 列显示绿色圆点</strong> ✅ 表示连接成功</li>
+<li>如果显示灰色或红色，说明 Agent 未连接，请联系基础设施团队排查</li>
+</ul>
+<p>Queue: ascend-a3</p>
+<table>
+<thead>
+<tr>
+<th>Agent Name</th>
+<th>Version</th>
+<th>Queue</th>
+<th>Connected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agent-abc123</td>
+<td>v3.80.0</td>
+<td>ascend-a3</td>
+<td>🟢 ← 绿色表示已连接</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="创建 Queue" src="../assets/user-manual-zh/image-27.png" />
+<img alt="创建 Queue" src="../assets/user-manual-zh/image-28.png" /></p>
+<hr />
+<h3 id="3-buildkite-pipeline">步骤 3：在 Buildkite 官网创建 Pipeline<a class="headerlink" href="#3-buildkite-pipeline" title="Permanent link">&para;</a></h3>
+<p><strong>目标</strong>：在 Buildkite 官网上创建一个 Pipeline，将其与你的 GitHub 仓库关联，并配置基本信息。</p>
+<p>你需要做什么：</p>
+<ol>
+<li><strong>创建 Pipeline</strong>：</li>
+<li>登录 <a href="https://buildkite.com">buildkite.com</a></li>
+<li>进入你的组织 → <strong>Pipelines</strong> → <strong>New Pipeline</strong></li>
+<li>
+<p>依次填写以下配置：</p>
+</li>
+<li>
+<p><strong>Pipeline 基本配置</strong>：</p>
+</li>
+<li><strong>Name</strong>：为你的 Pipeline 起一个合适的名字（如项目名 + 用途，例如 <code>vllm-npu-ci</code>）</li>
+<li><strong>Repository</strong>：选择或输入你的 GitHub 仓库地址（如 <code>https://github.com/&lt;org&gt;/&lt;repo&gt;</code>）</li>
+<li><strong>Default Branch</strong>：设置默认触发分支（如 <code>main</code>）</li>
+<li>
+<p><strong>Pipeline Definition Source</strong>：选择从仓库读取 Pipeline 定义</p>
+<ul>
+<li>选择 <strong>Read pipeline definition from repository</strong></li>
+<li><strong>File path</strong>：填写 Pipeline 脚本文件路径，默认为 <code>.buildkite/pipeline.yml</code></li>
+</ul>
+</li>
+<li>
+<p><strong>触发条件配置</strong>（可选）：</p>
+</li>
+<li>在 Pipeline 创建完成后，进入 <strong>Settings</strong> → <strong>GitHub</strong></li>
+<li>配置触发条件：<ul>
+<li><strong>Trigger builds on pushes</strong>：推送时触发</li>
+<li><strong>Trigger builds on pull requests</strong>：PR 时触发</li>
+</ul>
+</li>
+<li>可选择仅在特定分支或特定文件变更时触发</li>
+</ol>
+<p><img alt="创建 Pipeline" src="../assets/user-manual-zh/image-30.png" />
+<img alt="创建 Pipeline" src="../assets/user-manual-zh/image-31.png" /></p>
+<p>怎么验证这步完成：</p>
+<ul>
+<li>在 Buildkite 官网的 Pipelines 列表中能看到新创建的 Pipeline</li>
+<li>Pipeline 的 <strong>Repository</strong> 显示为你的 GitHub 仓库地址</li>
+<li>Pipeline 的 <strong>Source</strong> 显示为从仓库读取（<code>.buildkite/pipeline.yml</code>）</li>
+</ul>
+<hr />
+<h3 id="4-webhook">步骤 4：配置 Webhook<a class="headerlink" href="#4-webhook" title="Permanent link">&para;</a></h3>
+<p><strong>目标</strong>：让 GitHub 仓库的代码推送、PR 等事件能够自动触发 Buildkite Pipeline。</p>
+<p>你需要做什么：</p>
+<ol>
+<li><strong>获取 Webhook URL</strong>：</li>
+<li>登录 <a href="https://buildkite.com">buildkite.com</a></li>
+<li>进入你的组织 → 找到步骤 3 中创建的 Pipeline</li>
+<li>进入 Pipeline → <strong>Settings</strong> → <strong>GitHub</strong></li>
+<li>找到 <strong>Webhook URL</strong>，复制该地址</li>
+<li>
+<p>格式类似：<code>https://webhook.buildkite.com/deliver/xxxxxx</code></p>
+</li>
+<li>
+<p><strong>在 GitHub 仓库配置 Webhook</strong>：</p>
+</li>
+<li>打开你的 GitHub 仓库 → <strong>Settings</strong> → <strong>Webhooks</strong> → <strong>Add webhook</strong></li>
+<li><strong>Payload URL</strong>：粘贴上一步复制的 Webhook URL</li>
+<li><strong>Content type</strong>：选择 <code>application/json</code></li>
+<li><strong>Secret</strong>：按团队要求填写，不建议在生产环境留空</li>
+<li><strong>Events</strong>：选择 <strong>Let me select individual events</strong>，勾选：<ul>
+<li><code>Pushes</code></li>
+<li><code>Pull requests</code></li>
+</ul>
+</li>
+<li>点击 <strong>Add webhook</strong>
+<img alt="配置 Webhook" src="../assets/user-manual-zh/image-32.png" />
+<img alt="配置 Webhook" src="../assets/user-manual-zh/image-33.png" />
+<img alt="配置 Webhook" src="../assets/user-manual-zh/image-34.png" /></li>
+</ol>
+<p>怎么验证这步完成：</p>
+<ul>
+<li>在 GitHub Webhooks 页面，新添加的 Webhook 旁边显示绿色圆点 ✅</li>
+<li>或者向仓库推送一个测试提交，观察 Buildkite 官网是否出现新的 Build 记录</li>
+</ul>
+<hr />
+<h3 id="5-pipeline-yaml">步骤 5：编写 Pipeline YAML<a class="headerlink" href="#5-pipeline-yaml" title="Permanent link">&para;</a></h3>
+<p><strong>目标</strong>：定义你的 CI 任务流程，告诉 Buildkite 要执行什么任务、在什么资源上执行。</p>
+<p>你需要做什么：</p>
+<ol>
+<li>在项目仓库根目录创建 <code>.buildkite/</code> 目录</li>
+<li>在该目录下创建 <code>pipeline.yaml</code>（或 <code>pipeline.yml</code>）</li>
+<li>参考下面的模板编写你的 Pipeline</li>
+</ol>
+<p>Pipeline 模板：</p>
+<p>以下是一个完整的示例，展示了构建镜像和在昇腾 NPU 上运行测试的典型流程：</p>
+<pre><code class="language-yaml">steps:
+  # 第一步：构建并推送镜像
+  - label: &quot;:buildkit: Build and Push NPU Test Image&quot;
+    key: image-build
+    agents:
+      queue: &quot;ascend-a2b3&quot;
+      resource_class: &quot;npu-2&quot;
+    plugins:
+      - kubernetes:
+          metadata:
+            annotations:
+              vault.hashicorp.com/agent-init-first: &quot;true&quot;
+              vault.hashicorp.com/agent-inject: &quot;true&quot;
+              vault.hashicorp.com/role: ascend-gha-runners
+              vault.hashicorp.com/tls-skip-verify: &quot;true&quot;
+    env:
+      VLLM_IMAGE_TAG: &quot;${BUILDKITE_COMMIT}&quot;
+      IMAGE_NAME: &quot;your-project-ci-npu&quot;
+      IMAGE_REGISTRY: &quot;swr.cn-southwest-2.myhuaweicloud.com/your-namespace&quot;
+      BUILDKITD_ADDR: &quot;tcp://buildkitd-service.buildkitd:1234&quot;
+    command: |
+      set -ex
+      echo &quot;--- Building and pushing NPU Test Image&quot;
+      echo &quot;Image: ${IMAGE_REGISTRY}/${IMAGE_NAME}:${VLLM_IMAGE_TAG}&quot;
+      # 你的镜像构建命令...
+
+  # 第二步：在 NPU 上运行测试（依赖镜像构建完成）
+  - label: &quot;🧪 NPU Unit Test&quot;
+    depends_on: image-build
+    key: npu-test
+    agents:
+      queue: &quot;ascend-a3&quot;
+      resource_class: &quot;npu-2&quot;
+    image: &quot;${IMAGE_REGISTRY}/${IMAGE_NAME}:${BUILDKITE_COMMIT}&quot;
+    command: |
+      set -ex
+      echo &quot;--- Running NPU tests&quot;
+      pytest -v -s -m 'npu'
+</code></pre>
+<p>关键字段说明：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>示例值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>label</code></td>
+<td>任务显示名称</td>
+<td><code>🧪 NPU Unit Test</code></td>
+<td>在 Buildkite 官网上显示的任务名，支持 emoji</td>
+</tr>
+<tr>
+<td><code>key</code></td>
+<td>任务唯一标识</td>
+<td><code>npu-test</code></td>
+<td>用于任务间依赖引用，同一 Pipeline 中不能重复</td>
+</tr>
+<tr>
+<td><code>depends_on</code></td>
+<td>依赖的前置任务</td>
+<td><code>image-build</code></td>
+<td>指定该任务在哪个任务完成后执行</td>
+</tr>
+<tr>
+<td><code>agents.queue</code></td>
+<td><strong>队列名称</strong></td>
+<td><code>ascend-a3</code></td>
+<td><strong>必填</strong>，指定任务在哪个队列执行，必须与步骤 2 创建的队列名称一致</td>
+</tr>
+<tr>
+<td><code>agents.resource_class</code></td>
+<td><strong>NPU 资源规格</strong></td>
+<td><code>npu-2</code></td>
+<td><strong>必填</strong>，指定需要多少张 NPU 卡</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>运行镜像</td>
+<td><code>registry/your-image:tag</code></td>
+<td>任务运行使用的容器镜像</td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>执行命令</td>
+<td><code>pytest -v</code></td>
+<td>实际执行的 shell 命令</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>环境变量</td>
+<td><code>KEY: value</code></td>
+<td>传递给任务的环境变量</td>
+</tr>
+<tr>
+<td><code>if</code></td>
+<td>触发条件</td>
+<td><code>build.branch == "main"</code></td>
+<td>条件满足时才执行该任务</td>
+</tr>
+<tr>
+<td><code>plugins.kubernetes</code></td>
+<td>K8s 插件配置</td>
+<td>见模板</td>
+<td>用于注入 Vault 密钥等高级配置（通常由基础设施团队提供）</td>
+</tr>
+</tbody>
+</table>
+<p>资源规格（resource_class）选择：</p>
+<table>
+<thead>
+<tr>
+<th>资源类</th>
+<th>NPU 卡数</th>
+<th>CPU</th>
+<th>内存</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npu-1</code></td>
+<td>1 卡</td>
+<td>23 核</td>
+<td>64Gi</td>
+<td>轻量测试</td>
+</tr>
+<tr>
+<td><code>npu-2</code></td>
+<td>2 卡</td>
+<td>39-46 核</td>
+<td>128Gi</td>
+<td>标准测试（推荐默认使用）</td>
+</tr>
+<tr>
+<td><code>npu-4</code></td>
+<td>4 卡</td>
+<td>78 核</td>
+<td>256Gi</td>
+<td>中等规模测试</td>
+</tr>
+<tr>
+<td><code>npu-8</code></td>
+<td>8 卡</td>
+<td>156 核</td>
+<td>512Gi</td>
+<td>大规模测试</td>
+</tr>
+<tr>
+<td><code>npu-16</code></td>
+<td>16 卡</td>
+<td>312 核</td>
+<td>1024Gi</td>
+<td>压力测试 / 完整测试</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注意：<code>npu-1</code> 和 <code>npu-16</code> 仅在特定集群可用，具体可咨询基础设施团队。</p>
+</blockquote>
+<p>怎么验证这步完成：</p>
+<ul>
+<li>将 <code>pipeline.yaml</code> 提交到你的仓库</li>
+<li>在 Buildkite 官网进入对应 Pipeline，页面能正常解析并显示 Pipeline 结构</li>
+<li>没有语法错误提示</li>
+</ul>
+<hr />
+<h3 id="6">步骤 6：验证接入完成<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
+<p>完整验证流程：</p>
+<ol>
+<li><strong>确认 Agent 已连接</strong></li>
+<li>登录 <a href="https://buildkite.com">buildkite.com</a> → 你的组织 → <strong>Agents</strong></li>
+<li>
+<p>确认对应 Queue 下的 Agent 状态为 <strong>绿色 Connected</strong> ✅</p>
+</li>
+<li>
+<p><strong>触发一次测试运行</strong></p>
+</li>
+<li>向你的仓库提交一个代码变更（或创建一个 PR）</li>
+<li>
+<p>等待几秒，观察 Buildkite 官网是否出现新的 Build</p>
+</li>
+<li>
+<p><strong>观察 Pipeline 运行</strong></p>
+</li>
+<li>进入 Build → 查看 Pipeline 执行流程</li>
+<li>
+<p>确认每个 Step 的状态：</p>
+<ul>
+<li>🟢 绿色：成功</li>
+<li>🔴 红色：失败</li>
+<li>🟡 黄色：运行中</li>
+<li>⚪ 灰色：等待中</li>
+</ul>
+</li>
+<li>
+<p><strong>确认任务在昇腾 NPU 上执行</strong></p>
+</li>
+<li>点击任意 Step 查看详细日志</li>
+<li>日志中应能看到 NPU 相关的输出（如 <code>npu-smi info</code> 的结果）</li>
+</ol>
+<p>验证检查清单：</p>
+<ul>
+<li>[ ] Agent Token 已生成并安全传递给基础设施团队</li>
+<li>[ ] Queue 已创建，名称符合规范（<code>ascend-a3</code> 或 <code>ascend-a2b3</code>）</li>
+<li>[ ] Buildkite 官网中对应 Queue 的 Agent 显示绿色 Connected</li>
+<li>[ ] Pipeline 已在 Buildkite 官网创建，且关联到正确的 GitHub 仓库</li>
+<li>[ ] Webhook 已在 GitHub 仓库配置，且状态正常</li>
+<li>[ ] <code>.buildkite/pipeline.yml</code> 已提交到仓库</li>
+<li>[ ] 推送代码后，Buildkite 自动触发了 Build</li>
+<li>[ ] Build 中的 Job 成功在昇腾 NPU 上执行</li>
+</ul>
+<hr />
+<h2 id="_4">常见问题<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p><strong>Q1：如何知道我的组织创建者是谁？</strong></p>
+<p>登录 <a href="https://buildkite.com">buildkite.com</a> → 进入你的组织 → <strong>Settings</strong> → <strong>Members</strong>，查看角色为 <strong>Admin</strong> 的用户。</p>
+<p><strong>Q2：Agent 连接状态不是绿色怎么办？</strong></p>
+<ul>
+<li>检查 Token 是否正确传递给了基础设施团队</li>
+<li>认 Queue 名称是否与基础设施团队部署的 Agent 监听队列一致</li>
+<li>联系基础设施团队排查 Agent 部署状态</li>
+</ul>
+<p><strong>Q3：推送代码后没有触发 Build？</strong></p>
+<ul>
+<li>检查 GitHub Webhook 配置是否正确，Webhook 列表中是否有最近的成功投递记录</li>
+<li>确认 <code>.buildkite/pipeline.yaml</code> 文件路径和格式是否正确</li>
+<li>检查 Pipeline 的 Source Code 设置是否指向了正确的仓库和分支</li>
+</ul>
+<p><strong>Q4：如何查看任务运行日志？</strong></p>
+<p>在 Buildkite 官网 → 进入具体 Build → 点击任意 Step → 右侧面板会显示实时日志输出。</p>
+<p><strong>Q5：我的项目需要同时使用多个集群怎么办？</strong></p>
+<ul>
+<li>为每个集群生成独立的 Agent Token（如 <code>project_cn12_001</code>、<code>project_hk001</code>）</li>
+<li>在 Pipeline 中通过不同的 <code>queue</code> 字段将任务路由到不同集群：
+  ```yaml</li>
+<li>
+<p>label: "Test on A3"
+    agents:
+      queue: "ascend-a3"
+      resource_class: "npu-2"
+    command: ...</p>
+</li>
+<li>
+<p>label: "Test on A2B3"
+    agents:
+      queue: "ascend-a2b3"
+      resource_class: "npu-2"
+    command: ...
+  ```</p>
+</li>
+</ul>
+<hr />
+<h2 id="_5">反馈与支持<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>如果在接入过程中遇到任何问题，请通过以下方式反馈：</p>
+<ul>
+<li><strong>提交 Issue</strong>：<a href="https://github.com/opensourceways/backlog">https://github.com/opensourceways/backlog</a></li>
+<li>提交 Issue 时，请提供以下信息：</li>
+<li>项目名称和 Git 仓库地址</li>
+<li>问题描述和错误日志截图</li>
+<li>已完成的步骤和卡住的环节</li>
+</ul>
+<hr />
+<p><em>文档版本: v2.0</em><br />
+<em>最后更新: 2026-04-28</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
