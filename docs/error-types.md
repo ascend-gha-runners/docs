@@ -1,6 +1,6 @@
-# Error Types Reference
+# Pod Status Reference
 
-This page catalogs known pod error types observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected failure modes.
+This page catalogs known pod statuses observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected behavior.
 
 Expected pod state transitions for a successful run: **Pending → Running → Succeeded** (terminal — pod is then removed)
 

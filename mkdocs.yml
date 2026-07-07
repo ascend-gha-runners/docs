@@ -63,5 +63,5 @@ nav:
     - Repo.md
   - Features:
     - feature.md
-  - Error Types:
+  - Pod Status Reference:
     - error-types.md
