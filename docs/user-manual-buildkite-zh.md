@@ -416,8 +416,8 @@ steps:
 
 如果在接入过程中遇到任何问题，请通过以下方式反馈：
 
-- **提交 Issue**：[https://github.com/opensourceways/backlog](https://github.com/opensourceways/backlog)
-- 提交 Issue 时，请提供以下信息：
+- **发起讨论**：[https://github.com/ascend-gha-runners/docs/discussions](https://github.com/ascend-gha-runners/docs/discussions)
+- 提交时，请提供以下信息：
   - 项目名称和 Git 仓库地址
   - 问题描述和错误日志截图
   - 已完成的步骤和卡住的环节

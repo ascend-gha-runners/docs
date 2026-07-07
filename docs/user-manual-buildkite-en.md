@@ -337,8 +337,6 @@ How to verify this step is complete:
 
 ### Step 6: Validate Integration
 
-<!-- TODO: Add image: ![Validate Integration](assets/user-manual-en/buildkite-verification.png) -->
-
 Complete validation flow:
 
 1. **Confirm Agent is connected**
@@ -420,8 +418,8 @@ On the Buildkite website → navigate to a specific Build → click any Step →
 
 If you encounter any issues during integration, please report them through:
 
-- **Submit an Issue**: [https://github.com/opensourceways/backlog](https://github.com/opensourceways/backlog)
-- When submitting an Issue, please provide:
+- **Open a discussion**: [https://github.com/ascend-gha-runners/docs/discussions](https://github.com/ascend-gha-runners/docs/discussions)
+- When submitting, please provide:
   - Project name and Git repository URL
   - Issue description and error log screenshots
   - Completed steps and where you are stuck
