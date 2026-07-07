@@ -18,7 +18,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Running | Container Runtime | [Container crash](#container-crash) |
 | Running | Container Runtime | [OOMKilled](#oomkilled) |
 | Running | Container Runtime | [FailedPostStartHook](#failedpoststarkhook) |
-| Running | Container Runtime | [user-script-error](#user-script-error) |
+| Running | Workflow | [UserScriptError](#userscripterror) |
 <!-- ERROR_SUMMARY_TABLE_END -->
 
 ---
@@ -138,9 +138,11 @@ Out of memory — container killed by the kernel OOM killer.
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562900088)
 
-#### user-script-error
+### Workflow Errors
 
-User script exited with non-zero code — workflow steps ran but the script itself failed.
+#### UserScriptError
+
+User script step exited with non-zero code. K8s pod reason: `Error`. Unlike container crash, the runner container started successfully and workflow steps executed — the failure is in the script logic itself.
 
 ![GitHub Actions log showing user script failure with non-zero exit code](assets/error-types/user-script-error.png)
 
