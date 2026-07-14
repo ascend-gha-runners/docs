@@ -1,6 +1,6 @@
-# Pod Status Reference
+# Job Failure Reference
 
-This page catalogs known pod statuses observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected behavior.
+This page catalogs known job failure scenarios observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected behavior.
 
 Expected pod state transitions for a successful run: **Pending → Running → Succeeded** (terminal — pod is then removed)
 
