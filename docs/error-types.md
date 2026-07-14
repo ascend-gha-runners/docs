@@ -11,13 +11,11 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [InvalidImageName](#invalidimagename) |
 | Pending | Image | [ErrImagePull](#errimagepull) |
 | Pending | Container Creation | [CreateContainerConfigError](#createcontainerconfigerror) |
-| Pending | Container Creation | [CreateContainerError](#createcontainererror) |
 | Pending | Scheduling | [FailedScheduling (nodeSelector)](#failedscheduling-nodeselector) |
 | Pending | Scheduling | [FailedBinding](#failedbinding) |
 | Pending | Scheduling | [FailedScheduling (resource limit)](#failedscheduling-resource-limit) |
 | Running | Container Runtime | [Container crash](#container-crash) |
 | Running | Container Runtime | [OOMKilled](#oomkilled) |
-| Running | Container Runtime | [FailedPostStartHook](#failedpoststarkhook) |
 | Running | Workflow | [UserScriptError](#userscripterror) |
 <!-- ERROR_SUMMARY_TABLE_END -->
 
@@ -66,15 +64,6 @@ Referencing a non-existent Secret.
 
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346768522)
-
-#### CreateContainerError
-
-Invalid `securityContext`.
-
-![Pod stuck in Pending with CreateContainerError due to invalid securityContext](assets/error-types/create-container-error.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346853546)
 
 ### Scheduling Errors
 
@@ -129,15 +118,6 @@ Out of memory — container killed by the kernel OOM killer.
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28570845291)
 
-#### FailedPostStartHook
-
-`postStart` hook failed.
-
-![GitHub Actions log showing container failing with FailedPostStartHook error](assets/error-types/failed-post-start-hook.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562900088)
-
 ### Workflow Errors
 
 #### UserScriptError
@@ -148,3 +128,14 @@ User script step exited with non-zero code. K8s pod reason: `Error`. Unlike cont
 
 > **Ref:**
 > [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28836074056)
+
+---
+
+## Support
+
+If you encounter an issue not listed on this page, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions) or contact the infrastructure team at `ascendinfra@huawei.com`.
+
+---
+
+**Document version:** 1.1
+**Last updated:** 2026-07-14
