@@ -12,8 +12,8 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [ErrImagePull](#errimagepull) |
 | Pending | Container Creation | [CreateContainerConfigError](#createcontainerconfigerror) |
 | Pending | Scheduling | [FailedScheduling (nodeSelector)](#failedscheduling-nodeselector) |
-| Pending | Scheduling | [FailedBinding](#failedbinding) |
 | Pending | Scheduling | [FailedScheduling (resource limit)](#failedscheduling-resource-limit) |
+| Pending | Scheduling | [FailedBinding](#failedbinding) |
 | Running | Container Runtime | [Container crash](#container-crash) |
 | Running | Container Runtime | [OOMKilled](#oomkilled) |
 | Running | Workflow | [UserScriptError](#userscripterror) |
@@ -43,7 +43,7 @@ Invalid image name format.
 ![Pod stuck in Pending with InvalidImageName reason in GitHub Actions log](assets/error-types/invalid-image-name.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_invalid-image-name · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346604103)
+> [linux-aarch64-test-hook_invalid-image-name · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319721644)
 
 #### ErrImagePull
 
@@ -52,7 +52,7 @@ Image does not exist.
 ![Pod stuck in Pending with ErrImagePull and ImagePullBackOff in GitHub Actions log](assets/error-types/err-image-pull.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_err-image-pull · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346673285)
+> [linux-aarch64-test-hook_err-image-pull · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319718531)
 
 ### Container Creation Errors
 
@@ -74,16 +74,7 @@ Referencing a non-existent Secret.
 ![Pod stuck in Pending with FailedScheduling due to nodeSelector mismatch](assets/error-types/failed-scheduling-node-selector.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562227896)
-
-#### FailedBinding
-
-PVC does not exist.
-
-![Pod stuck in Pending with FailedBinding due to missing PVC](assets/error-types/failed-binding-pvc.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562333058)
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317874137)
 
 #### FailedScheduling (resource limit)
 
@@ -92,7 +83,16 @@ Resource request exceeds node limit (422 scenario).
 ![Pod stuck in Pending with FailedScheduling due to resource request exceeding node limit](assets/error-types/failed-scheduling-resource.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28571626882)
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317502668)
+
+#### FailedBinding
+
+PVC does not exist.
+
+![Pod stuck in Pending with FailedBinding due to missing PVC](assets/error-types/failed-binding-pvc.png)
+
+> **Ref:**
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29318217127)
 
 ---
 
@@ -127,15 +127,15 @@ User script step exited with non-zero code. K8s pod reason: `Error`. Unlike cont
 ![GitHub Actions log showing user script failure with non-zero exit code](assets/error-types/user-script-error.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28836074056)
+> [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319724802)
 
 ---
 
 ## Support
 
-If you encounter an issue not listed on this page, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions) or contact the infrastructure team at `ascendinfra@huawei.com`.
+If you encounter an issue not listed on this page, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions) or contact the infrastructure team.
 
 ---
 
-**Document version:** 1.1
+**Document version:** v2.0
 **Last updated:** 2026-07-14
