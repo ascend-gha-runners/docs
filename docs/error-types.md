@@ -1,6 +1,6 @@
-# Error Types Reference
+# Job Failure Reference
 
-This page catalogs known pod error types observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected failure modes.
+This page catalogs known job failure scenarios observed across the runner pod lifecycle, with verified GitHub Actions run examples for each case. Use it for troubleshooting or to understand expected behavior.
 
 Expected pod state transitions for a successful run: **Pending → Running → Succeeded** (terminal — pod is then removed)
 
@@ -11,14 +11,12 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [InvalidImageName](#invalidimagename) |
 | Pending | Image | [ErrImagePull](#errimagepull) |
 | Pending | Container Creation | [CreateContainerConfigError](#createcontainerconfigerror) |
-| Pending | Container Creation | [CreateContainerError](#createcontainererror) |
 | Pending | Scheduling | [FailedScheduling (nodeSelector)](#failedscheduling-nodeselector) |
-| Pending | Scheduling | [FailedBinding](#failedbinding) |
 | Pending | Scheduling | [FailedScheduling (resource limit)](#failedscheduling-resource-limit) |
+| Pending | Scheduling | [FailedBinding](#failedbinding) |
 | Running | Container Runtime | [Container crash](#container-crash) |
 | Running | Container Runtime | [OOMKilled](#oomkilled) |
-| Running | Container Runtime | [FailedPostStartHook](#failedpoststarkhook) |
-| Running | Container Runtime | [user-script-error](#user-script-error) |
+| Running | Workflow | [UserScriptError](#userscripterror) |
 <!-- ERROR_SUMMARY_TABLE_END -->
 
 ---
@@ -45,7 +43,7 @@ Invalid image name format.
 ![Pod stuck in Pending with InvalidImageName reason in GitHub Actions log](assets/error-types/invalid-image-name.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_invalid-image-name · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346604103)
+> [linux-aarch64-test-hook_invalid-image-name · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319721644)
 
 #### ErrImagePull
 
@@ -54,7 +52,7 @@ Image does not exist.
 ![Pod stuck in Pending with ErrImagePull and ImagePullBackOff in GitHub Actions log](assets/error-types/err-image-pull.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_err-image-pull · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346673285)
+> [linux-aarch64-test-hook_err-image-pull · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319718531)
 
 ### Container Creation Errors
 
@@ -67,15 +65,6 @@ Referencing a non-existent Secret.
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346768522)
 
-#### CreateContainerError
-
-Invalid `securityContext`.
-
-![Pod stuck in Pending with CreateContainerError due to invalid securityContext](assets/error-types/create-container-error.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346853546)
-
 ### Scheduling Errors
 
 #### FailedScheduling (nodeSelector)
@@ -85,16 +74,7 @@ Invalid `securityContext`.
 ![Pod stuck in Pending with FailedScheduling due to nodeSelector mismatch](assets/error-types/failed-scheduling-node-selector.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562227896)
-
-#### FailedBinding
-
-PVC does not exist.
-
-![Pod stuck in Pending with FailedBinding due to missing PVC](assets/error-types/failed-binding-pvc.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562333058)
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317874137)
 
 #### FailedScheduling (resource limit)
 
@@ -103,7 +83,16 @@ Resource request exceeds node limit (422 scenario).
 ![Pod stuck in Pending with FailedScheduling due to resource request exceeding node limit](assets/error-types/failed-scheduling-resource.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28571626882)
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317502668)
+
+#### FailedBinding
+
+PVC does not exist.
+
+![Pod stuck in Pending with FailedBinding due to missing PVC](assets/error-types/failed-binding-pvc.png)
+
+> **Ref:**
+> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29318217127)
 
 ---
 
@@ -129,20 +118,24 @@ Out of memory — container killed by the kernel OOM killer.
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28570845291)
 
-#### FailedPostStartHook
+### Workflow Errors
 
-`postStart` hook failed.
+#### UserScriptError
 
-![GitHub Actions log showing container failing with FailedPostStartHook error](assets/error-types/failed-post-start-hook.png)
-
-> **Ref:**
-> [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562900088)
-
-#### user-script-error
-
-User script exited with non-zero code — workflow steps ran but the script itself failed.
+User script step exited with non-zero code. K8s pod reason: `Error`. Unlike container crash, the runner container started successfully and workflow steps executed — the failure is in the script logic itself.
 
 ![GitHub Actions log showing user script failure with non-zero exit code](assets/error-types/user-script-error.png)
 
 > **Ref:**
-> [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28836074056)
+> [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319724802)
+
+---
+
+## Support
+
+If you encounter an issue not listed on this page, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions) or contact the infrastructure team.
+
+---
+
+**Document version:** v2.0
+**Last updated:** 2026-07-14
