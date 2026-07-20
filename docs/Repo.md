@@ -5,17 +5,17 @@
 <!-- CACHE_AUDIT_TABLE_START -->
 | Repository | PyPI Cache | APT Cache | CCache | uv | Last Checked |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | ✅ | 2026-07-19 |
-| [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | 2026-07-19 |
-| [Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI) | ❌ | ❌ | - | - | 2026-07-19 |
-| [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | - | - | 2026-07-19 |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | 2026-07-19 |
-| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-07-19 |
-| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | - | ✅ | 2026-07-19 |
-| [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | - | ✅ | 2026-07-19 |
-| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | - | ✅ | 2026-07-19 |
-| [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | - | - | 2026-07-19 |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | - | 2026-07-19 |
+| [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | ✅ | 2026-07-20 |
+| [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | 2026-07-20 |
+| [Ascend/Ascend-CI](https://github.com/Ascend/Ascend-CI) | ❌ | ❌ | - | - | 2026-07-20 |
+| [pytorch-fdn/accelerator-integration-wg](https://github.com/pytorch-fdn/accelerator-integration-wg) | - | - | - | - | 2026-07-20 |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | 2026-07-20 |
+| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-07-20 |
+| [volcengine/verl](https://github.com/volcengine/verl) | ✅ | ✅ | - | ✅ | 2026-07-20 |
+| [hiyouga/LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) | ✅ | ✅ | - | ✅ | 2026-07-20 |
+| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | - | ✅ | 2026-07-20 |
+| [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | - | - | 2026-07-20 |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | - | 2026-07-20 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/29675037451](https://github.com/ascend-gha-runners/docs/actions/runs/29675037451)
+> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/29720094990](https://github.com/ascend-gha-runners/docs/actions/runs/29720094990)
