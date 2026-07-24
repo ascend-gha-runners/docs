@@ -1,0 +1,2110 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/action_test/self-hosted-validation-report/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Self-Hosted Runner Actions 兼容性指南 - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#self-hosted-runner-actions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Self-Hosted Runner Actions 兼容性指南
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required="">
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-manual-gha-en/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-manual-gha-zh/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-manual-buildkite-en/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../user-manual-buildkite-zh/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Repo/" class="md-tabs__link">
+          
+  
+  
+  Integrated repo
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../feature/" class="md-tabs__link">
+          
+  
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../error-types/" class="md-tabs__link">
+          
+  
+  
+  Job Failure Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1">
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-manual-gha-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-manual-gha-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4">
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-manual-buildkite-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-manual-buildkite-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6">
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated repo
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrated repo
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated Repositories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7">
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Job Failure Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../error-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结论（TL;DR）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="结论（TL;DR）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可以直接用 ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        需要换方式 ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        必须移除 🚫
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        验证覆盖说明
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、官方 Actions 使用指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一、官方 Actions 使用指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 如何使用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-runner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 可用 Runner 列表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 完整示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-github-hosted" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 与 GitHub-hosted 的差异
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、Docker 构建指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、Docker 构建指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-docker-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 为什么 Docker Action 不可用
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-buildctl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 替代方案：buildctl（推荐）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-buildkitd-runner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 未配置 buildkitd 的 Runner 如何构建
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、第三方 Actions 使用指南
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、第三方 Actions 使用指南">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-dornypaths-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 dorny/paths-filter（路径变更检测）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-ascend-gha-runnersartifactupload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 ascend-gha-runners/artifact/upload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-peter-evanscreate-or-update-comment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 peter-evans/create-or-update-comment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 安全提醒
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、并发与性能
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、并发与性能">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 并发模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 缓存策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、迁移 Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/action_test/self-hosted-validation-report.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/action_test/self-hosted-validation-report.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+    </a>
+  
+
+
+<h1 id="self-hosted-runner-actions">Self-Hosted Runner Actions 兼容性指南<a class="headerlink" href="#self-hosted-runner-actions" title="Permanent link">¶</a></h1>
+<blockquote>
+<p>适用仓库：<a href="https://github.com/vllm-project/vllm-ascend">vllm-project/vllm-ascend</a>
+最后更新：2026-07-20</p>
+</blockquote>
+<hr>
+<h2 id="tldr">结论（TL;DR）<a class="headerlink" href="#tldr" title="Permanent link">¶</a></h2>
+<h3 id="_1">可以直接用 ✅<a class="headerlink" href="#_1" title="Permanent link">¶</a></h3>
+<p><strong>6 个官方 Action 全部可用</strong> — 无需任何额外配置，把 <code>runs-on</code> 改成 self-hosted runner 标签即可：</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>当前使用次数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>actions/checkout@v7</code></td>
+<td>41</td>
+<td></td>
+</tr>
+<tr>
+<td><code>actions/setup-python@v6</code></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><code>actions/cache@v4</code></td>
+<td>替代 <code>runs-on/cache@v5</code></td>
+<td>miss/hit + restore/save 均正常</td>
+</tr>
+<tr>
+<td><code>actions/upload-artifact@v7</code></td>
+<td>12</td>
+<td></td>
+</tr>
+<tr>
+<td><code>actions/download-artifact@v8</code></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><code>actions/github-script@v9</code></td>
+<td>5</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>3 个第三方 Action 全部可用</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>当前使用次数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dorny/paths-filter@v4</code></td>
+<td>2</td>
+<td>推荐用于路径变更检测</td>
+</tr>
+<tr>
+<td><code>tj-actions/changed-files@v47</code></td>
+<td>1</td>
+<td>⚠️ 有供应链安全事件历史，建议替换</td>
+</tr>
+<tr>
+<td><code>ascend-gha-runners/artifact/upload@v0.3</code></td>
+<td>4</td>
+<td>需 OBS 凭证，无凭证时用标准 upload-artifact 兜底</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2">需要换方式 ⚠️<a class="headerlink" href="#_2" title="Permanent link">¶</a></h3>
+<p><strong>5 个 Docker Action 不可用</strong> — self-hosted runner 没有 Docker daemon，需用 <code>buildctl</code> 替代：</p>
+<table>
+<thead>
+<tr>
+<th>原 Action</th>
+<th>当前使用次数</th>
+<th>替代方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker/build-push-action@v7</code></td>
+<td>3</td>
+<td><code>buildctl build</code>（32核 HK runner 已预配置）</td>
+</tr>
+<tr>
+<td><code>docker/login-action@v4</code></td>
+<td>5</td>
+<td>直接写 Docker config 或 Vault 证书</td>
+</tr>
+<tr>
+<td><code>docker/setup-buildx-action@v4</code></td>
+<td>4</td>
+<td>远程 buildkitd 已配置，无需 setup</td>
+</tr>
+<tr>
+<td><code>docker/setup-qemu-action@v4</code></td>
+<td>1</td>
+<td>不需要（交叉编译由 buildkitd 处理）</td>
+</tr>
+<tr>
+<td><code>docker/metadata-action@v6</code></td>
+<td>2</td>
+<td>✅ 可以继续用（纯 JS，不需要 Docker）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_3">必须移除 🚫<a class="headerlink" href="#_3" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>当前使用次数</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jlumbroso/free-disk-space</code></td>
+<td>4</td>
+<td>会删除宿主机系统包，仅限 GitHub-hosted runner</td>
+</tr>
+<tr>
+<td><code>runs-on/cache@v5</code> 系列</td>
+<td>7</td>
+<td>runs-on 服务专用 Action，替换为 <code>actions/cache@v4</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_4">验证覆盖说明<a class="headerlink" href="#_4" title="Permanent link">¶</a></h3>
+<p><strong>已实际验证</strong>（在 self-hosted runner 上跑过）：
+- <code>actions/checkout@v7</code>、<code>actions/setup-python@v6</code>、<code>actions/cache@v4</code>、<code>actions/cache/restore@v4</code>、<code>actions/cache/save@v4</code>、<code>actions/upload-artifact@v7</code>、<code>actions/download-artifact@v8</code>、<code>actions/github-script@v9</code>
+- <code>dorny/paths-filter@v4</code>、<code>tj-actions/changed-files@v47</code>、<code>ascend-gha-runners/artifact/upload@v0.3</code>、<code>peter-evans/create-or-update-comment@v5</code>
+- <code>docker/metadata-action@v6</code>、<code>docker/setup-buildx-action@v4</code>（验证失败：Docker daemon 不存在）</p>
+<p><strong>未实际验证</strong>（需要 PR/Issue 上下文，<code>workflow_dispatch</code> 无法触发）：</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>当前使用次数</th>
+<th>为什么没验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>peter-evans/slash-command-dispatch@v5</code></td>
+<td>1</td>
+<td>需要 Issue Comment 事件</td>
+</tr>
+<tr>
+<td><code>actions/stale@v10</code></td>
+<td>2</td>
+<td>需要 Issue/PR 事件 + schedule 触发</td>
+</tr>
+<tr>
+<td><code>actions/labeler@v6</code></td>
+<td>1</td>
+<td>需要 PR 事件</td>
+</tr>
+<tr>
+<td><code>github/issue-labeler@v3.4</code></td>
+<td>1</td>
+<td>需要 Issue 事件</td>
+</tr>
+<tr>
+<td><code>eps1lon/actions-label-merge-conflict@v3</code></td>
+<td>1</td>
+<td>需要 PR 事件</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>说明</strong>：以上 5 个 Action 的<strong>核心逻辑不依赖 Docker daemon</strong>，且 GitHub Action 的运行环境（Node.js/Git/网络）在 self-hosted runner 上已验证正常，<strong>推测均可正常使用</strong>。如需确认，可在对应事件触发时观察运行结果。</p>
+</blockquote>
+<hr>
+<h2 id="actions">一、官方 Actions 使用指南<a class="headerlink" href="#actions" title="Permanent link">¶</a></h2>
+<h3 id="11">1.1 如何使用<a class="headerlink" href="#11" title="Permanent link">¶</a></h3>
+<p>将 workflow 中的 <code>runs-on</code> 从 <code>ubuntu-latest</code> 改为 self-hosted runner 标签即可，<strong>无需任何额外配置</strong>：</p>
+<pre><code class="language-yaml"># 原来
+runs-on: ubuntu-latest
+
+# 改为
+runs-on: linux-amd64-cpu-4-hk       # 4 核 HK amd64
+runs-on: linux-amd64-cpu-8-hk       # 8 核 HK amd64
+runs-on: linux-arm64-cpu-16         # 16 核 guiyang arm64
+</code></pre>
+<h3 id="12-runner">1.2 可用 Runner 列表<a class="headerlink" href="#12-runner" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>Runner 标签</th>
+<th>架构</th>
+<th>CPU</th>
+<th>内存</th>
+<th>集群</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>linux-amd64-cpu-2-hk</code></td>
+<td>amd64</td>
+<td>2</td>
+<td>8Gi</td>
+<td>hk001</td>
+<td>轻量任务</td>
+</tr>
+<tr>
+<td><code>linux-amd64-cpu-4-hk</code></td>
+<td>amd64</td>
+<td>4</td>
+<td>8Gi</td>
+<td>hk001</td>
+<td>常规 CI</td>
+</tr>
+<tr>
+<td><code>linux-amd64-cpu-8-hk</code></td>
+<td>amd64</td>
+<td>8</td>
+<td>32Gi</td>
+<td>hk001</td>
+<td>编译任务</td>
+</tr>
+<tr>
+<td><code>linux-amd64-cpu-16-hk</code></td>
+<td>amd64</td>
+<td>16</td>
+<td>64Gi</td>
+<td>hk001</td>
+<td>大型编译</td>
+</tr>
+<tr>
+<td><code>linux-amd64-cpu-32-hk</code></td>
+<td>amd64</td>
+<td>32</td>
+<td>128Gi</td>
+<td>hk001</td>
+<td>镜像构建 (buildkitd)</td>
+</tr>
+<tr>
+<td><code>linux-arm64-cpu-8</code></td>
+<td>arm64</td>
+<td>8</td>
+<td>32Gi</td>
+<td>gy005</td>
+<td>常规 CI</td>
+</tr>
+<tr>
+<td><code>linux-arm64-cpu-16</code></td>
+<td>arm64</td>
+<td>16</td>
+<td>64Gi</td>
+<td>gy005</td>
+<td>编译任务</td>
+</tr>
+<tr>
+<td><code>linux-arm64-cpu-32-hk</code></td>
+<td>arm64</td>
+<td>32</td>
+<td>128Gi</td>
+<td>hk001</td>
+<td>镜像构建 (buildkitd)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13">1.3 完整示例<a class="headerlink" href="#13" title="Permanent link">¶</a></h3>
+<pre><code class="language-yaml">name: CI on Self-Hosted Runner
+
+on:
+  push:
+    branches: [main]
+
+defaults:
+  run:
+    shell: bash -el {0}    # 使用 login shell，确保环境变量加载
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: linux-amd64-cpu-8-hk
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+
+      - run: pip install -r requirements.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+</code></pre>
+<h3 id="14-github-hosted">1.4 与 GitHub-hosted 的差异<a class="headerlink" href="#14-github-hosted" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>方面</th>
+<th>GitHub-hosted (<code>ubuntu-latest</code>)</th>
+<th>Self-hosted</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Docker daemon</td>
+<td>✅ 可用</td>
+<td>❌ 不可用</td>
+</tr>
+<tr>
+<td>每次运行环境</td>
+<td>全新 VM</td>
+<td>共享 runner pod（ARC 管理）</td>
+</tr>
+<tr>
+<td>磁盘空间</td>
+<td>14GB</td>
+<td>取决于 PVC 大小（64Gi）</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td>仅 GHA cache</td>
+<td>GHA cache + 共享 PVC（<code>/root/.cache</code>）</td>
+</tr>
+<tr>
+<td>网络</td>
+<td>直连 GitHub</td>
+<td>通过 <code>gh-proxy.test.osinfra.cn</code> 代理</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="docker">二、Docker 构建指南<a class="headerlink" href="#docker" title="Permanent link">¶</a></h2>
+<h3 id="21-docker-action">2.1 为什么 Docker Action 不可用<a class="headerlink" href="#21-docker-action" title="Permanent link">¶</a></h3>
+<p>self-hosted runner 运行在 Kubernetes 容器中，<strong>没有 Docker daemon</strong>。所有需要 <code>/var/run/docker.sock</code> 的 Docker Action 均无法使用：</p>
+<pre><code>$ docker buildx create ...
+ERROR: failed to connect to docker API at unix:///var/run/docker.sock
+dial unix /var/run/docker.sock: connect: no such file or directory
+</code></pre>
+<blockquote>
+<p><code>docker/metadata-action@v6</code> 是例外 — 它是纯 JS 实现的元数据生成器，不调用 Docker，可以继续使用。</p>
+</blockquote>
+<h3 id="22-buildctl">2.2 替代方案：buildctl（推荐）<a class="headerlink" href="#22-buildctl" title="Permanent link">¶</a></h3>
+<p>32 核 HK runner 已预配置远程 buildkitd 服务，用 <code>buildctl</code> 替代 <code>docker/build-push-action</code>：</p>
+<pre><code class="language-yaml">name: Build Docker Image on Self-Hosted
+
+on:
+  push:
+    branches: [main]
+
+defaults:
+  run:
+    shell: bash -el {0}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-image:
+    runs-on: linux-amd64-cpu-32-hk       # 用 32 核 HK runner
+    steps:
+      - uses: actions/checkout@v7
+
+      # 1. 生成镜像标签（继续用 docker/metadata-action）✅
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/my-image
+          tags: type=sha
+
+      # 2. 构建并推送（替换 docker/build-push-action）
+      - name: Build and push image
+        run: |
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -1)
+
+          buildctl \
+            --addr="$BUILDKITD_ADDR" \
+            build \
+            --frontend=dockerfile.v0 \
+            --local context=. \
+            --local dockerfile=. \
+            --output "type=image,name=${IMAGE_TAG},push=true" \
+            --export-cache "type=registry,ref=${IMAGE_TAG}-cache,mode=max" \
+            --import-cache "type=registry,ref=${IMAGE_TAG}-cache"
+</code></pre>
+<p><strong>关键点</strong>：
+- <code>BUILDKITD_ADDR</code> 环境变量由 32 核 HK runner 的 pod template 自动注入
+- Vault 证书（<code>/home/user/.docker/</code>）由 pod template 自动注入，<code>buildctl</code> 用它做认证
+- <code>--import-cache</code> / <code>--export-cache</code> 提供与 <code>cache-from: type=gha</code> 等价的缓存能力
+- 多架构构建：切换 <code>runs-on</code> 到 <code>linux-arm64-cpu-32-hk</code> 即可构建 arm64 镜像</p>
+<h3 id="23-buildkitd-runner">2.3 未配置 buildkitd 的 Runner 如何构建<a class="headerlink" href="#23-buildkitd-runner" title="Permanent link">¶</a></h3>
+<p>如果需要在非 32 核 runner 上构建镜像，可选择：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用法</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skopeo</code></td>
+<td><code>skopeo copy docker://A docker://B</code></td>
+<td>镜像搬运（不构建）</td>
+</tr>
+<tr>
+<td><code>kaniko</code></td>
+<td><code>/kaniko/executor --destination ...</code></td>
+<td>容器内构建，无需 daemon</td>
+</tr>
+<tr>
+<td><code>oras</code></td>
+<td><code>oras push ghcr.io/... my-file</code></td>
+<td>OCI 制品推送</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="actions_1">三、第三方 Actions 使用指南<a class="headerlink" href="#actions_1" title="Permanent link">¶</a></h2>
+<h3 id="31-dornypaths-filter">3.1 dorny/paths-filter（路径变更检测）<a class="headerlink" href="#31-dornypaths-filter" title="Permanent link">¶</a></h3>
+<pre><code class="language-yaml">- uses: actions/checkout@v7
+  with:
+    fetch-depth: 0       # 必须
+
+- uses: dorny/paths-filter@v4
+  id: filter
+  with:
+    filters: |
+      source:
+        - 'vllm_ascend/**'
+        - 'csrc/**'
+        - 'setup.py'
+
+- if: steps.filter.outputs.source == 'true'
+  run: echo "Source code changed"
+</code></pre>
+<h3 id="32-ascend-gha-runnersartifactupload">3.2 ascend-gha-runners/artifact/upload<a class="headerlink" href="#32-ascend-gha-runnersartifactupload" title="Permanent link">¶</a></h3>
+<pre><code class="language-yaml"># 优先使用 ascend 上传，失败时自动用标准 upload-artifact 兜底
+- uses: ascend-gha-runners/artifact/upload@v0.3
+  id: ascend-upload
+  continue-on-error: true      # 无 OBS 凭证时跳过
+  with:
+    name: my-artifact
+    path: dist/
+
+- if: steps.ascend-upload.outcome != 'success'
+  uses: actions/upload-artifact@v7
+  with:
+    name: my-artifact
+    path: dist/
+</code></pre>
+<h3 id="33-peter-evanscreate-or-update-comment">3.3 peter-evans/create-or-update-comment<a class="headerlink" href="#33-peter-evanscreate-or-update-comment" title="Permanent link">¶</a></h3>
+<pre><code class="language-yaml">- uses: peter-evans/create-or-update-comment@v5
+  id: comment
+  continue-on-error: true     # fork PR 无写权限时优雅降级
+  with:
+    issue-number: ${{ github.event.pull_request.number }}
+    body: |
+      ## Build Result
+      ✅ Build completed for ${{ github.sha }}
+</code></pre>
+<blockquote>
+<p><strong>注意</strong>：当 PR 来自 fork 时，<code>GITHUB_TOKEN</code> 对目标仓库无写权限，评论无法发布。这不是 self-hosted runner 的问题，GitHub-hosted runner 上同样存在。只需加 <code>continue-on-error: true</code> 即可。</p>
+</blockquote>
+<h3 id="34">3.4 安全提醒<a class="headerlink" href="#34" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>替换 <code>tj-actions/changed-files@v47</code></strong> → <code>dorny/paths-filter@v4</code>：前者 2025 年 3 月曾有供应链攻击事件</li>
+<li><strong>移除 <code>jlumbroso/free-disk-space</code></strong>：在 self-hosted runner 上会删除宿主机系统文件，只能用于 GitHub-hosted runner</li>
+<li><strong>替换 <code>runs-on/cache@v5</code></strong> → <code>actions/cache@v4</code>：前者是 runs-on 服务专用 Action，已验证标准 cache 在 self-hosted 上正常工作</li>
+</ul>
+<hr>
+<h2 id="_5">四、并发与性能<a class="headerlink" href="#_5" title="Permanent link">¶</a></h2>
+<h3 id="41">4.1 并发模型<a class="headerlink" href="#41" title="Permanent link">¶</a></h3>
+<p>self-hosted runner 由 ARC (Actions Runner Controller) 在 Kubernetes 上管理：</p>
+<ul>
+<li><strong>自动扩缩</strong>：ARC 根据任务队列动态创建/销毁 runner pod</li>
+<li><strong>Matrix 并行</strong>：workflow 的 <code>strategy.matrix</code> 自动分发到多个 runner pod</li>
+<li><strong>资源隔离</strong>：每个 job 运行在独立容器中，互不影响</li>
+</ul>
+<pre><code class="language-yaml"># 多 runner 并行执行
+strategy:
+  fail-fast: false          # 一个失败不影响其他
+  matrix:
+    runner:
+      - linux-amd64-cpu-8-hk
+      - linux-arm64-cpu-16
+</code></pre>
+<h3 id="42">4.2 缓存策略<a class="headerlink" href="#42" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th>缓存类型</th>
+<th>载体</th>
+<th>跨 Job</th>
+<th>跨 Run</th>
+<th>跨 Runner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>actions/cache@v4</code></td>
+<td>GitHub 云存储</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>共享 PVC (<code>/root/.cache</code>)</td>
+<td>vllm-project-hk001</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>pip cache (<code>~/.cache/pip</code>)</td>
+<td>actions/cache</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>buildkitd 构建缓存</td>
+<td>registry</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>建议</strong>：pip cache 用 <code>actions/cache@v4</code>（跨 runner 共享）；编译产物用共享 PVC（免上传下载）。</p>
+<hr>
+<h2 id="checklist">五、迁移 Checklist<a class="headerlink" href="#checklist" title="Permanent link">¶</a></h2>
+<p>从 <code>ubuntu-latest</code> 迁移到 self-hosted runner 时，逐项检查：</p>
+<ul>
+<li>[ ] <code>runs-on</code> 改为合适的 self-hosted runner 标签</li>
+<li>[ ] <code>actions/cache@v4</code> 替换 <code>runs-on/cache@v5</code></li>
+<li>[ ] <code>docker/build-push-action</code> 替换为 <code>buildctl build</code></li>
+<li>[ ] <code>docker/login-action</code> 移除（Vault 证书已处理认证）</li>
+<li>[ ] <code>docker/setup-buildx-action</code> / <code>docker/setup-qemu-action</code> 移除</li>
+<li>[ ] <code>jlumbroso/free-disk-space</code> 移除</li>
+<li>[ ] <code>tj-actions/changed-files</code> 替换为 <code>dorny/paths-filter</code></li>
+<li>[ ] <code>peter-evans/create-or-update-comment</code> 添加 <code>continue-on-error: true</code></li>
+<li>[ ] <code>ascend-gha-runners/artifact/upload</code> 添加标准 upload 兜底</li>
+<li>[ ] <code>concurrency.group</code> 按需添加（避免同一 workflow 重复触发）</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

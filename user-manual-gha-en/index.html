@@ -1,0 +1,2428 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/user-manual-gha-en/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../user-manual-gha-zh/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>GitHub Actions Integration Guide - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#github-actions-integration-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GitHub Actions Integration Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required="">
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-gha-zh/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-buildkite-en/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide En
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-buildkite-zh/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide Zh
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../Repo/" class="md-tabs__link">
+          
+  
+  
+  Integrated repo
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../feature/" class="md-tabs__link">
+          
+  
+  
+  Features
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../error-types/" class="md-tabs__link">
+          
+  
+  
+  Job Failure Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1">
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked="">
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#runner-pod-types-and-naming-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Pod Types and Naming Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Runner Pod Types and Naming Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#runner-pod-resource-quota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Pod Resource Quota
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runner-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Naming Convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#onboarding-flowchart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Onboarding Flowchart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-organization-via-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Organization via GitHub App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Organization via GitHub App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-install-runner-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: Install Runner Group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install GitHub App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-repository-via-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Repository via GitHub App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Repository via GitHub App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-github-app_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install GitHub App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-organization-via-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Organization via PAT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Organization via PAT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-install-runner-group_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: Install Runner Group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-activation-request-for-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit Activation Request for Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-repository-via-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Repository via PAT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Repository via PAT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-token_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-activation-request-for-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit Activation Request for Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#view-runner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Runner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-npu-runners-in-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use NPU Runners in Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAQ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feedback-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feedback &amp; Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4">
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide En
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide En
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide Zh
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide Zh
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite CI 接入昇腾算力指导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6">
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated repo
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Integrated repo
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated Repositories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7">
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Features
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Job Failure Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#runner-pod-types-and-naming-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Pod Types and Naming Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Runner Pod Types and Naming Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#runner-pod-resource-quota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Pod Resource Quota
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runner-naming-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runner Naming Convention
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#onboarding-flowchart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Onboarding Flowchart
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-organization-via-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Organization via GitHub App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Organization via GitHub App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-install-runner-group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: Install Runner Group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install GitHub App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-repository-via-github-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Repository via GitHub App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Repository via GitHub App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-github-app_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install GitHub App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Activation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-organization-via-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Organization via PAT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Organization via PAT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-install-runner-group_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: Install Runner Group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-activation-request-for-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit Activation Request for Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-runner-to-repository-via-pat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Runner to Repository via PAT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Install Runner to Repository via PAT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-token_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submit-activation-request-for-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submit Activation Request for Repository
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#view-runner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Runner
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-npu-runners-in-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use NPU Runners in Workflows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAQ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feedback-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feedback &amp; Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/user-manual-gha-en.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/user-manual-gha-en.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+    </a>
+  
+
+
+<h1 id="github-actions-integration-guide">GitHub Actions Integration Guide<a class="headerlink" href="#github-actions-integration-guide" title="Permanent link">¶</a></h1>
+<p>We implement GitHub Action tasks on Ascend cluster nodes based on <a href="https://github.com/actions/actions-runner-controller/">ARC</a>.</p>
+<h2 id="runner-pod-types-and-naming-methods">Runner Pod Types and Naming Methods<a class="headerlink" href="#runner-pod-types-and-naming-methods" title="Permanent link">¶</a></h2>
+<p>Ascend clusters create runner pods to execute GitHub Action jobs. We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Architecture</th>
+<th>Default name(x = chip count)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atlas 300I DUO</td>
+<td>arm64</td>
+<td>linux-aarch64-310p-x</td>
+</tr>
+<tr>
+<td>Atlas 800 A3</td>
+<td>arm64</td>
+<td>linux-aarch64-a3-x</td>
+</tr>
+<tr>
+<td>Atlas 800 A2</td>
+<td>arm64</td>
+<td>linux-aarch64-a2-x or linux-aarch64-a2b3-x</td>
+</tr>
+</tbody>
+</table>
+<h3 id="runner-pod-resource-quota">Runner Pod Resource Quota<a class="headerlink" href="#runner-pod-resource-quota" title="Permanent link">¶</a></h3>
+<p>CPU and memory quota of each runner pod scales proportionally with the number of NPU chips requested:</p>
+<table>
+<thead>
+<tr>
+<th>Runner Name</th>
+<th>NPU Chips</th>
+<th>CPU (cores)</th>
+<th>Memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linux-aarch64-310p-1</td>
+<td>1</td>
+<td>11</td>
+<td>40Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-310p-2</td>
+<td>2</td>
+<td>22</td>
+<td>80Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-310p-4</td>
+<td>4</td>
+<td>44</td>
+<td>160Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a3-2</td>
+<td>2</td>
+<td>39</td>
+<td>64Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a3-4</td>
+<td>4</td>
+<td>78</td>
+<td>128Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a3-8</td>
+<td>8</td>
+<td>156</td>
+<td>256Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a3-16</td>
+<td>16</td>
+<td>312</td>
+<td>512Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2-1</td>
+<td>1</td>
+<td>23</td>
+<td>64Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2-2</td>
+<td>2</td>
+<td>46</td>
+<td>128Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2-4</td>
+<td>4</td>
+<td>92</td>
+<td>256Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2-8</td>
+<td>8</td>
+<td>184</td>
+<td>512Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2b3-1</td>
+<td>1</td>
+<td>23</td>
+<td>64Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2b3-2</td>
+<td>2</td>
+<td>46</td>
+<td>128Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2b3-4</td>
+<td>4</td>
+<td>92</td>
+<td>256Gi</td>
+</tr>
+<tr>
+<td>linux-aarch64-a2b3-8</td>
+<td>8</td>
+<td>184</td>
+<td>512Gi</td>
+</tr>
+</tbody>
+</table>
+<h3 id="runner-naming-convention">Runner Naming Convention<a class="headerlink" href="#runner-naming-convention" title="Permanent link">¶</a></h3>
+<p>The naming convention for runner pod is composed of the following parts:</p>
+<pre><code>linux-aarch64-a2-x
+^     ^       ^  ^
+|     |       |  |
+|     |       |  Number of NPUs Available
+|     |       NPU Designator
+|     Architecture
+Operating System
+</code></pre>
+<h2 id="onboarding-flowchart">Onboarding Flowchart<a class="headerlink" href="#onboarding-flowchart" title="Permanent link">¶</a></h2>
+<pre><code>                       Start
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 1: Choose Installation Scope and Authentication │
+│ You: Determine organization or repository level       │
+│ You: Choose GitHub App or PAT authentication         │
+│ Acceptance: Installation plan clarified              │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 2: Prepare Permissions                           │
+│ You: Obtain organization or repository admin          │
+│ Acceptance: Necessary permissions ready               │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ├─────────┬─────────┬─────────┐
+                         │         │         │         │
+                         ▼         ▼         ▼         ▼
+                    ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+                    │Org+App │ │Repo+App│ │Org+PAT │ │Repo+PAT│
+                    └────────┘ └────────┘ └────────┘ └────────┘
+                         │         │         │         │
+                         └─────────┴─────────┴─────────┴─────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 3: Install GitHub App or Create PAT              │
+│ You: Execute installation or creation                 │
+│ Acceptance: App installed or PAT generated            │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 4: Contact Us for Activation                     │
+│ PAT only: Send email with org/repo and token          │
+│ GitHub App: We assist directly after installation     │
+│ Acceptance: Runner deployment confirmed               │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 5: Validate Runner Availability                  │
+│ You: Check Runner status in Settings                  │
+│ Acceptance: Runner status shows Online                │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│ Step 6: Use Runner in Workflow                        │
+│ You: Write workflow and specify Runner label          │
+│ Acceptance: Workflow runs successfully                │
+└────────────────────────┬──────────────────────────────┘
+                         │
+                         ▼
+                Integration Complete
+</code></pre>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¶</a></h2>
+<p>We introduce installation methods based on scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method or combine multiple methods.
+If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner.
+GitHub App is more secure but requires organization admin permissions. If difficult to obtain organization-level approval, you can choose PAT permissions.
+If you encounter any issues during installation/usage, please <a href="https://github.com/ascend-gha-runners/docs/discussions">create a discussion</a>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Organization</th>
+<th>Repository</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitHub App</td>
+<td><a href="#install-runner-to-organization-via-github-app">Installation Method</a></td>
+<td><a href="#install-runner-to-repository-via-github-app">Installation Method</a></td>
+</tr>
+<tr>
+<td>PAT</td>
+<td><a href="#install-runner-to-organization-via-pat">Installation Method</a></td>
+<td><a href="#install-runner-to-repository-via-pat">Installation Method</a></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="install-runner-to-organization-via-github-app">Install Runner to Organization via GitHub App<a class="headerlink" href="#install-runner-to-organization-via-github-app" title="Permanent link">¶</a></h2>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">¶</a></h3>
+<p>Requires organization admin permissions.</p>
+<h3 id="optional-install-runner-group">Optional: Install Runner Group<a class="headerlink" href="#optional-install-runner-group" title="Permanent link">¶</a></h3>
+<p>Runners installed at organization level are managed by runner groups.
+Runner groups have 3 configuration options to control repository workflow access:
+1. Repositories: All repositories / Specific repositories
+2. Repository access: private / public
+3. Workflow: All workflows / Specific workflows
+Repositories meeting all 3 configurations can use organization runners.</p>
+<p>If no runner group specified, default runner group is used with configuration:
+1. Repositories: All repositories
+2. Repository access: private
+3. Workflow: All workflows</p>
+<p>You can use and modify default runner group (skip <a href="https://docs.github.com/en/actions/how-tos/hosting-your-own-runners/managing-self-hosted-runners/managing-access-to-self-hosted-runners-using-groups#creating-a-self-hosted-runner-group-for-an-organization">Create New Runner Group</a>). If default runner group is managing runners with different permissions, create custom runner group.</p>
+<h3 id="install-github-app">Install GitHub App<a class="headerlink" href="#install-github-app" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>Visit <a href="https://github.com/apps/ascend-runner-mgmt">apps/ascend-runner-mgmt</a> in browser and click <code>Install</code>.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-3.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-3.png"></a>
+Select organization, choose <code>All repositories</code>, click <code>Install</code>.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-19.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-19.png"></a></p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>GitHub App installed to target organization</li>
+</ul>
+<h3 id="activation">Activation<a class="headerlink" href="#activation" title="Permanent link">¶</a></h3>
+<p><strong>What we do</strong>:</p>
+<p>After GitHub App is installed, our team will directly assist with onboarding. No action required from you.</p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>Runner status shows Online in repository Settings → Actions → Runners</li>
+</ul>
+<hr>
+<h2 id="install-runner-to-repository-via-github-app">Install Runner to Repository via GitHub App<a class="headerlink" href="#install-runner-to-repository-via-github-app" title="Permanent link">¶</a></h2>
+<h3 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Permanent link">¶</a></h3>
+<p>Requires organization and repository admin permissions.</p>
+<h3 id="install-github-app_1">Install GitHub App<a class="headerlink" href="#install-github-app_1" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>Visit <a href="https://github.com/apps/ascend-runner-mgmt">apps/ascend-runner-mgmt</a> in browser and click <code>Install</code>.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-3.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-3.png"></a>
+Select organization, choose <code>Only select repositories</code>, select target repository, click <code>Install</code>.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-18.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-18.png"></a></p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>GitHub App installed to target repository</li>
+</ul>
+<h3 id="activation_1">Activation<a class="headerlink" href="#activation_1" title="Permanent link">¶</a></h3>
+<p><strong>What we do</strong>:</p>
+<p>After GitHub App is installed, our team will directly assist with onboarding. No action required from you.</p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>Runner status shows Online in repository Settings → Actions → Runners</li>
+</ul>
+<hr>
+<h2 id="install-runner-to-organization-via-pat">Install Runner to Organization via PAT<a class="headerlink" href="#install-runner-to-organization-via-pat" title="Permanent link">¶</a></h2>
+<h3 id="prerequisites_2">Prerequisites<a class="headerlink" href="#prerequisites_2" title="Permanent link">¶</a></h3>
+<p>Requires organization admin permissions.</p>
+<h3 id="optional-install-runner-group_1"><a href="#optional-install-runner-group">Optional: Install Runner Group</a><a class="headerlink" href="#optional-install-runner-group_1" title="Permanent link">¶</a></h3>
+<h3 id="create-token">Create Token<a class="headerlink" href="#create-token" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>Create token following <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic">GitHub Docs</a>.
+Select <code>admin:org</code> for scopes.
+Note token expiration - after expiration, Runner scale set won't display in repository and workflows cannot execute. Regenerate valid token when expired.
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-23.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-23.png"></a></p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>PAT created and securely saved</li>
+</ul>
+<h3 id="submit-activation-request-for-organization">Submit Activation Request for Organization<a class="headerlink" href="#submit-activation-request-for-organization" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>For token security, send email to <code>ascendinfra@huawei.com</code>.
+<strong>Email subject template</strong>: <code>Request Ascend NPU Runners</code>
+<strong>Email content template</strong>:</p>
+<pre><code class="language-yaml">org: my-org
+token: ghp_xxx
+expire-at: 30days
+</code></pre>
+<p><strong>What we do</strong>:</p>
+<ul>
+<li>Deploy and configure Runner after receiving request</li>
+</ul>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>Email sent and confirmation received</li>
+</ul>
+<hr>
+<h2 id="install-runner-to-repository-via-pat">Install Runner to Repository via PAT<a class="headerlink" href="#install-runner-to-repository-via-pat" title="Permanent link">¶</a></h2>
+<h3 id="prerequisites_3">Prerequisites<a class="headerlink" href="#prerequisites_3" title="Permanent link">¶</a></h3>
+<p>Requires repository admin permissions.</p>
+<h3 id="create-token_1">Create Token<a class="headerlink" href="#create-token_1" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>Create token following <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic">GitHub Docs</a>.
+Select <code>repo</code> for scopes.
+Note token expiration - after expiration, Runner scale set won't display in repository and workflows cannot execute. Regenerate valid token when expired.</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-16.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-16.png"></a></p>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>PAT created and securely saved</li>
+</ul>
+<h3 id="submit-activation-request-for-repository">Submit Activation Request for Repository<a class="headerlink" href="#submit-activation-request-for-repository" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>For token security, send email to <code>ascendinfra@huawei.com</code>.
+<strong>Email subject template</strong>: <code>Request Ascend NPU Runners</code>
+<strong>Email content template</strong>:</p>
+<pre><code class="language-yaml">repo: https://github.com/my-org/my-repo
+token: ghp_xxx
+expire-at: 30days
+</code></pre>
+<p><strong>What we do</strong>:</p>
+<ul>
+<li>Deploy and configure Runner after receiving request</li>
+</ul>
+<p><strong>How to verify</strong>:</p>
+<ul>
+<li>Email sent and confirmation received</li>
+</ul>
+<hr>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">¶</a></h2>
+<h3 id="view-runner">View Runner<a class="headerlink" href="#view-runner" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>Whether installed to repository or organization, runners are triggered by repository workflows. Navigate to repository → <code>Settings</code> → <code>Actions</code> → <code>Runners</code>.
+- <code>Runner scale set</code>: Runners configured for repository
+- <code>Shared with this repository</code>: Organization runners accessible to repository
+- <code>Status</code> showing <code>Online</code> indicates availability
+<a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/user-manual-zh/image-24.png" data-desc-position="bottom"><img alt="alt text" src="../assets/user-manual-zh/image-24.png"></a></p>
+<p><strong>How to verify Runner availability</strong>:</p>
+<ul>
+<li>Runner status shows <strong>Online</strong> (green dot)</li>
+</ul>
+<h3 id="use-npu-runners-in-workflows">Use NPU Runners in Workflows<a class="headerlink" href="#use-npu-runners-in-workflows" title="Permanent link">¶</a></h3>
+<p><strong>What you need to do</strong>:</p>
+<p>To use Ascend chips in job, specify <code>container.image</code> field. Otherwise NPU resources won't be allocated.
+Example showing how GitHub Action workflow uses NPU Runners.</p>
+<pre><code class="language-yaml">name: Test NPU Runner
+on:
+  workflow_dispatch:
+jobs:
+  job_0:
+    runs-on: linux-aarch64-a2-1
+    container:
+      image: ascendai/cann:latest
+
+    steps:
+      - name: Show NPU info
+        run: |
+          npu-smi info
+</code></pre>
+<p><strong>How to verify Workflow runs correctly</strong>:</p>
+<ul>
+<li>Workflow successfully triggered and running</li>
+<li>Logs show NPU information</li>
+</ul>
+<hr>
+<h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">¶</a></h2>
+<p><strong>Q1: How do I know if my organization has permission to install GitHub App?</strong></p>
+<p>Requires organization Owner permission. If unsure, contact your organization administrator.</p>
+<p><strong>Q2: What if Runner status stays Offline?</strong></p>
+<ul>
+<li>Check if GitHub App is correctly installed</li>
+<li>Check if PAT is valid and not expired</li>
+<li>Confirm Runner Group permission configuration</li>
+<li>Contact infrastructure team for troubleshooting</li>
+</ul>
+<p><strong>Q3: Workflow keeps waiting for Runner, cannot run?</strong></p>
+<ul>
+<li>Confirm <code>runs-on</code> field matches requested Runner name exactly</li>
+<li>Check if Runner status is Online</li>
+<li>Confirm repository has access to Runner (Runner Group configuration)</li>
+</ul>
+<p><strong>Q4: What to do when PAT expires?</strong></p>
+<ul>
+<li>Regenerate PAT</li>
+<li>Send new Token to infrastructure team via email</li>
+<li>Wait for infrastructure team to update configuration</li>
+</ul>
+<p><strong>Q5: How to share Runner across multiple repositories?</strong></p>
+<ul>
+<li>Use organization-level installation (install to organization via GitHub App or PAT)</li>
+<li>Control repository access via Runner Group</li>
+</ul>
+<hr>
+<h2 id="feedback-support">Feedback &amp; Support<a class="headerlink" href="#feedback-support" title="Permanent link">¶</a></h2>
+<p>If you encounter any issues during installation/usage, please <a href="https://github.com/ascend-gha-runners/docs/discussions">create a discussion</a>.</p>
+<p>When submitting, please provide:
+- Project name and Git repository URL
+- Issue description and error information
+- Installation method used (GitHub App or PAT)</p>
+<hr>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>
