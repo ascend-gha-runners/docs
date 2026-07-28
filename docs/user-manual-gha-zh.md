@@ -22,6 +22,7 @@
 |linux-aarch64-310p-1|1|11|40Gi|
 |linux-aarch64-310p-2|2|22|80Gi|
 |linux-aarch64-310p-4|4|44|160Gi|
+|linux-aarch64-a3-0|0|4|8Gi|
 |linux-aarch64-a3-2|2|39|64Gi|
 |linux-aarch64-a3-4|4|78|128Gi|
 |linux-aarch64-a3-8|8|156|256Gi|
