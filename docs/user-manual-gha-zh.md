@@ -36,6 +36,15 @@
 |linux-aarch64-a2b3-4|4|92|256Gi|
 |linux-aarch64-a2b3-8|8|184|512Gi|
 
+### CPU-Only Runner 资源配额
+
+| Runner 名称 | CPU(核) | 内存 | 用途 |
+|--|--|--|--|
+| linux-amd64-cpu-4-buildkit-gy006 | 4 | 8Gi | BuildKit 镜像构建 (amd64) |
+| linux-aarch64-cpu-4-buildkit-gy006 | 4 | 8Gi | BuildKit 镜像构建 (arm64) |
+| linux-amd64-cpu-4-buildkit-cn12-001 | 4 | 8Gi | BuildKit 镜像构建 (amd64) |
+| linux-aarch64-cpu-4-buildkit-cn12-001 | 4 | 8Gi | BuildKit 镜像构建 (arm64) |
+
 ### Runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
