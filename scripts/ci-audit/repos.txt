@@ -12,3 +12,5 @@ hiyouga/LLaMA-Factory|tests_npu.yml||||
 modelscope/ms-swift|citest_npu.yaml||||
 tile-ai/tilelang-ascend|ci_npuir.yml||||
 triton-lang/triton-ascend|||✅||
+vllm-ascend/vllm-ascend-recipes|||||
+verl-project/verl-omni|||||
