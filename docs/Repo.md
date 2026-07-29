@@ -16,6 +16,8 @@
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | - | ✅ | 2026-07-29 |
 | [tile-ai/tilelang-ascend](https://github.com/tile-ai/tilelang-ascend) | ✅ | ✅ | - | - | 2026-07-29 |
 | [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | - | 2026-07-29 |
+| [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | - | - | - | - | 2026-07-29 |
+| [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | - | - | - | - | 2026-07-29 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
 > Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/30425433161](https://github.com/ascend-gha-runners/docs/actions/runs/30425433161)
