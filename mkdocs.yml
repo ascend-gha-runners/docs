@@ -45,6 +45,8 @@ markdown_extensions:
   - attr_list
   # - mdx_truly_sane_lists
   - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
 nav:
@@ -61,6 +63,8 @@ nav:
     - user-manual-buildkite-zh.md
   - Integrated repo:
     - Repo.md
+  - Cluster Map:
+    - Cluster.md
   - Features:
     - feature.md
   - Job Failure Reference:
