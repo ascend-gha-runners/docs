@@ -26,6 +26,29 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install -y jq
 
+      # ================================================================
+      # Phase 1: Discover new repos from ascend-ci-deployment
+      # ================================================================
+      - name: Discover new repos from deployment repo
+        id: discover
+        continue-on-error: true
+        run: python3 scripts/ci-audit/discover_new_repos.py
+
+      - name: Check acceleration config for new repos
+        if: steps.discover.outputs.has_new == 'true'
+        run: |
+          echo "## 新仓库加速 CI 检查报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r REPO; do
+            [ -z "$REPO" ] && continue
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "### $REPO" >> $GITHUB_STEP_SUMMARY
+            bash scripts/ci-audit/check_acceleration.sh "$REPO" >> $GITHUB_STEP_SUMMARY
+          done < /tmp/new_repos.txt
+
+      # ================================================================
+      # Phase 2: Existing daily cache audit
+      # ================================================================
       - name: Generate repos list from Repo.md
         run: |
           REPOS=$(grep -oE '\[([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\]\(https://github\.com/' docs/Repo.md \
@@ -61,7 +84,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/Repo.md
+          git add docs/Repo.md scripts/ci-audit/repos.txt
           if git diff --cached --quiet; then
             echo "No changes to Repo.md"
           else
