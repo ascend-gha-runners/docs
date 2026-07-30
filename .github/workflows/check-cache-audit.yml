@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: "24 2 * * *" # 每天 10:24 北京时间 (UTC+8)
   workflow_dispatch:
+    inputs:
+      new_repos:
+        description: 'New repos to add (JSON array, e.g. ["org/repo1","org/repo2"])'
+        required: false
+        type: string
+      source_deployment_run:
+        description: 'Source deployment run URL for traceability'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -26,11 +35,91 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install -y jq
 
+      # ================================================================
+      # Phase 1: Receive new repos from workflow_dispatch input
+      #
+      # 自动发现新对接仓库由部署仓 opensourceways/ascend-ci-deployment 的
+      # sync-new-projects-to-docs 工作流负责（push projects/** → 向本仓提 PR）。
+      # 本步骤只处理手动/被触发时通过 new_repos 显式传入的仓库列表。
+      # ================================================================
+      - name: Receive new repos from dispatch input
+        id: discover
+        continue-on-error: true
+        env:
+          NEW_REPOS_INPUT: ${{ inputs.new_repos || '' }}
+        run: |
+          > /tmp/new_repos.txt
+
+          if [ -n "$NEW_REPOS_INPUT" ]; then
+            echo "$NEW_REPOS_INPUT" | jq -r '.[]' > /tmp/new_repos.txt
+            echo "=== 从 workflow_dispatch 输入接收新仓库 ==="
+            cat /tmp/new_repos.txt
+            echo "has_new=true" >> $GITHUB_OUTPUT
+          else
+            echo "=== 无 new_repos 输入，跳过发现（仅执行每日审计）==="
+            echo "has_new=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ================================================================
+      # Phase 2: Check acceleration config for new repos
+      # ================================================================
+      - name: Check acceleration config for new repos
+        if: steps.discover.outputs.has_new == 'true'
+        run: |
+          echo "## 新仓库加速 CI 检查报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r REPO; do
+            [ -z "$REPO" ] && continue
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            bash scripts/ci-audit/check_acceleration.sh "$REPO" >> $GITHUB_STEP_SUMMARY
+          done < /tmp/new_repos.txt
+
+      # ================================================================
+      # Phase 3: Add new repos to tracking files
+      # ================================================================
+      - name: Add new repos to repos.txt
+        if: steps.discover.outputs.has_new == 'true'
+        run: |
+          while IFS= read -r REPO; do
+            [ -z "$REPO" ] && continue
+            # Only add if not already in repos.txt
+            if ! grep -q "^${REPO}|" scripts/ci-audit/repos.txt 2>/dev/null; then
+              echo "${REPO}|||||" >> scripts/ci-audit/repos.txt
+              echo "Added $REPO to repos.txt"
+            else
+              echo "$REPO already in repos.txt, skip"
+            fi
+          done < /tmp/new_repos.txt
+
+      - name: Insert new repos into Repo.md
+        if: steps.discover.outputs.has_new == 'true'
+        run: |
+          TODAY=$(TZ='Asia/Shanghai' date '+%Y-%m-%d')
+          TMP=$(mktemp)
+          while IFS= read -r REPO; do
+            [ -z "$REPO" ] && continue
+            printf '| [%s](https://github.com/%s) | - | - | - | - | %s |\n' \
+              "$REPO" "$REPO" "$TODAY" >> "$TMP"
+          done < /tmp/new_repos.txt
+
+          if [ -s "$TMP" ]; then
+            awk -v rows="$(cat "$TMP")" '
+              /<!-- CACHE_AUDIT_TABLE_END -->/ && rows != "" { print rows }
+              { print }
+            ' docs/Repo.md > docs/Repo.md.new && mv docs/Repo.md.new docs/Repo.md
+            echo "Inserted $(wc -l < "$TMP") new repo row(s) into Repo.md"
+          else
+            echo "No new rows to insert into Repo.md"
+          fi
+          rm -f "$TMP"
+
+      # ================================================================
+      # Phase 4: Existing audit flow
+      # ================================================================
       - name: Generate repos list from Repo.md
         run: |
           REPOS=$(grep -oE '\[([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\]\(https://github\.com/' docs/Repo.md \
             | grep -oE '[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+')
-
           > /tmp/audit_repos.txt
           while IFS= read -r REPO; do
             MAPPING=$(grep "^${REPO}|" scripts/ci-audit/repos.txt 2>/dev/null || true)
@@ -40,7 +129,6 @@ jobs:
               echo "$REPO" >> /tmp/audit_repos.txt
             fi
           done <<< "$REPOS"
-
           echo "=== 本次审计仓库列表 ==="
           cat /tmp/audit_repos.txt
 
@@ -61,7 +149,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/Repo.md
+          git add docs/Repo.md scripts/ci-audit/repos.txt
           if git diff --cached --quiet; then
             echo "No changes to Repo.md"
           else
