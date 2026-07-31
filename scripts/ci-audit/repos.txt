@@ -14,3 +14,11 @@ tile-ai/tilelang-ascend|ci_npuir.yml||||
 triton-lang/triton-ascend|||✅||
 vllm-ascend/vllm-ascend-recipes|||||
 verl-project/verl-omni|||||
+
+Ascend/pytorch|||||
+Ascend/sglang|||||
+alibaba/ROLL|||||
+areal-project/AReaL|||||
+fla-org/flash-linear-attention|||||
+tile-ai/tilelang-mlir-ascend|||||
+verl-project/verl-SpeCo|||||
