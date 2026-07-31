@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Scan opensourceways/ascend-ci-deployment argocd/clusters/ via GitHub API.
-For each Application with source.path starting with "projects/", collect:
-  - cluster: spec.destination.name
-  - project: org/repo from path segments
-  - runner dir: path segment after org/repo (e.g. linux-aarch64-a3-2)
-Then for each runner dir, read projects/{org}/{repo}/{runner}/values.yaml to get:
-  - scaleSetLabels (capability labels = all labels except the one matching cluster)
+Cluster map is derived FROM PROJECTS: iterate projects/{org}/{repo}/{runner}/,
+map each runner dir to its cluster via the ArgoCD Application that references it
+(source.path -> spec.destination.name). This is the trustworthy direction — the
+argocd/clusters/ directory listing itself is not authoritative.
+
+For each runner dir read values.yaml for:
+  - scaleSetLabels (capability labels, minus cluster short-names)
   - required-npu-count
   - npu-resource-model
 
-Generates docs/Cluster.md with MkDocs Material content tabs, one tab per cluster.
-Also git-adds the file (caller must commit).
+Generates docs/Cluster.md as a card grid, main clusters first, then a divider
+and the remaining ("other") clusters.
 
 Required env:
   GH_TOKEN   token with read access to opensourceways/ascend-ci-deployment
@@ -26,9 +26,30 @@ import urllib.request
 
 DEPLOYMENT_REPO = "opensourceways/ascend-ci-deployment"
 CLUSTERS_DIR = "argocd/clusters"
+PROJECTS_DIR = "projects"
 OUT_FILE = "docs/Cluster.md"
 
 TOKEN = os.environ.get("GH_TOKEN", "")
+
+# scaleSetLabels cluster labels (short names), excluded from runner capability labels
+CLUSTER_SHORTNAMES = {
+    "gy-001", "gy-002", "gy-003", "gy-004", "gy-005", "gy-006", "gy-007",
+    "hk-001", "hk-ci", "cn12-001", "sh-001",
+    "guiyang-001", "guiyang-003", "guiyang-004", "guiyang-005", "guiyang-006",
+    "hb-003", "huabei-003", "verl-suzhou", "suzhou", "in-cluster",
+}
+
+# main clusters (guiyang/hongkong/shanghai/cn12) shown first; the rest grouped
+# after a divider (e.g. huabei-003, verl-hb3, suzhou)
+MAIN_CLUSTERS = {
+    "openmerlin-guiyang-003-cluster",
+    "openmerlin-guiyang-004-cluster",
+    "openmerlin-guiyang-005-cluster",
+    "ascend-infra-guiyang-cluster-001",
+    "ascend-hk-001-cluster",
+    "openmerlin-sh-001-cluster",
+    "ascend-cn12-001-cluster",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -40,15 +61,20 @@ def _api(path, *, accept="application/vnd.github+json"):
     req = urllib.request.Request(url)
     req.add_header("Authorization", f"Bearer {TOKEN}")
     req.add_header("Accept", accept)
-    try:
-        with urllib.request.urlopen(req, timeout=20) as resp:  # nosec B310
-            return json.loads(resp.read()), resp.status
-    except urllib.error.HTTPError as exc:
-        body = exc.read()
+    for attempt in range(3):
         try:
-            return json.loads(body), exc.code
-        except Exception:
-            return {"message": body.decode(errors="replace")}, exc.code
+            with urllib.request.urlopen(req, timeout=30) as resp:  # nosec B310
+                return json.loads(resp.read()), resp.status
+        except urllib.error.HTTPError as exc:
+            body = exc.read()
+            try:
+                return json.loads(body), exc.code
+            except Exception:
+                return {"message": body.decode(errors="replace")}, exc.code
+        except (urllib.error.URLError, TimeoutError, OSError):
+            if attempt == 2:
+                raise
+    return {"message": "unreachable"}, 500
 
 
 def list_dir(path):
@@ -156,49 +182,64 @@ def parse_applications(text):
 # Main scan
 # ---------------------------------------------------------------------------
 
-def scan_clusters():
-    """
-    Returns dict: {destination_name -> {project -> [runner_info, ...]}}
-    runner_info = {runner_dir, labels, npu_count, npu_model}
-    """
-    entries = list_dir(CLUSTERS_DIR)
-    clusters = {}  # dest_name -> {project -> [runner_info]}
-
-    for entry in entries:
+def build_app_index():
+    """source.path -> destination.name for every projects/ Application."""
+    index = {}
+    for entry in list_dir(CLUSTERS_DIR):
         if entry.get("type") != "dir":
             continue
         dir_name = entry["name"]
-        files = list_dir(f"{CLUSTERS_DIR}/{dir_name}")
-
-        for f in files:
+        for f in list_dir(f"{CLUSTERS_DIR}/{dir_name}"):
             if f.get("type") != "file" or not f["name"].endswith(".yaml"):
                 continue
             content = get_file_content(f"{CLUSTERS_DIR}/{dir_name}/{f['name']}")
             if not content:
                 continue
-            apps = parse_applications(content)
-            for app in apps:
-                dest = app["destination_name"]
-                parts = app["source_path"].split("/")
-                # parts: ['projects', org, repo, runner_dir]
-                if len(parts) < 4:
-                    continue
-                org, repo, runner_dir = parts[1], parts[2], parts[3]
-                project = f"{org}/{repo}"
+            for app in parse_applications(content):
+                index.setdefault(app["source_path"], app["destination_name"])
+    return index
 
-                # fetch values.yaml
-                values_path = f"{app['source_path']}/values.yaml"
-                values_text = get_file_content(values_path)
+
+def scan_clusters():
+    """
+    Reverse-map: iterate projects/{org}/{repo}/{runner}/, map each runner dir to
+    its cluster via the ArgoCD Application referencing it.
+
+    Returns dict: {destination_name -> {project -> [runner_info, ...]}}
+    runner_info = {runner_dir, labels, npu_count, npu_model}
+    """
+    index = build_app_index()
+    clusters = {}  # dest_name -> {project -> [runner_info]}
+
+    for org in list_dir(PROJECTS_DIR):
+        if org.get("type") != "dir":
+            continue
+        org_name = org["name"]
+        for repo in list_dir(f"{PROJECTS_DIR}/{org_name}"):
+            if repo.get("type") != "dir":
+                continue
+            repo_name = repo["name"]
+            project = f"{org_name}/{repo_name}"
+            for sub in list_dir(f"{PROJECTS_DIR}/{org_name}/{repo_name}"):
+                if sub.get("type") != "dir":
+                    continue
+                runner_dir = sub["name"]
+                if not runner_dir.startswith("linux-"):
+                    continue
+                rel = f"{PROJECTS_DIR}/{org_name}/{repo_name}/{runner_dir}"
+                dest = index.get(rel)
+                if not dest:
+                    # runner dir not referenced by any ArgoCD Application
+                    # (e.g. sgl-kernel-npu linux-arm64-npu-*): skip
+                    continue
+
+                values_text = get_file_content(f"{rel}/values.yaml")
                 labels, npu_count, npu_model = parse_values_yaml(values_text)
 
-                # capability labels = all scaleSetLabels except the one matching dest
-                # (cluster label is typically the short cluster suffix like "gy-005" or full dest name)
-                cap_labels = [
-                    lbl for lbl in labels
-                    if lbl not in (dest,) and not dest.endswith(lbl) and not lbl == dir_name
-                ]
+                # capability labels = scaleSetLabels minus cluster short-names
+                # (sub-model labels like a3-560t are kept)
+                cap_labels = [lbl for lbl in labels if lbl not in CLUSTER_SHORTNAMES]
                 if not cap_labels and labels:
-                    # fallback: use runner_dir name itself
                     cap_labels = [runner_dir]
 
                 runner_info = {
@@ -214,48 +255,204 @@ def scan_clusters():
 
 
 # ---------------------------------------------------------------------------
-# Markdown generation
+# Cluster map generation (HTML card grid)
 # ---------------------------------------------------------------------------
+
+def _esc(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def _machine(runner):
+    """One machine row: label + NPU/cpu/on-demand suffix."""
+    labels = [l.rstrip("-") for l in runner["labels"]] if runner["labels"] else [runner["runner_dir"]]
+    label_txt = " + ".join(labels)
+    model = runner["npu_model"]
+    count = runner["npu_count"]
+    if _machine_bucket(runner) == "on-demand":
+        # -0 pool: multi-machine / on-demand, business starts pods itself
+        suffix = " · on-demand"
+        cls = " machine--ondemand"
+    elif not model or model in ("-", ""):
+        suffix = " · cpu"
+        cls = " machine--cpu"
+    else:
+        suffix = f" · {count} × {model}" if count and count != "-" else f" · {model}"
+        cls = ""
+    npu_bucket = _machine_bucket(runner)
+    return (
+        f'<div class="machine{cls}" data-label="{_esc(runner["runner_dir"])}" '
+        f'data-npu="{_esc(npu_bucket)}">'
+        f'<span class="machine-label">{_esc(label_txt)}</span>'
+        f'<span class="machine-npu">{_esc(suffix)}</span></div>'
+    )
+
+
+def _npu_bucket(model, count):
+    """Group runner into hardware bucket for filtering/statistics."""
+    if not model or model in ("-", ""):
+        return "cpu"
+    return model
+
+
+def _machine_bucket(runner):
+    """Unified bucket for a runner: on-demand pools, CPU-only, or NPU model."""
+    if re.search(r"-0(?:-|$)", runner["runner_dir"]):
+        return "on-demand"
+    if not runner["npu_model"] or runner["npu_model"] in ("-", ""):
+        return "cpu"
+    return runner["npu_model"]
+
+
+def _collect_stats(clusters):
+    """Compute counts and NPU-model distribution across all clusters."""
+    projects = set()
+    model_counts = {}
+    total_npu = 0
+    for dest, proj_map in clusters.items():
+        for project, runners in proj_map.items():
+            projects.add(project)
+            for r in runners:
+                bucket = _machine_bucket(r)
+                model_counts[bucket] = model_counts.get(bucket, 0) + 1
+                if bucket not in ("cpu", "on-demand") and r["npu_count"] not in ("-", ""):
+                    try:
+                        total_npu += int(r["npu_count"])
+                    except ValueError:
+                        pass
+    return projects, model_counts, total_npu
+
 
 def render_cluster_md(clusters):
     lines = [
         "# Cluster & Project Map",
         "",
-        "Cluster-to-project mapping, auto-generated daily from",
-        "[`opensourceways/ascend-ci-deployment`](https://github.com/opensourceways/ascend-ci-deployment)`/argocd/clusters/`.",
-        "",
-        "Each tab shows one cluster and its active `projects/` runner scale sets.",
+        "Cluster-to-project mapping derived from",
+        "[`opensourceways/ascend-ci-deployment`](https://github.com/opensourceways/ascend-ci-deployment) "
+        "project runner configs and their ArgoCD Applications.",
         "",
         "<!-- CLUSTER_MAP_START -->",
     ]
 
     if not clusters:
-        lines.append("*No active runner deployments found.*")
+        lines.append("<p><em>No active runner deployments found.</em></p>")
         lines.append("")
         lines.append("<!-- CLUSTER_MAP_END -->")
         return "\n".join(lines) + "\n"
 
-    for dest in sorted(clusters.keys()):
+    total_runners = sum(len(r) for ps in clusters.values() for r in ps.values())
+    all_projects, model_counts, total_npu = _collect_stats(clusters)
+
+    # --- legend (front) ---------------------------------------------------
+    lines.append(
+        '<p class="cluster-legend">Each row is one machine: <code>runner label</code> · '
+        "<code>N × NPU model</code>. "
+        "<code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool "
+        "(business starts pods itself). Click a project to show its machines.</p>"
+    )
+
+    # --- stats bar -------------------------------------------------------
+    lines.append('<div class="cluster-stats">')
+    for num, label in (
+        (len(clusters), "Clusters"),
+        (len(all_projects), "Projects"),
+        (total_runners, "Runners"),
+        (total_npu, "NPU chips"),
+    ):
+        lines.append('  <div class="stat-card">')
+        lines.append(f'    <span class="stat-num">{num}</span>')
+        lines.append(f'    <span class="stat-label">{label}</span>')
+        lines.append("  </div>")
+    lines.append("</div>")
+
+    # --- filter toolbar --------------------------------------------------
+    lines.append('<div class="cluster-toolbar">')
+    lines.append(
+        '<input type="search" id="cluster-filter" class="cluster-filter" '
+        'placeholder="Filter clusters, projects or runners…" aria-label="Filter clusters">'
+    )
+    lines.append('<select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">')
+    lines.append(f'  <option value="">All hardware</option>')
+    for bucket in sorted(model_counts.keys(), key=lambda b: (-model_counts[b], b)):
+        if bucket == "cpu":
+            lines.append(f'  <option value="cpu">CPU (no NPU) · {model_counts[bucket]}</option>')
+        else:
+            lines.append(f'  <option value="{_esc(bucket)}">{_esc(bucket)} · {model_counts[bucket]}</option>')
+    lines.append("</select>")
+    lines.append(
+        f'<span class="cluster-hint">{len(clusters)} clusters · {total_runners} runners</span>'
+    )
+    lines.append("</div>")
+
+    # --- card grid (main clusters, then divider + other clusters) --------
+    lines.append('<div class="cluster-grid" id="cluster-grid">')
+    lines.append("")
+
+    main_dests = sorted(d for d in clusters if d in MAIN_CLUSTERS)
+    other_dests = sorted(d for d in clusters if d not in MAIN_CLUSTERS)
+
+    divider_emitted = False
+    for dest in main_dests + other_dests:
+        if dest in other_dests and not divider_emitted:
+            # divider before the "other" group (only when both groups exist)
+            lines.append('<div class="cluster-divider">Other clusters</div>')
+            divider_emitted = True
+
         projects = clusters[dest]
-        lines.append(f'=== "{dest}"')
-        lines.append("")
+        n_proj = len(projects)
+        n_run = sum(len(r) for r in projects.values())
 
-        # collect all rows first so we can emit one table per cluster
-        rows = []
+        lines.append(f'<div class="cluster-card" data-name="{_esc(dest)}">')
+        lines.append('  <div class="cluster-card-header">')
+        lines.append(f'    <span class="cluster-name">{_esc(dest)}</span>')
+        lines.append(
+            f'    <span class="cluster-meta">{n_proj} project{"s" if n_proj != 1 else ""} · {n_run} runner{"s" if n_run != 1 else ""}</span>'
+        )
+        lines.append("  </div>")
+        lines.append('  <div class="cluster-body">')
+
         for project in sorted(projects.keys()):
-            runners = sorted(projects[project], key=lambda r: r["runner_dir"])
-            first = True
-            for r in runners:
-                cap = ", ".join(l.rstrip("-") for l in r["labels"]) if r["labels"] else r["runner_dir"]
-                proj_cell = f"[{project}](https://github.com/{project})" if first else ""
-                rows.append((proj_cell, cap, r["npu_model"], r["npu_count"]))
-                first = False
+            # sort by label length first, then alphabetically (a3-2, a3-4, a3-8, a3-16)
+            runners = sorted(projects[project], key=lambda r: (len(r["runner_dir"]), r["runner_dir"]))
+            machines = "".join(f"        {_machine(r)}" for r in runners)
 
-        lines.append("    | Project | Runner Labels | NPU Model | NPU Count |")
-        lines.append("    | :--- | :--- | :---: | :---: |")
-        for proj_cell, cap, model, count in rows:
-            lines.append(f"    | {proj_cell} | `{cap}` | {model} | {count} |")
+            # searchable text: project + all runner labels
+            label_text = " ".join(
+                (l.rstrip("-") for r in runners for l in (r["labels"] or [r["runner_dir"]]))
+            )
+            search_text = f"{project} {label_text}"
+
+            n_machines = len(runners)
+            lines.append(f'    <div class="project-row" data-search="{_esc(search_text)}">')
+            lines.append('      <div class="project-line">')
+            lines.append('        <button type="button" class="project-head" aria-expanded="false">')
+            lines.append('          <span class="project-toggle"></span>')
+            lines.append(f'          <span class="project-name-text">{_esc(project)}</span>')
+            lines.append(
+                f'          <span class="project-count">{n_machines} machine{"s" if n_machines != 1 else ""}</span>'
+            )
+            lines.append("        </button>")
+            lines.append(
+                f'        <a class="project-link" href="https://github.com/{_esc(project)}" '
+                'target="_blank" rel="noopener" title="Open on GitHub">↗</a>'
+            )
+            lines.append("      </div>")
+            lines.append('      <div class="machine-list" hidden>')
+            lines.append(machines)
+            lines.append("      </div>")
+            lines.append("    </div>")
+
+        lines.append("  </div>")
+        lines.append("</div>")
         lines.append("")
+
+    lines.append("</div>")
+
+    # --- empty state (shown by JS only when filters match nothing) --------
+    lines.append(
+        '<div class="cluster-empty" id="cluster-empty" hidden>'
+        "<p>No matching clusters.</p>"
+        "</div>"
+    )
 
     lines.append("<!-- CLUSTER_MAP_END -->")
     return "\n".join(lines) + "\n"
