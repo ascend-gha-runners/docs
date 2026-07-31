@@ -34,6 +34,9 @@ extra:
   generator: false
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - javascripts/tablesort.js
+  - javascripts/cluster-map.js
 
 plugins:
   - search
@@ -45,23 +48,21 @@ markdown_extensions:
   - attr_list
   # - mdx_truly_sane_lists
   - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
   - toc:
       permalink: true
 nav:
   - Home:
     - Getting Started: index.md
     - Future Plans: "#future-plans"
-  - GitHub Actions Guide En:
-    - user-manual-gha-en.md
-  - GitHub Actions Guide Zh:
-    - user-manual-gha-zh.md
-  - Buildkite Guide En:
-    - user-manual-buildkite-en.md
-  - Buildkite Guide Zh:
-    - user-manual-buildkite-zh.md
-  - Integrated repo:
-    - Repo.md
-  - Features:
-    - feature.md
-  - Job Failure Reference:
-    - error-types.md
+  - GitHub Actions Guide:
+    - English: user-manual-gha-en.md
+    - 中文: user-manual-gha-zh.md
+  - Buildkite Guide:
+    - English: user-manual-buildkite-en.md
+    - 中文: user-manual-buildkite-zh.md
+  - Integrated Repos: Repo.md
+  - Cluster Map: Cluster.md
+  - Features: feature.md
+  - Job Failure Reference: error-types.md
