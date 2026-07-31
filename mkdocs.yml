@@ -34,6 +34,8 @@ extra:
   generator: false
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - javascripts/tablesort.js
 
 plugins:
   - search
@@ -53,19 +55,14 @@ nav:
   - Home:
     - Getting Started: index.md
     - Future Plans: "#future-plans"
-  - GitHub Actions Guide En:
-    - user-manual-gha-en.md
-  - GitHub Actions Guide Zh:
-    - user-manual-gha-zh.md
-  - Buildkite Guide En:
-    - user-manual-buildkite-en.md
-  - Buildkite Guide Zh:
-    - user-manual-buildkite-zh.md
-  - Integrated repo:
-    - Repo.md
-  - Cluster Map:
-    - Cluster.md
-  - Features:
-    - feature.md
-  - Job Failure Reference:
-    - error-types.md
+  - Usage:
+    - GitHub Actions (EN): user-manual-gha-en.md
+    - GitHub Actions (ZH): user-manual-gha-zh.md
+    - Buildkite (EN): user-manual-buildkite-en.md
+    - Buildkite (ZH): user-manual-buildkite-zh.md
+  - Infrastructure:
+    - Integrated Repos: Repo.md
+    - Cluster Map: Cluster.md
+  - Reference:
+    - Features: feature.md
+    - Job Failure Reference: error-types.md
