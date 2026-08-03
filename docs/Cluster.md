@@ -3,7 +3,7 @@
 Auto-generated from CI deployment configuration: each runner's cluster is derived from the ArgoCD Application that deploys it.
 
 <!-- CLUSTER_MAP_START -->
-<p class="cluster-legend">Each row is one machine: <code>runner label</code> · <code>N × NPU model</code>. <code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool (business starts pods itself). Click a project to show its machines.</p>
+<p class="cluster-legend">Each row is one label: <code>runner label</code> · <code>N × NPU model</code>. Projects claim resources via these labels and queue for available machines. <code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool (business starts pods itself). Click a project to show its labels.</p>
 <div class="cluster-stats">
   <div class="stat-card">
     <span class="stat-num">10</span>
@@ -14,19 +14,15 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">149</span>
-    <span class="stat-label">Runners</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-num">637</span>
-    <span class="stat-label">NPU chips</span>
+    <span class="stat-num">153</span>
+    <span class="stat-label">Labels</span>
   </div>
 </div>
 <div class="cluster-toolbar">
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter clusters, projects or runners…" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 97</option>
+  <option value="ascend-1980">ascend-1980 · 101</option>
   <option value="cpu">CPU (no NPU) · 32</option>
   <option value="on-demand">on-demand · 8</option>
   <option value="Ascend910">Ascend910 · 4</option>
@@ -35,14 +31,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">10 clusters · 149 runners</span>
+<span class="cluster-hint">10 clusters · 153 runners</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
 <div class="cluster-card" data-name="ascend-cn12-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-cn12-001-cluster</span>
-    <span class="cluster-meta">8 projects · 36 runners</span>
+    <span class="cluster-meta">9 projects · 40 runners</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-aarch64-a3-0 a3-560t linux-aarch64-a3-2 a3-560t linux-aarch64-a3-4 a3-560t linux-aarch64-a3-8 a3-560t linux-aarch64-a3-16 a3-560t">
@@ -50,7 +46,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/sglang</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -63,7 +59,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">alibaba/ROLL</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/alibaba/ROLL" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -76,7 +72,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">areal-project/AReaL</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/areal-project/AReaL" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -89,7 +85,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sgl-kernel-npu</span>
-          <span class="project-count">1 machine</span>
+          <span class="project-count">1 label</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sgl-kernel-npu" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -97,12 +93,25 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="machine" data-label="linux-aarch64-a3-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16 + a3-560t</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
       </div>
     </div>
+    <div class="project-row" data-search="sgl-project/sglang linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">sgl-project/sglang</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a3-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+      </div>
+    </div>
     <div class="project-row" data-search="tile-ai/tilelang-mlir-ascend linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">tile-ai/tilelang-mlir-ascend</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/tile-ai/tilelang-mlir-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -115,7 +124,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">triton-lang/triton-ascend</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/triton-lang/triton-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -128,7 +137,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">11 machines</span>
+          <span class="project-count">11 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -141,7 +150,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-omni</span>
-          <span class="project-count">1 machine</span>
+          <span class="project-count">1 label</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -163,7 +172,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/sglang</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -176,7 +185,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">fla-org/flash-linear-attention</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/fla-org/flash-linear-attention" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -189,7 +198,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">hiyouga/LlamaFactory</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/hiyouga/LlamaFactory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -202,7 +211,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">modelscope/ms-swift</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/modelscope/ms-swift" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -215,7 +224,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sgl-kernel-npu</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sgl-kernel-npu" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -228,7 +237,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sglang</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -241,7 +250,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">triton-lang/triton-ascend</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/triton-lang/triton-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -254,7 +263,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">13 machines</span>
+          <span class="project-count">13 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -267,7 +276,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-omni</span>
-          <span class="project-count">1 machine</span>
+          <span class="project-count">1 label</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -280,7 +289,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -293,7 +302,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl-SpeCo</span>
-          <span class="project-count">2 machines</span>
+          <span class="project-count">2 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl-SpeCo" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -315,7 +324,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">triton-lang/triton-ascend</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/triton-lang/triton-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -328,7 +337,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-ascend/vllm-ascend-recipes</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-ascend/vllm-ascend-recipes" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -341,7 +350,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -354,7 +363,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl-omni</span>
-          <span class="project-count">2 machines</span>
+          <span class="project-count">2 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -376,7 +385,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">3 machines</span>
+          <span class="project-count">3 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -398,7 +407,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/sglang</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -411,7 +420,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sgl-kernel-npu</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sgl-kernel-npu" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -424,7 +433,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sglang</span>
-          <span class="project-count">5 machines</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -446,7 +455,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">triton-lang/triton-ascend</span>
-          <span class="project-count">6 machines</span>
+          <span class="project-count">6 labels</span>
         </button>
         <a class="project-link" href="https://github.com/triton-lang/triton-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -459,7 +468,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">11 machines</span>
+          <span class="project-count">11 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -481,7 +490,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">3 machines</span>
+          <span class="project-count">3 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -504,7 +513,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/pytorch</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/pytorch" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -526,7 +535,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
@@ -548,7 +557,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">4 machines</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
