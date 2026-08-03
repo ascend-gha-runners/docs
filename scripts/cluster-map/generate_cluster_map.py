@@ -362,10 +362,11 @@ def render_cluster_md(clusters):
 
     # --- legend (front) ---------------------------------------------------
     lines.append(
-        '<p class="cluster-legend">Each row is one machine: <code>runner label</code> · '
-        "<code>N × NPU model</code>. "
+        '<p class="cluster-legend">Each row is one label: <code>runner label</code> · '
+        "<code>N × NPU model</code>. Projects claim resources via these labels "
+        "and queue for available machines. "
         "<code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool "
-        "(business starts pods itself). Click a project to show its machines.</p>"
+        "(business starts pods itself). Click a project to show its labels.</p>"
     )
 
     # --- stats bar -------------------------------------------------------
@@ -373,8 +374,7 @@ def render_cluster_md(clusters):
     for num, label in (
         (len(clusters), "Clusters"),
         (len(all_projects), "Projects"),
-        (total_runners, "Runners"),
-        (total_npu, "NPU chips"),
+        (total_runners, "Labels"),
     ):
         lines.append('  <div class="stat-card">')
         lines.append(f'    <span class="stat-num">{num}</span>')
@@ -447,7 +447,7 @@ def render_cluster_md(clusters):
             lines.append('          <span class="project-toggle"></span>')
             lines.append(f'          <span class="project-name-text">{_esc(display)}</span>')
             lines.append(
-                f'          <span class="project-count">{n_machines} machine{"s" if n_machines != 1 else ""}</span>'
+                f'          <span class="project-count">{n_machines} label{"s" if n_machines != 1 else ""}</span>'
             )
             lines.append("        </button>")
             lines.append(
