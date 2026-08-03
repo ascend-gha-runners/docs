@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -106,6 +107,29 @@ def resolve_repo(org, repo):
 
 
 # ---------------------------------------------------------------------------
+# Removal helpers
+# ---------------------------------------------------------------------------
+
+def _remove_from_md(content, repos):
+    """Drop rows referencing the given repos from Repo.md table."""
+    out = []
+    removed = 0
+    for line in content.splitlines():
+        if any(f"[{r}](https://github.com/{r})" in line for r in repos):
+            removed += 1
+            continue
+        out.append(line)
+    return "\n".join(out), removed
+
+
+def _remove_from_txt(content, repos):
+    """Drop lines for the given repos from repos.txt."""
+    out = [ln for ln in content.splitlines()
+           if ln and not any(ln.startswith(f"{r}|") for r in repos)]
+    return "\n".join(out) + ("\n" if out else "")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -127,25 +151,44 @@ def main():
             project_dirs.append((org, repo))
     print(f"Found {len(project_dirs)} project dirs")
 
-    # ---- Resolve and find new repos ----
-    new_repos = []
+    # ---- Resolve every project dir to its real repo name ----
+    resolved = {}  # dir_name -> real name
     for org, repo in project_dirs:
         dir_name = f"{org}/{repo}"
-        # Fast path: dir name already known → skip API calls
         if dir_name in known:
+            # fast path: already tracked by dir name
+            resolved[dir_name] = dir_name
             continue
-        real = resolve_repo(org, repo)
+        resolved[dir_name] = resolve_repo(org, repo)
+    active_real = set(resolved.values())
+
+    # ---- New repos: real name not yet tracked ----
+    new_repos = []
+    for real in resolved.values():
         if real not in known:
             new_repos.append(real)
             known.add(real)  # deduplicate within this run
 
-    # ---- Write /tmp/new_repos.txt for downstream steps ----
-    with open("/tmp/new_repos.txt", "w", encoding="utf-8") as f:
+    # ---- Removed repos: in Repo.md but no longer in deployment projects/ ----
+    removed = sorted(known - active_real)
+    if removed:
+        print(f"Removed repos (gone from deployment projects/): {removed}")
+        repo_md, _ = _remove_from_md(repo_md, removed)
+        with open("docs/Repo.md", "w", encoding="utf-8") as f:
+            f.write(repo_md)
+        with open("scripts/ci-audit/repos.txt", encoding="utf-8") as f:
+            repos_txt = f.read()
+        with open("scripts/ci-audit/repos.txt", "w", encoding="utf-8") as f:
+            f.write(_remove_from_txt(repos_txt, removed))
+
+    # ---- Write new_repos.txt for downstream steps ----
+    new_repos_file = os.path.join(tempfile.gettempdir(), "new_repos.txt")
+    with open(new_repos_file, "w", encoding="utf-8") as f:
         f.write("\n".join(new_repos) + ("\n" if new_repos else ""))
 
     github_output = os.environ.get("GITHUB_OUTPUT", "")
-    if not new_repos:
-        print("No new repos found.")
+    if not new_repos and not removed:
+        print("No repo changes.")
         if github_output:
             with open(github_output, "a") as f:
                 f.write("has_new=false\n")
@@ -153,7 +196,7 @@ def main():
 
     print(f"New repos to add: {new_repos}")
 
-    # ---- Update Repo.md ----
+    # ---- Update Repo.md with new rows ----
     today = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
     new_rows = "".join(
         f"| [{r}](https://github.com/{r}) | - | - | - | - | {today} |\n"
