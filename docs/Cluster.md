@@ -1,7 +1,6 @@
 # Cluster & Project Map
 
-Cluster-to-project mapping derived from
-[`opensourceways/ascend-ci-deployment`](https://github.com/opensourceways/ascend-ci-deployment) project runner configs and their ArgoCD Applications.
+Auto-generated from CI deployment configuration: each runner's cluster is derived from the ArgoCD Application that deploys it.
 
 <!-- CLUSTER_MAP_START -->
 <p class="cluster-legend">Each row is one machine: <code>runner label</code> · <code>N × NPU model</code>. <code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool (business starts pods itself). Click a project to show its machines.</p>
@@ -185,14 +184,14 @@ Cluster-to-project mapping derived from
         <div class="machine" data-label="linux-aarch64-a2-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
       </div>
     </div>
-    <div class="project-row" data-search="hiyouga/LLaMA-Factory linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
+    <div class="project-row" data-search="hiyouga/LlamaFactory linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">hiyouga/LLaMA-Factory</span>
+          <span class="project-name-text">hiyouga/LlamaFactory</span>
           <span class="project-count">4 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/hiyouga/LLaMA-Factory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/hiyouga/LlamaFactory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
@@ -276,27 +275,27 @@ Cluster-to-project mapping derived from
         <div class="machine machine--cpu" data-label="linux-aarch64-a2b3" data-npu="cpu"><span class="machine-label">linux-aarch64-a2b3</span><span class="machine-npu"> · cpu</span></div>
       </div>
     </div>
-    <div class="project-row" data-search="volcengine/verl linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">volcengine/verl</span>
+          <span class="project-name-text">verl-project/verl</span>
           <span class="project-count">4 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/volcengine/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine machine--cpu" data-label="linux-aarch64-a2-1" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-2" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-4" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
       </div>
     </div>
-    <div class="project-row" data-search="volcengine/verl-SpeCo linux-aarch64-a2-4 linux-aarch64-a2-8">
+    <div class="project-row" data-search="verl-project/verl-SpeCo linux-aarch64-a2-4 linux-aarch64-a2-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">volcengine/verl-SpeCo</span>
+          <span class="project-name-text">verl-project/verl-SpeCo</span>
           <span class="project-count">2 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/volcengine/verl-SpeCo" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/verl-project/verl-SpeCo" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine machine--cpu" data-label="linux-aarch64-a2-4" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
@@ -350,14 +349,14 @@ Cluster-to-project mapping derived from
         <div class="machine" data-label="linux-aarch64-a2b1-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b1-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2b1-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b1-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2b1-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b1-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2b1-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b1-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
       </div>
     </div>
-    <div class="project-row" data-search="volcengine/verl-omni linux-aarch64-a2b4-4 linux-aarch64-a2b4-8">
+    <div class="project-row" data-search="verl-project/verl-omni linux-aarch64-a2b4-4 linux-aarch64-a2b4-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">volcengine/verl-omni</span>
+          <span class="project-name-text">verl-project/verl-omni</span>
           <span class="project-count">2 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/volcengine/verl-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/verl-project/verl-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2b4-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b4-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2b4-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2b4-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
@@ -522,14 +521,14 @@ Cluster-to-project mapping derived from
     <span class="cluster-meta">1 project · 4 runners</span>
   </div>
   <div class="cluster-body">
-    <div class="project-row" data-search="volcengine/verl linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">volcengine/verl</span>
+          <span class="project-name-text">verl-project/verl</span>
           <span class="project-count">4 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/volcengine/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
@@ -544,14 +543,14 @@ Cluster-to-project mapping derived from
     <span class="cluster-meta">1 project · 4 runners</span>
   </div>
   <div class="cluster-body">
-    <div class="project-row" data-search="volcengine/verl linux-aarch64-a2b3-1 linux-aarch64-a2b3-2 linux-aarch64-a2b3-4 linux-aarch64-a2b3-8">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a2b3-1 linux-aarch64-a2b3-2 linux-aarch64-a2b3-4 linux-aarch64-a2b3-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">volcengine/verl</span>
+          <span class="project-name-text">verl-project/verl</span>
           <span class="project-count">4 machines</span>
         </button>
-        <a class="project-link" href="https://github.com/volcengine/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2b3-1" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-1</span><span class="machine-npu"> · 1 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-2" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-2</span><span class="machine-npu"> · 2 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-4" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-4</span><span class="machine-npu"> · 4 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-8" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-8</span><span class="machine-npu"> · 8 × Ascend910</span></div>
