@@ -345,9 +345,8 @@ def render_cluster_md(clusters):
     lines = [
         "# Cluster & Project Map",
         "",
-        "Cluster-to-project mapping derived from",
-        "[`opensourceways/ascend-ci-deployment`](https://github.com/opensourceways/ascend-ci-deployment) "
-        "project runner configs and their ArgoCD Applications.",
+        "Auto-generated from CI deployment configuration: each runner's cluster "
+        "is derived from the ArgoCD Application that deploys it.",
         "",
         "<!-- CLUSTER_MAP_START -->",
     ]

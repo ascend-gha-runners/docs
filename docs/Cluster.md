@@ -1,7 +1,6 @@
 # Cluster & Project Map
 
-Cluster-to-project mapping derived from
-[`opensourceways/ascend-ci-deployment`](https://github.com/opensourceways/ascend-ci-deployment) project runner configs and their ArgoCD Applications.
+Auto-generated from CI deployment configuration: each runner's cluster is derived from the ArgoCD Application that deploys it.
 
 <!-- CLUSTER_MAP_START -->
 <p class="cluster-legend">Each row is one machine: <code>runner label</code> · <code>N × NPU model</code>. <code>· cpu</code> = CPU-only · <code>· on-demand</code> = elastic pool (business starts pods itself). Click a project to show its machines.</p>
