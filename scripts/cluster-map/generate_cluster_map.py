@@ -386,7 +386,7 @@ def render_cluster_md(clusters):
     lines.append('<div class="cluster-toolbar">')
     lines.append(
         '<input type="search" id="cluster-filter" class="cluster-filter" '
-        'placeholder="Filter clusters, projects or runners…" aria-label="Filter clusters">'
+        'placeholder="Filter clusters, projects or labels…" aria-label="Filter clusters">'
     )
     lines.append('<select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">')
     lines.append(f'  <option value="">All hardware</option>')
@@ -397,7 +397,7 @@ def render_cluster_md(clusters):
             lines.append(f'  <option value="{_esc(bucket)}">{_esc(bucket)} · {model_counts[bucket]}</option>')
     lines.append("</select>")
     lines.append(
-        f'<span class="cluster-hint">{len(clusters)} clusters · {total_runners} runners</span>'
+        f'<span class="cluster-hint">{len(clusters)} clusters · {total_runners} labels</span>'
     )
     lines.append("</div>")
 
@@ -423,7 +423,7 @@ def render_cluster_md(clusters):
         lines.append('  <div class="cluster-card-header">')
         lines.append(f'    <span class="cluster-name">{_esc(dest)}</span>')
         lines.append(
-            f'    <span class="cluster-meta">{n_proj} project{"s" if n_proj != 1 else ""} · {n_run} runner{"s" if n_run != 1 else ""}</span>'
+            f'    <span class="cluster-meta">{n_proj} project{"s" if n_proj != 1 else ""} · {n_run} label{"s" if n_run != 1 else ""}</span>'
         )
         lines.append("  </div>")
         lines.append('  <div class="cluster-body">')
