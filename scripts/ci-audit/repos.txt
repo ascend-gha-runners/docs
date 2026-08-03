@@ -5,8 +5,8 @@ sgl-project/sglang|pr-test-npu.yml||||
 vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅||
 vllm-project/vllm-omni||||||
 sgl-project/sgl-kernel-npu||✅|✅||
-volcengine/verl|e2e_ascend.yml|✅|✅||
-hiyouga/LLaMA-Factory|tests_npu.yml||||
+verl-project/verl|e2e_ascend.yml|✅|✅||
+hiyouga/LlamaFactory|tests_npu.yml||||
 modelscope/ms-swift|citest_npu.yaml||||
 triton-lang/triton-ascend|||✅||
 vllm-ascend/vllm-ascend-recipes|||||
