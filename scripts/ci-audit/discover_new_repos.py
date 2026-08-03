@@ -91,8 +91,10 @@ def resolve_repo(org, repo):
     actually verl-project/verl-omni). Values.yaml URLs can also be stale but
     the GitHub API follows renames transparently.
     """
-    candidates = []
     url_repo = _url_from_values(org, repo)
+    if url_repo and url_repo == f"{org}/{repo}":
+        return url_repo  # URL already matches dir name, no API round-trip needed
+    candidates = []
     if url_repo and url_repo != f"{org}/{repo}":
         candidates.append(url_repo)
     candidates.append(f"{org}/{repo}")
@@ -129,6 +131,33 @@ def _remove_from_txt(content, repos):
     return "\n".join(out) + ("\n" if out else "")
 
 
+def _rename_in_md(content, renames):
+    """Rename repo rows (preserving the rest of the row) in Repo.md."""
+    for old, new in renames.items():
+        content = content.replace(
+            f"[{old}](https://github.com/{old})",
+            f"[{new}](https://github.com/{new})",
+        )
+    return content
+
+
+def _rename_in_txt(content, renames):
+    """Rename repo lines (preserving the rest of the line) in repos.txt."""
+    out = []
+    for line in content.splitlines():
+        if not line:
+            continue
+        renamed = False
+        for old, new in renames.items():
+            if line.startswith(f"{old}|"):
+                out.append(new + line[len(old):])
+                renamed = True
+                break
+        if not renamed:
+            out.append(line)
+    return "\n".join(out) + ("\n" if out else "")
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -155,12 +184,25 @@ def main():
     resolved = {}  # dir_name -> real name
     for org, repo in project_dirs:
         dir_name = f"{org}/{repo}"
-        if dir_name in known:
-            # fast path: already tracked by dir name
-            resolved[dir_name] = dir_name
-            continue
         resolved[dir_name] = resolve_repo(org, repo)
     active_real = set(resolved.values())
+
+    # ---- Rename stale tracked names (e.g. volcengine/verl -> verl-project/verl) ----
+    renamed = {}
+    for dir_name, real in resolved.items():
+        if real != dir_name and dir_name in known and real not in known:
+            renamed[dir_name] = real
+            known.discard(dir_name)
+            known.add(real)
+    if renamed:
+        print(f"Renamed tracked repos: {renamed}")
+        repo_md = _rename_in_md(repo_md, renamed)
+        with open("docs/Repo.md", "w", encoding="utf-8") as f:
+            f.write(repo_md)
+        with open("scripts/ci-audit/repos.txt", encoding="utf-8") as f:
+            repos_txt = f.read()
+        with open("scripts/ci-audit/repos.txt", "w", encoding="utf-8") as f:
+            f.write(_rename_in_txt(repos_txt, renamed))
 
     # ---- New repos: real name not yet tracked ----
     new_repos = []
