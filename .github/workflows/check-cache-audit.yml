@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "24 2 * * *" # 每天 10:24 北京时间 (UTC+8)
   workflow_dispatch:
+  repository_dispatch:
+    types: [ci-config-update]
+
+concurrency:
+  group: ci-cache-audit
+  cancel-in-progress: false
 
 permissions:
   contents: write
