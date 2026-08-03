@@ -236,6 +236,16 @@ def scan_clusters():
                 values_text = get_file_content(f"{rel}/values.yaml")
                 labels, npu_count, npu_model = parse_values_yaml(values_text)
 
+                # real GitHub org/repo from githubConfigUrl (dir name is often stale)
+                repo_full = ""
+                if values_text:
+                    m = re.search(
+                        r"githubConfigUrl:\s*https?://github\.com/([^/\s]+)/([^/\s]+)",
+                        values_text,
+                    )
+                    if m:
+                        repo_full = f"{m.group(1)}/{m.group(2).rstrip('/')}"
+
                 # capability labels = scaleSetLabels minus cluster short-names
                 # (sub-model labels like a3-560t are kept)
                 cap_labels = [lbl for lbl in labels if lbl not in CLUSTER_SHORTNAMES]
@@ -247,6 +257,7 @@ def scan_clusters():
                     "labels": cap_labels,
                     "npu_count": npu_count or "-",
                     "npu_model": npu_model or "-",
+                    "repo_full": repo_full,
                 }
 
                 clusters.setdefault(dest, {}).setdefault(project, []).append(runner_info)
@@ -260,6 +271,14 @@ def scan_clusters():
 
 def _esc(s):
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def _project_display(project, runners):
+    """Display name for a project: real repo from githubConfigUrl, else dir name."""
+    for r in runners:
+        if r.get("repo_full"):
+            return r["repo_full"]
+    return project
 
 
 def _machine(runner):
@@ -414,25 +433,26 @@ def render_cluster_md(clusters):
             # sort by label length first, then alphabetically (a3-2, a3-4, a3-8, a3-16)
             runners = sorted(projects[project], key=lambda r: (len(r["runner_dir"]), r["runner_dir"]))
             machines = "".join(f"        {_machine(r)}" for r in runners)
+            display = _project_display(project, runners)
 
-            # searchable text: project + all runner labels
+            # searchable text: display name + all runner labels
             label_text = " ".join(
                 (l.rstrip("-") for r in runners for l in (r["labels"] or [r["runner_dir"]]))
             )
-            search_text = f"{project} {label_text}"
+            search_text = f"{display} {label_text}"
 
             n_machines = len(runners)
             lines.append(f'    <div class="project-row" data-search="{_esc(search_text)}">')
             lines.append('      <div class="project-line">')
             lines.append('        <button type="button" class="project-head" aria-expanded="false">')
             lines.append('          <span class="project-toggle"></span>')
-            lines.append(f'          <span class="project-name-text">{_esc(project)}</span>')
+            lines.append(f'          <span class="project-name-text">{_esc(display)}</span>')
             lines.append(
                 f'          <span class="project-count">{n_machines} machine{"s" if n_machines != 1 else ""}</span>'
             )
             lines.append("        </button>")
             lines.append(
-                f'        <a class="project-link" href="https://github.com/{_esc(project)}" '
+                f'        <a class="project-link" href="https://github.com/{_esc(display)}" '
                 'target="_blank" rel="noopener" title="Open on GitHub">↗</a>'
             )
             lines.append("      </div>")
