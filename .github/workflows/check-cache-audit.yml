@@ -23,6 +23,8 @@ jobs:
       APT_CACHE_PORT: ${{ vars.APT_CACHE_PORT || '8081' }}
       RUNNER_FILTER: ${{ vars.RUNNER_FILTER || 'linux-aarch64,linux-amd64' }}
       MAX_NPU_SEARCH: ${{ vars.MAX_NPU_SEARCH || '50' }}
+      MAX_CANDIDATES: ${{ vars.MAX_CANDIDATES || '3' }}
+      PARALLEL: ${{ vars.PARALLEL || '4' }}
 
     steps:
       - uses: actions/checkout@v4

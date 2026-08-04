@@ -4,20 +4,20 @@ set -euo pipefail
 # ==============================================================================
 # CI 缓存审计脚本 — 基于 GitHub Actions 运行日志分析
 #
-# 策略：
-#   1. 支持两种搜索模式：
-#      - 自动模式：翻页搜索所有 run，找 NPU runner job，下载日志
-#      - 定向模式：repos.txt 每行可指定 workflow 文件名，直接搜该 workflow
-#   2. 找到 NPU job 后如果日志过期，继续翻找下一个可用日志的 job
-#   3. Runner label 过滤跳过 ubuntu-latest 等无关 workflow
+# 优化策略（v2）：
+#   1. GraphQL 查询替代 REST 翻页（获取 runs，1 次 GraphQL 替代 2-4 次 REST）
+#   2. 早停：找到 MAX_CANDIDATES 个 NPU job 候选即停止扫描
+#   3. 并发：repo 级 PARALLEL 并发处理
 #
 # repos.txt 格式：
-#   org/repo                           — 自动模式，翻页搜所有 run
-#   org/repo|workflow-file.yml         — 定向模式，只搜指定 workflow 的 run
+#   org/repo                           — 自动模式，GraphQL 查询
+#   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
 #
 # 环境变量：
-#   RUNNER_FILTER    — runner label 过滤词（逗号分隔），默认 "linux-aarch64,self-hosted"
-#   MAX_NPU_SEARCH   — 自动模式最多搜多少个 run，默认 100
+#   RUNNER_FILTER    — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
+#   MAX_NPU_SEARCH   — 自动模式最多搜多少个 run，默认 50
+#   MAX_CANDIDATES   — 早停：最多收集多少个候选 job，默认 3
+#   PARALLEL         — 并发 repo 数，默认 4
 #   PYPI_CACHE_HOST  — PyPI 缓存主机名
 #   APT_CACHE_PORT   — APT 缓存端口
 #   CCACHE_KEYWORD   — ccache 检测关键词（默认 "ccache"）
@@ -33,8 +33,8 @@ if ! command -v gh &>/dev/null; then
     exit 1
 fi
 
-INPUT_FILE="$1"
-if [ ! -f "$INPUT_FILE" ]; then
+INPUT_FILE="${1:-}"
+if [ -z "$INPUT_FILE" ] || [ ! -f "$INPUT_FILE" ]; then
     echo "Usage: $0 <repos_file>" >&2
     exit 1
 fi
@@ -45,7 +45,9 @@ APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
 CCACHE_KEYWORD="${CCACHE_KEYWORD:-ccache}"
 RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
-MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-100}"
+MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-50}"
+MAX_CANDIDATES="${MAX_CANDIDATES:-3}"
+PARALLEL="${PARALLEL:-4}"
 PER_PAGE="${PER_PAGE:-30}"
 
 RUNNER_REGEX=$(echo "$RUNNER_FILTER" | sed 's/,/|/g')
@@ -56,140 +58,346 @@ else
     APT_PATTERN=":${APT_CACHE_PORT}"
 fi
 
-LOG_DIR="/tmp/cache-audit-logs"
-rm -rf "$LOG_DIR"
-mkdir -p "$LOG_DIR"
-
-echo "Log-based Cache Audit Configuration:"
+echo "Log-based Cache Audit Configuration (v2 — optimized):"
 echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
 echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
 echo " - Max NPU Search:   $MAX_NPU_SEARCH runs"
+echo " - Max Candidates:   $MAX_CANDIDATES (early stop)"
+echo " - Parallel:         $PARALLEL repos"
 echo "------------------------------------------------------------------"
 
-STAT_PYPI=0
-STAT_APT=0
-STAT_CCACHE=0
-STAT_UV=0
-STAT_NO_CACHE=0
-STAT_NO_NPU=0
-STAT_ERROR=0
-TOTAL=0
+# ==============================================================================
+# Phase 1 helpers: get runs and filter NPU jobs
+# ==============================================================================
 
-echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 (Evidence) |"
-echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |"
+# GraphQL: get recent runs for a repo (replaces REST pagination)
+graphql_get_runs() {
+    local REPO="$1"
+    local ORG="${REPO%%/*}"
+    local NAME="${REPO#*/}"
 
-while IFS= read -r LINE || [ -n "$LINE" ]; do
-    [[ -z "$LINE" || "$LINE" =~ ^[[:space:]]*# ]] && continue
-    TOTAL=$((TOTAL + 1))
+    gh api graphql \
+        -f query='query($owner: String!, $name: String!) {
+            repository(owner: $owner, name: $name) {
+                workflowRuns(first: 10, orderBy: {field: CREATED_AT, direction: DESC}) {
+                    nodes {
+                        databaseId
+                        headBranch
+                        name
+                        conclusion
+                        status
+                    }
+                }
+            }
+        }' \
+        -f owner="$ORG" \
+        -f name="$NAME" \
+        2>/dev/null \
+    | jq -r '
+        (.data.repository.workflowRuns.nodes // [])[]
+        | select(.conclusion == "success" or .conclusion == "failure")
+        | "\(.databaseId)|\(.headBranch)|\(.name)"
+    ' 2>/dev/null || true
+}
 
-    # Parse repo and optional workflow filter
-    # Format: org/repo   or   org/repo|workflow-file.yml
-    REPO=$(echo "$LINE" | cut -d'|' -f1 | xargs)
-    if [[ "$LINE" == *"|"* ]]; then
-        WORKFLOW_FILTER=$(echo "$LINE" | cut -d'|' -f2 | xargs)
-    else
-        WORKFLOW_FILTER=""
-    fi
-
-    # ==================================================================
-    # Phase 1: Collect candidate NPU jobs (paginate until found)
-    # ==================================================================
-    # Store candidates as: run_id|run_branch|run_name|job_id|job_name|job_labels
-    candidates=""
-    npu_found=false
-    runs_scanned=0
-    max_runs=${MAX_NPU_SEARCH}
-
-    page=1
-    max_pages=$(( (max_runs + PER_PAGE - 1) / PER_PAGE ))
+# REST fallback: get runs for a specific workflow file (when repos.txt specifies |workflow.yml)
+rest_get_runs() {
+    local REPO="$1"
+    local WF="$2"
+    local page=1
+    local max_pages=$(( (MAX_NPU_SEARCH + PER_PAGE - 1) / PER_PAGE ))
 
     while [ "$page" -le "$max_pages" ]; do
-        if [ -n "$WORKFLOW_FILTER" ]; then
-            runs_success=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
-            runs_failure=$(gh api "repos/$REPO/actions/workflows/${WORKFLOW_FILTER}/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
-        else
-            runs_success=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
-            runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
-        fi
-        # 合并两次结果，按 run id 降序排列（新的优先）
+        local runs_success runs_failure runs_json
+        runs_success=$(gh api "repos/$REPO/actions/workflows/${WF}/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
+        runs_failure=$(gh api "repos/$REPO/actions/workflows/${WF}/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
         runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
             {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
         ' 2>/dev/null) || true
 
-        if [ -z "$runs_json" ]; then
-            break
-        fi
-
+        [ -z "$runs_json" ] && break
+        local run_count
         run_count=$(echo "$runs_json" | jq -r '.workflow_runs | length' 2>/dev/null || echo "0")
-        if [ "$run_count" = "0" ]; then
-            break
-        fi
+        [ "$run_count" = "0" ] && break
 
-        runs_scanned=$((runs_scanned + run_count))
-        run_ids=$(echo "$runs_json" | jq -r '.workflow_runs[].id')
-
-        for run_id in $run_ids; do
-            run_branch=$(echo "$runs_json" | jq -r ".workflow_runs[] | select(.id == $run_id) | .head_branch")
-            run_name=$(echo "$runs_json" | jq -r ".workflow_runs[] | select(.id == $run_id) | .name")
-
-            jobs_json=$(gh api "repos/$REPO/actions/runs/$run_id/jobs" 2>/dev/null) || continue
-
-            total_jobs=$(echo "$jobs_json" | jq -r '.total_count // 0')
-            if [ "$total_jobs" = "0" ]; then
-                continue
-            fi
-
-            filtered=$(echo "$jobs_json" | jq -r "
-                .jobs[]
-                | select(
-                    (.labels | any(test(\"$RUNNER_REGEX\"))) and
-                    .conclusion != \"skipped\" and
-                    .status == \"completed\"
-                )
-                | [\"$run_id\", \"$run_branch\", \"$run_name\", .id, .name, (.labels | join(\",\"))] | join(\"|\")
-            " 2>/dev/null) || true
-
-            if [ -n "$filtered" ]; then
-                candidates="$candidates"$'\n'"$filtered"
-                npu_found=true
-            fi
-        done
-
+        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"'
         page=$((page + 1))
     done
+}
 
-    # ==================================================================
-    # Phase 2: Try candidates one by one until a usable log is found
-    # ==================================================================
-    repo_pypi=false
-    repo_apt=false
-    repo_ccache=false
-    repo_uv=false
-    repo_evidence=""
-    repo_run=""
-    repo_runner=""
-    log_ok=false
+# Get jobs for a run, filter NPU runner jobs
+get_npu_jobs() {
+    local REPO="$1"
+    local RUN_ID="$2"
 
-    if [ "$npu_found" = false ]; then
-        if [ "$runs_scanned" -gt 0 ]; then
-            echo "| $REPO | (scanned $runs_scanned runs) | - | 🔍 | 🔍 | 🔍 | 🔍 | No NPU runner jobs found in last $runs_scanned runs |"
-            STAT_NO_NPU=$((STAT_NO_NPU + 1))
-        else
-            echo "| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | No completed runs / no access |"
-            STAT_ERROR=$((STAT_ERROR + 1))
-        fi
-        continue
+    local jobs_json
+    jobs_json=$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs" 2>/dev/null) || return 1
+
+    echo "$jobs_json" | jq -r "
+        .jobs[]
+        | select(
+            (.labels | any(test(\"$RUNNER_REGEX\"))) and
+            .conclusion != \"skipped\" and
+            .status == \"completed\"
+          )
+        | [.id, .name, (.labels | join(\",\"))] | join(\"|\")
+    " 2>/dev/null || true
+}
+
+# ==============================================================================
+# Phase 2: search log for cache evidence
+# ==============================================================================
+search_log_evidence() {
+    local log_file="$1"
+    # Sets via globals: repo_pypi repo_apt repo_ccache repo_uv
+    # ev_pypi ev_apt ev_ccache ev_uv
+    # counter_evidence_pypi counter_evidence_apt
+
+    # Pre-check: skip jobs with no package installation activity
+    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake" "$log_file" 2>/dev/null; then
+        return 1
     fi
 
-    # Deduplicate and sort candidates (newest run first = first found)
-    candidates=$(echo "$candidates" | grep -v '^$' | sort -t'|' -k1 -rn | uniq)
+    # ---------- PyPI cache evidence ----------
+    ev_pypi=""
+    counter_evidence_pypi=""
+    repo_pypi=false
+
+    actual_index_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null || true)
+    if [ -n "$actual_index_line" ]; then
+        if echo "$actual_index_line" | grep -q "$PYPI_CACHE_HOST"; then
+            repo_pypi=true
+            ev_pypi="pip实际用缓存: ${actual_index_line:0:200}"
+        else
+            counter_evidence_pypi="实际用: ${actual_index_line:0:200}"
+        fi
+    else
+        grep_line=$(grep -m1 -iE "pip config set.*index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
+        if [ -n "$grep_line" ]; then
+            repo_pypi=true
+            ev_pypi="uv/pip-config(配置,无运行时证据): ${grep_line:0:200}"
+        fi
+        if [ "$repo_pypi" = false ]; then
+            grep_line=$(grep -m1 -E "PIP_INDEX_URL=.*$PYPI_CACHE_HOST|PIP_EXTRA_INDEX_URL=.*$PYPI_CACHE_HOST|UV_INDEX_URL=.*$PYPI_CACHE_HOST|UV_DEFAULT_INDEX=.*$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                repo_pypi=true
+                ev_pypi="pip/uv-env(配置,无运行时证据): ${grep_line:0:200}"
+            fi
+        fi
+        if [ "$repo_pypi" = false ]; then
+            grep_line=$(grep -m1 -iE "index-url|extra-index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
+            if [ -n "$grep_line" ] && ! echo "$grep_line" | grep -qi "pip config set"; then
+                repo_pypi=true
+                ev_pypi="pip-config(配置,无运行时证据): ${grep_line:0:200}"
+            fi
+        fi
+        if [ "$repo_pypi" = false ]; then
+            grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null \
+                | grep -viE "apt|sed|sources\.list|Get:|Hit:|Ign:" || true)
+            if [ -n "$grep_line" ]; then
+                repo_pypi=true
+                ev_pypi="pip-broad(配置): ${grep_line:0:200}"
+            fi
+        fi
+    fi
+
+    # ---------- APT cache evidence ----------
+    ev_apt=""
+    counter_evidence_apt=""
+    repo_apt=false
+
+    grep_line=$(grep -m1 -iE "^Get:|^Hit:|^Ign:" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
+    if [ -n "$grep_line" ]; then
+        repo_apt=true
+        ev_apt="apt-get: ${grep_line:0:200}"
+    fi
+    if [ "$repo_apt" = false ]; then
+        grep_line=$(grep -m1 -i "Acquire::http" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
+        if [ -n "$grep_line" ]; then
+            repo_apt=true
+            ev_apt="apt-proxy: ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_apt" = false ]; then
+        grep_line=$(grep -m1 -iE "sed.*${APT_PATTERN}" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_apt=true
+            ev_apt="apt-sed: ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_apt" = false ]; then
+        grep_line=$(grep -m1 -E "$APT_PATTERN" "$log_file" 2>/dev/null | grep -iE "apt|sources|mirror|repo" || true)
+        if [ -n "$grep_line" ]; then
+            repo_apt=true
+            ev_apt="apt-broad: ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_apt" = false ]; then
+        grep_line=$(grep -m1 -iE "^Get:|^Hit:" "$log_file" 2>/dev/null | grep -vE "$APT_PATTERN|$PYPI_CACHE_HOST" || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_apt="实际用: ${grep_line:0:200}"
+        else
+            grep_line=$(grep -m1 -iE "apt-get install|apt-get update" "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                counter_evidence_apt="apt cmd: ${grep_line:0:200}"
+            fi
+        fi
+    fi
+
+    # ---------- CCache evidence ----------
+    ev_ccache=""
+    repo_ccache=false
+
+    grep_line=$(grep -m1 -iE "cache hit|cache miss|Cache hit|Cache miss|cache_hit|cache_miss|cachehit|cachemiss" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_ccache=true
+        ev_ccache="ccache统计(运行时): ${grep_line:0:200}"
+    fi
+    if [ "$repo_ccache" = false ]; then
+        grep_line=$(grep -m1 -iE "TRITON_BUILD_WITH_CCACHE|CMAKE_C_COMPILER_LAUNCHER.*ccache|CMAKE_CXX_COMPILER_LAUNCHER.*ccache|CC=ccache|CXX=ccache" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_ccache=true
+            ev_ccache="ccache-cmake(配置): ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_ccache" = false ]; then
+        grep_line=$(grep -m1 -iE "CCACHE_COMPRESS|CCACHE_DIR|ccache --zero-stats|ccache -z" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_ccache=true
+            ev_ccache="ccache-env(配置): ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_ccache" = false ]; then
+        grep_line=$(grep -m1 -iE "(^|[^a-z])ccache([^a-z]|$)" "$log_file" 2>/dev/null \
+            | grep -viE "^\s*#|/usr/share/doc" || true)
+        if [ -n "$grep_line" ]; then
+            repo_ccache=true
+            ev_ccache="ccache-broad: ${grep_line:0:200}"
+        fi
+    fi
+
+    # ---------- uv evidence ----------
+    ev_uv=""
+    repo_uv=false
+
+    grep_line=$(grep -m1 -iE "^\s*uv (pip |sync|install|add|run pip)" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_uv=true
+        ev_uv="uv-cmd(运行时): ${grep_line:0:200}"
+    fi
+    if [ "$repo_uv" = false ]; then
+        grep_line=$(grep -m1 -iE "uv pip install|uv sync|uv install|Resolved .* packages|Prepared .* packages|Installed .* packages" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_uv=true
+            ev_uv="uv-output(运行时): ${grep_line:0:200}"
+        fi
+    fi
+    if [ "$repo_uv" = false ]; then
+        grep_line=$(grep -m1 -iE "UV_INDEX_URL|UV_DEFAULT_INDEX|UV_CACHE_DIR|pip install uv|pipx install uv|curl.*uv.*install|astral-sh/uv" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_uv=true
+            ev_uv="uv-setup(配置): ${grep_line:0:200}"
+        fi
+    fi
+
+    return 0
+}
+
+# ==============================================================================
+# Process one repo (Phase 1 + Phase 2)
+# Output: writes markdown row to $OUTDIR/${safe}.row, stats to $OUTDIR/${safe}.stat
+# ==============================================================================
+process_repo() {
+    local LINE="$1"
+    local OUTDIR="$2"
+
+    # Parse repo and optional workflow filter
+    local REPO
+    REPO=$(echo "$LINE" | cut -d'|' -f1 | xargs)
+    local WORKFLOW_FILTER=""
+    if [[ "$LINE" == *"|"* ]]; then
+        WORKFLOW_FILTER=$(echo "$LINE" | cut -d'|' -f2 | xargs)
+    fi
+
+    local safe="${REPO//\//_}"
+    local row_file="$OUTDIR/${safe}.row"
+    local stat_file="$OUTDIR/${safe}.stat"
+    local log_dir="$OUTDIR/logs_${safe}"
+    mkdir -p "$log_dir"
+
+    # Stats for this repo
+    local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_no_cache=0 s_no_npu=0 s_error=0
+
+    # ===== Phase 1: Collect candidates (max MAX_CANDIDATES) =====
+    local candidates=""
+    local candidate_count=0
+    local runs_scanned=0
+    local npu_found=false
+
+    # Get runs: GraphQL (common) or REST (workflow filter fallback)
+    local run_lines
+    if [ -n "$WORKFLOW_FILTER" ]; then
+        run_lines=$(rest_get_runs "$REPO" "$WORKFLOW_FILTER")
+    else
+        run_lines=$(graphql_get_runs "$REPO")
+    fi
+
+    # For each run, get jobs, find NPU candidates (early stop at MAX_CANDIDATES)
+    while IFS='|' read -r run_id run_branch run_name; do
+        [ -z "$run_id" ] && continue
+        runs_scanned=$((runs_scanned + 1))
+
+        # Safety cap
+        [ "$runs_scanned" -gt "$MAX_NPU_SEARCH" ] && break
+
+        local npu_jobs
+        npu_jobs=$(get_npu_jobs "$REPO" "$run_id")
+
+        if [ -n "$npu_jobs" ]; then
+            npu_found=true
+            while IFS='|' read -r job_id job_name job_labels; do
+                [ -z "$job_id" ] && continue
+                candidates="$candidates"$'\n'"$run_id|$run_branch|$run_name|$job_id|$job_name|$job_labels"
+                candidate_count=$((candidate_count + 1))
+                # Early stop: collected enough candidates
+                [ "$candidate_count" -ge "$MAX_CANDIDATES" ] && break 2
+            done <<< "$npu_jobs"
+        fi
+    done <<< "$run_lines"
+
+    # ===== No NPU jobs found =====
+    if [ "$candidate_count" -eq 0 ]; then
+        local row=""
+        if [ "$runs_scanned" -gt 0 ]; then
+            row="| $REPO | (scanned $runs_scanned runs) | - | 🔍 | 🔍 | 🔍 | 🔍 | No NPU runner jobs found in last $runs_scanned runs |"
+            s_no_npu=1
+        else
+            row="| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | No completed runs / no access |"
+            s_error=1
+        fi
+        echo "$row" > "$row_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        rm -rf "$log_dir"
+        return 0
+    fi
+
+    # ===== Phase 2: Try candidates one by one until a usable log is found =====
+    local repo_pypi=false repo_apt=false repo_ccache=false repo_uv=false
+    local ev_pypi="" ev_apt="" ev_ccache="" ev_uv=""
+    local counter_evidence_pypi="" counter_evidence_apt=""
+    local repo_run="" repo_runner="" repo_job_url=""
+    local log_ok=false
+
+    # Deduplicate and sort candidates (newest run first)
+    local sorted_candidates
+    sorted_candidates=$(echo "$candidates" | grep -v '^$' | sort -t'|' -k1 -rn | uniq)
 
     while IFS='|' read -r c_run_id c_run_branch c_run_name c_job_id c_job_name c_job_labels; do
         [ -z "$c_job_id" ] && continue
 
-        log_file="$LOG_DIR/${REPO//\//_}_${c_run_id}_${c_job_id}.log"
+        local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
         gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>/dev/null || {
             rm -f "$log_file"
             continue
@@ -200,6 +408,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
             continue
         fi
 
+        local file_size
         file_size=$(wc -c <"$log_file")
         if [ "$file_size" -lt 50 ]; then
             rm -f "$log_file"
@@ -211,269 +420,159 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
         sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
         sed -i 's/\x1b\[[0-9;]*m//g' "$log_file" 2>/dev/null || true
 
-        # Pre-check: skip jobs with no package installation activity at all
-        # (e.g. docs-check, lint-only jobs that use pre-built images)
-        if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake" "$log_file" 2>/dev/null; then
+        # Search for evidence
+        if ! search_log_evidence "$log_file"; then
             rm -f "$log_file"
             continue
         fi
 
-        # ---------- Search for PyPI cache evidence (正面 + 反面) ----------
-        ev_pypi=""
-        counter_evidence_pypi=""
-
-        # 第一步：检查运行时实际使用的 index（最高优先级，能覆盖所有配置）
-        # "Looking in indexes:" 是 pip 实际执行时打印的，反映真实行为
-        actual_index_line=$(grep -m1 -i "Looking in indexes" "$log_file" 2>/dev/null || true)
-
-        if [ -n "$actual_index_line" ]; then
-            # 有运行时证据，直接用它判断，不再看配置文件
-            if echo "$actual_index_line" | grep -q "$PYPI_CACHE_HOST"; then
-                repo_pypi=true
-                ev_pypi="pip实际用缓存: ${actual_index_line:0:200}"
-            else
-                # 运行时用的不是缓存地址，直接判 ❌，不管配置怎么写
-                counter_evidence_pypi="实际用: ${actual_index_line:0:200}"
-            fi
-        else
-            # 没有 "Looking in indexes:" 输出（uv 静默下载 / 未安装包）
-            # 退回到配置层面判断，标记为弱证据(配置)
-
-            # uv 尊重 pip config，检测 "pip config set global.index-url <cache>" 作为弱证据
-            grep_line=$(grep -m1 -iE "pip config set.*index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
-            if [ -n "$grep_line" ]; then
-                repo_pypi=true
-                ev_pypi="uv/pip-config(配置,无运行时证据): ${grep_line:0:200}"
-            fi
-
-            if [ "$repo_pypi" = false ]; then
-                grep_line=$(grep -m1 -E "PIP_INDEX_URL=.*$PYPI_CACHE_HOST|PIP_EXTRA_INDEX_URL=.*$PYPI_CACHE_HOST|UV_INDEX_URL=.*$PYPI_CACHE_HOST|UV_DEFAULT_INDEX=.*$PYPI_CACHE_HOST" "$log_file" 2>/dev/null || true)
-                if [ -n "$grep_line" ]; then
-                    repo_pypi=true
-                    ev_pypi="pip/uv-env(配置,无运行时证据): ${grep_line:0:200}"
-                fi
-            fi
-
-            if [ "$repo_pypi" = false ]; then
-                grep_line=$(grep -m1 -iE "index-url|extra-index-url" "$log_file" 2>/dev/null | grep "$PYPI_CACHE_HOST" || true)
-                # 只有不含 "pip config set"（配置命令）时才算，避免误判执行配置操作为实际使用
-                if [ -n "$grep_line" ] && ! echo "$grep_line" | grep -qi "pip config set"; then
-                    repo_pypi=true
-                    ev_pypi="pip-config(配置,无运行时证据): ${grep_line:0:200}"
-                fi
-            fi
-
-            if [ "$repo_pypi" = false ]; then
-                # 排除 apt/sed 相关行，避免把 apt 配置命令误判为 pip 证据
-                grep_line=$(grep -m1 "$PYPI_CACHE_HOST" "$log_file" 2>/dev/null \
-                    | grep -viE "apt|sed|sources\.list|Get:|Hit:|Ign:" || true)
-                if [ -n "$grep_line" ]; then
-                    repo_pypi=true
-                    ev_pypi="pip-broad(配置): ${grep_line:0:200}"
-                fi
-            fi
-        fi
-
-        # ---------- Search for APT cache evidence (正面 + 反面) ----------
-        ev_apt=""
-        counter_evidence_apt=""
-        grep_line=$(grep -m1 -iE "^Get:|^Hit:|^Ign:" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
-        if [ -n "$grep_line" ]; then
-            repo_apt=true
-            ev_apt="apt-get: ${grep_line:0:200}"
-        fi
-
-        if [ "$repo_apt" = false ]; then
-            grep_line=$(grep -m1 -i "Acquire::http" "$log_file" 2>/dev/null | grep -E "$APT_PATTERN" || true)
-            if [ -n "$grep_line" ]; then
-                repo_apt=true
-                ev_apt="apt-proxy: ${grep_line:0:200}"
-            fi
-        fi
-
-        if [ "$repo_apt" = false ]; then
-            grep_line=$(grep -m1 -iE "sed.*${APT_PATTERN}" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_apt=true
-                ev_apt="apt-sed: ${grep_line:0:200}"
-            fi
-        fi
-
-        if [ "$repo_apt" = false ]; then
-            grep_line=$(grep -m1 -E "$APT_PATTERN" "$log_file" 2>/dev/null | grep -iE "apt|sources|mirror|repo" || true)
-            if [ -n "$grep_line" ]; then
-                repo_apt=true
-                ev_apt="apt-broad: ${grep_line:0:200}"
-            fi
-        fi
-
-        # Counter-evidence: apt source URL without cache (proves NOT using cache)
-        if [ "$repo_apt" = false ]; then
-            grep_line=$(grep -m1 -iE "^Get:|^Hit:" "$log_file" 2>/dev/null | grep -vE "$APT_PATTERN|$PYPI_CACHE_HOST" || true)
-            if [ -n "$grep_line" ]; then
-                counter_evidence_apt="实际用: ${grep_line:0:200}"
-            else
-                grep_line=$(grep -m1 -iE "apt-get install|apt-get update" "$log_file" 2>/dev/null || true)
-                if [ -n "$grep_line" ]; then
-                    counter_evidence_apt="apt cmd: ${grep_line:0:200}"
-                fi
-            fi
-        fi
-
-        # ---------- Search for CCache evidence (正面 + 反面) ----------
-        ev_ccache=""
-        counter_evidence_ccache=""
-
-        # 最强证据：ccache --print-stats 或 --show-stats 输出，说明本次构建实际使用了 ccache
-        grep_line=$(grep -m1 -iE "cache hit|cache miss|Cache hit|Cache miss|cache_hit|cache_miss|cachehit|cachemiss" "$log_file" 2>/dev/null || true)
-        if [ -n "$grep_line" ]; then
-            repo_ccache=true
-            ev_ccache="ccache统计(运行时): ${grep_line:0:200}"
-        fi
-
-        # 次强证据：TRITON_BUILD_WITH_CCACHE 或 CMAKE_C_COMPILER_LAUNCHER=ccache 出现在日志里
-        if [ "$repo_ccache" = false ]; then
-            grep_line=$(grep -m1 -iE "TRITON_BUILD_WITH_CCACHE|CMAKE_C_COMPILER_LAUNCHER.*ccache|CMAKE_CXX_COMPILER_LAUNCHER.*ccache|CC=ccache|CXX=ccache" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_ccache=true
-                ev_ccache="ccache-cmake(配置): ${grep_line:0:200}"
-            fi
-        fi
-
-        # 弱证据：CCACHE_* 环境变量或 ccache --zero-stats 出现（说明 workflow 配置了 ccache）
-        if [ "$repo_ccache" = false ]; then
-            grep_line=$(grep -m1 -iE "CCACHE_COMPRESS|CCACHE_DIR|ccache --zero-stats|ccache -z" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_ccache=true
-                ev_ccache="ccache-env(配置): ${grep_line:0:200}"
-            fi
-        fi
-
-        # 宽泛匹配：日志中出现 ccache 字样（排除注释和纯路径行）
-        if [ "$repo_ccache" = false ]; then
-            grep_line=$(grep -m1 -iE "(^|[^a-z])ccache([^a-z]|$)" "$log_file" 2>/dev/null \
-                | grep -viE "^\s*#|/usr/share/doc" || true)
-            if [ -n "$grep_line" ]; then
-                repo_ccache=true
-                ev_ccache="ccache-broad: ${grep_line:0:200}"
-            fi
-        fi
-
-        # 反面证据：ccache 不适用，有没有用只能从正面证据判断
-
-        # ---------- Search for uv evidence ----------
-        ev_uv=""
-
-        # 最强证据：uv 实际执行安装命令
-        grep_line=$(grep -m1 -iE "^\s*uv (pip |sync|install|add|run pip)" "$log_file" 2>/dev/null || true)
-        if [ -n "$grep_line" ]; then
-            repo_uv=true
-            ev_uv="uv-cmd(运行时): ${grep_line:0:200}"
-        fi
-
-        # 次强证据：uv pip install / uv sync 出现在日志（非行首，可能是 shell 展开后的输出）
-        if [ "$repo_uv" = false ]; then
-            grep_line=$(grep -m1 -iE "uv pip install|uv sync|uv install|Resolved .* packages|Prepared .* packages|Installed .* packages" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_uv=true
-                ev_uv="uv-output(运行时): ${grep_line:0:200}"
-            fi
-        fi
-
-        # 弱证据：UV_* 环境变量或 uv 工具安装步骤出现
-        if [ "$repo_uv" = false ]; then
-            grep_line=$(grep -m1 -iE "UV_INDEX_URL|UV_DEFAULT_INDEX|UV_CACHE_DIR|pip install uv|pipx install uv|curl.*uv.*install|astral-sh/uv" "$log_file" 2>/dev/null || true)
-            if [ -n "$grep_line" ]; then
-                repo_uv=true
-                ev_uv="uv-setup(配置): ${grep_line:0:200}"
-            fi
-        fi
-
         rm -f "$log_file"
 
-        # Got a usable log — record which job it came from
         repo_run="${c_run_branch}/${c_run_name}"
         repo_runner="$c_job_labels"
         repo_job_url="https://github.com/${REPO}/actions/runs/${c_run_id}/job/${c_job_id}"
         log_ok=true
         break
 
-    done <<< "$candidates"
+    done <<< "$sorted_candidates"
 
-    # ---------- Output ----------
+    # ===== Output =====
+    local row=""
     if [ "$log_ok" = false ]; then
-        # Found NPU jobs but ALL logs expired/unavailable
-        first_candidate=$(echo "$candidates" | grep -v '^$' | head -1)
+        local first_candidate first_run_id first_job_id first_runner first_url
+        first_candidate=$(echo "$sorted_candidates" | grep -v '^$' | head -1)
         first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
         first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
         first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
-        echo "| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
-        STAT_ERROR=$((STAT_ERROR + 1))
-        continue
+        row="| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
+        s_error=1
+        echo "$row" > "$row_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        rm -rf "$log_dir"
+        return 0
     fi
 
-    job_link="[日志](${repo_job_url})"
+    local job_link="[日志](${repo_job_url})"
 
-    # 每个缓存类型独立判断，区分三种状态：
-    #   ✅ 找到正面证据（确认使用了缓存）
-    #   ❌ 找到反面证据（发现使用了其他地址，确认未使用缓存）
-    #   ⚙️  无证据（日志中未出现相关输出，无法判断）
+    # Determine marks
+    local pypi_mark pypi_detail apt_mark apt_detail ccache_mark ccache_detail uv_mark uv_detail
 
     if [ "$repo_pypi" = true ]; then
-        pypi_mark="✅"
-        pypi_detail="${ev_pypi}"
-        STAT_PYPI=$((STAT_PYPI + 1))
+        pypi_mark="✅"; pypi_detail="$ev_pypi"; s_pypi=1
     elif [ -n "$counter_evidence_pypi" ]; then
-        pypi_mark="❌"
-        pypi_detail="反面证据: ${counter_evidence_pypi}"
-        STAT_NO_CACHE=$((STAT_NO_CACHE + 1))
+        pypi_mark="❌"; pypi_detail="反面证据: ${counter_evidence_pypi}"; s_no_cache=1
     else
-        pypi_mark="⚙️"
-        pypi_detail="无证据(日志中未出现 pip index 相关输出)"
+        pypi_mark="⚙️"; pypi_detail="无证据(日志中未出现 pip index 相关输出)"
     fi
 
     if [ "$repo_apt" = true ]; then
-        apt_mark="✅"
-        apt_detail="${ev_apt}"
-        STAT_APT=$((STAT_APT + 1))
+        apt_mark="✅"; apt_detail="$ev_apt"; s_apt=1
     elif [ -n "$counter_evidence_apt" ]; then
-        apt_mark="❌"
-        apt_detail="反面证据: ${counter_evidence_apt}"
+        apt_mark="❌"; apt_detail="反面证据: ${counter_evidence_apt}"
     else
-        apt_mark="⚙️"
-        apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
+        apt_mark="⚙️"; apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
     fi
 
     if [ "$repo_ccache" = true ]; then
-        ccache_mark="✅"
-        ccache_detail="${ev_ccache}"
-        STAT_CCACHE=$((STAT_CCACHE + 1))
+        ccache_mark="✅"; ccache_detail="$ev_ccache"; s_ccache=1
     else
-        ccache_mark="⚙️"
-        ccache_detail="无证据(日志中未出现 ccache 相关输出)"
+        ccache_mark="⚙️"; ccache_detail="无证据(日志中未出现 ccache 相关输出)"
     fi
 
     if [ "$repo_uv" = true ]; then
-        uv_mark="✅"
-        uv_detail="${ev_uv}"
-        STAT_UV=$((STAT_UV + 1))
+        uv_mark="✅"; uv_detail="$ev_uv"; s_uv=1
     else
-        uv_mark="⚙️"
-        uv_detail="无证据(日志中未出现 uv 相关输出)"
+        uv_mark="⚙️"; uv_detail="无证据(日志中未出现 uv 相关输出)"
     fi
 
-    evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
+    local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
     evidence="${evidence# ; }"
     evidence="${evidence% ; }"
 
-    echo "| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | ${evidence:0:400} $job_link |"
+    row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | ${evidence:0:400} $job_link |"
+    echo "$row" > "$row_file"
+    echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
 
-    rm -f "$LOG_DIR/${REPO//\//_}"*.log
+    rm -rf "$log_dir"
+}
 
+# ==============================================================================
+# Main: read repos, process in parallel, combine results
+# ==============================================================================
+
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+TOTAL=0
+REPO_LINES=()
+
+# Read repos into array (preserve order)
+while IFS= read -r LINE || [ -n "$LINE" ]; do
+    [[ -z "$LINE" || "$LINE" =~ ^[[:space:]]*# ]] && continue
+    REPO_LINES+=("$LINE")
+    TOTAL=$((TOTAL + 1))
 done < "$INPUT_FILE"
 
-rm -rf "$LOG_DIR"
+echo "Processing $TOTAL repos with $PARALLEL parallel workers..."
+echo ""
+
+# Output table header
+echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 (Evidence) |"
+echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |"
+
+# Process repos in parallel
+# Use background processes with a concurrency limit
+declare -a PIDS=()
+for line in "${REPO_LINES[@]}"; do
+    process_repo "$line" "$TMPDIR" &
+    PIDS+=($!)
+
+    # Wait when we hit the concurrency limit
+    if [ ${#PIDS[@]} -ge "$PARALLEL" ]; then
+        wait "${PIDS[0]}" 2>/dev/null || true
+        PIDS=("${PIDS[@]:1}")
+    fi
+done
+
+# Wait for all remaining processes
+for pid in "${PIDS[@]}"; do
+    wait "$pid" 2>/dev/null || true
+done
+
+# Combine results in original order
+STAT_PYPI=0
+STAT_APT=0
+STAT_CCACHE=0
+STAT_UV=0
+STAT_NO_CACHE=0
+STAT_NO_NPU=0
+STAT_ERROR=0
+
+for line in "${REPO_LINES[@]}"; do
+    REPO=$(echo "$line" | cut -d'|' -f1 | xargs)
+    safe="${REPO//\//_}"
+    row_file="$TMPDIR/${safe}.row"
+    stat_file="$TMPDIR/${safe}.stat"
+
+    if [ -f "$row_file" ]; then
+        cat "$row_file"
+    else
+        echo "| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | Processing error — no output |"
+        echo "0|0|0|0|0|0|1" > "$stat_file"
+    fi
+
+    if [ -f "$stat_file" ]; then
+        IFS='|' read -r sp sa sc su sn snn se < "$stat_file"
+        STAT_PYPI=$((STAT_PYPI + sp))
+        STAT_APT=$((STAT_APT + sa))
+        STAT_CCACHE=$((STAT_CCACHE + sc))
+        STAT_UV=$((STAT_UV + su))
+        STAT_NO_CACHE=$((STAT_NO_CACHE + sn))
+        STAT_NO_NPU=$((STAT_NO_NPU + snn))
+        STAT_ERROR=$((STAT_ERROR + se))
+    fi
+done
 
 # ---------- Summary ----------
 echo ""
