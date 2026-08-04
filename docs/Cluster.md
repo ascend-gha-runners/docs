@@ -14,15 +14,16 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">153</span>
+    <span class="stat-num">157</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
 <div class="cluster-toolbar">
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter clusters, projects or labels…" aria-label="Filter clusters">
+<input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter clusters, projects or labels…" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 101</option>
+  <option value="ascend-1980">ascend-1980 · 105</option>
   <option value="cpu">CPU (no NPU) · 32</option>
   <option value="on-demand">on-demand · 8</option>
   <option value="Ascend910">Ascend910 · 4</option>
@@ -32,6 +33,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
 <span class="cluster-hint">10 clusters · 153 labels</span>
+<span class="cluster-hint">10 clusters · 157 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -39,6 +41,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-cn12-001-cluster</span>
     <span class="cluster-meta">9 projects · 40 labels</span>
+    <span class="cluster-meta">9 projects · 44 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-aarch64-a3-0 a3-560t linux-aarch64-a3-2 a3-560t linux-aarch64-a3-4 a3-560t linux-aarch64-a3-8 a3-560t linux-aarch64-a3-16 a3-560t">
@@ -93,17 +96,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="machine" data-label="linux-aarch64-a3-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16 + a3-560t</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
       </div>
     </div>
-    <div class="project-row" data-search="sgl-project/sglang linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
+    <div class="project-row" data-search="sgl-project/sglang linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-8 linux-aarch64-a3-800t-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sglang</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">8 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
       </div>
     </div>
     <div class="project-row" data-search="tile-ai/tilelang-mlir-ascend linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
@@ -164,6 +167,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="ascend-hk-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-hk-001-cluster</span>
+    <span class="cluster-meta">11 projects · 49 labels</span>
     <span class="cluster-meta">11 projects · 49 labels</span>
   </div>
   <div class="cluster-body">
@@ -317,6 +321,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-infra-guiyang-cluster-001</span>
     <span class="cluster-meta">4 projects · 15 labels</span>
+    <span class="cluster-meta">4 projects · 15 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="triton-lang/triton-ascend linux-aarch64-a2b1-1 linux-aarch64-a2b1-2 linux-aarch64-a2b1-4 linux-aarch64-a2b1-8">
@@ -378,6 +383,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-003-cluster</span>
     <span class="cluster-meta">1 project · 3 labels</span>
+    <span class="cluster-meta">1 project · 3 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-310p-1 linux-aarch64-310p-2 linux-aarch64-310p-4">
@@ -399,6 +405,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-004-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-004-cluster</span>
+    <span class="cluster-meta">3 projects · 14 labels</span>
     <span class="cluster-meta">3 projects · 14 labels</span>
   </div>
   <div class="cluster-body">
@@ -448,6 +455,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-005-cluster</span>
     <span class="cluster-meta">2 projects · 17 labels</span>
+    <span class="cluster-meta">2 projects · 17 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="triton-lang/triton-ascend linux-amd64-cpu-8 linux-amd64-cpu-16 linux-aarch64-cpu-1 linux-aarch64-cpu-2 linux-aarch64-cpu-8 linux-aarch64-cpu-16">
@@ -483,6 +491,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-sh-001-cluster</span>
     <span class="cluster-meta">1 project · 3 labels</span>
+    <span class="cluster-meta">1 project · 3 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
@@ -506,6 +515,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-aiframework</span>
     <span class="cluster-meta">1 project · 4 labels</span>
+    <span class="cluster-meta">1 project · 4 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
@@ -528,6 +538,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-mind-third-ci</span>
     <span class="cluster-meta">1 project · 4 labels</span>
+    <span class="cluster-meta">1 project · 4 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
@@ -549,6 +560,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="in-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">in-cluster</span>
+    <span class="cluster-meta">1 project · 4 labels</span>
     <span class="cluster-meta">1 project · 4 labels</span>
   </div>
   <div class="cluster-body">

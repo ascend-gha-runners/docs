@@ -7,11 +7,16 @@
 昇腾集群创建 runner pod 执行 Github Action job。
 我们提供如下类型的昇腾芯片。如果您未指定名称，我们将使用默认命名。
 
-|类型|架构|默认命名(x表示卡数)|
-|--|--|--|
-|Atlas 300I DUO|arm64|linux-aarch64-310p-x|
-|Atlas 800 A3|arm64|linux-aarch64-a3-x|
-|Atlas 800 A2|arm64|linux-aarch64-a2-x 或 linux-aarch64-a2b3-x|
+| 类型                  | 架构     | 配置    | 默认命名(x表示卡数)           |
+|---------------------|--------|-------|-----------------------|
+| Atlas 300I DUO 280T | arm64  | 910C  | linux-aarch64-310p-x  |
+| Atlas A3  混用        | arm64 | NA    | linux-aarch64-a3-x    |
+| Atlas 800I A3 560T  | arm64 | 910C  | linux-aarch64-a3-800i-x |
+| Atlas 800T A3 752T  | arm64 | 910C  | linux-aarch64-a3-800t-x |
+| Atlas A2 混用         | arm64  | NA    | linux-aarch64-a2-x    |
+| Atlas 800T A2 376T  | arm64  | 910B2 | linux-aarch64-a2b2-x  |
+| Atlas 800T A2 313T  | arm64  | 910B3 | linux-aarch64-a2b3-x  |
+| Atlas 800I A2 560T  | arm64  | 910B4 | linux-aarch64-a2b4-x  |
 
 ### Runner pod 资源配额
 
@@ -27,14 +32,32 @@
 |linux-aarch64-a3-4|4|78|128Gi|
 |linux-aarch64-a3-8|8|156|256Gi|
 |linux-aarch64-a3-16|16|312|512Gi|
+|linux-aarch64-a3-800i-0|0|4|8Gi|
+|linux-aarch64-a3-800i-2|2|39|64Gi|
+|linux-aarch64-a3-800i-4|4|78|128Gi|
+|linux-aarch64-a3-800i-8|8|156|256Gi|
+|linux-aarch64-a3-800i-16|16|312|512Gi|
+|linux-aarch64-a3-800t-0|0|4|8Gi|
+|linux-aarch64-a3-800t-2|2|39|64Gi|
+|linux-aarch64-a3-800t-4|4|78|128Gi|
+|linux-aarch64-a3-800t-8|8|156|256Gi|
+|linux-aarch64-a3-800t-16|16|312|512Gi|
 |linux-aarch64-a2-1|1|23|64Gi|
 |linux-aarch64-a2-2|2|46|128Gi|
 |linux-aarch64-a2-4|4|92|256Gi|
 |linux-aarch64-a2-8|8|184|512Gi|
+|linux-aarch64-a2b2-1|1|23|64Gi|
+|linux-aarch64-a2b2-2|2|46|128Gi|
+|linux-aarch64-a2b2-4|4|92|256Gi|
+|linux-aarch64-a2b2-8|8|184|512Gi|
 |linux-aarch64-a2b3-1|1|23|64Gi|
 |linux-aarch64-a2b3-2|2|46|128Gi|
 |linux-aarch64-a2b3-4|4|92|256Gi|
 |linux-aarch64-a2b3-8|8|184|512Gi|
+|linux-aarch64-a2b4-1|1|23|64Gi|
+|linux-aarch64-a2b4-2|2|46|128Gi|
+|linux-aarch64-a2b4-4|4|92|256Gi|
+|linux-aarch64-a2b4-8|8|184|512Gi|
 
 ### Runner pod 命名规范
 
