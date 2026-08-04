@@ -21,20 +21,9 @@ TODAY = datetime.now(CST).strftime("%Y-%m-%d")
 TABLE_START = "<!-- CACHE_AUDIT_TABLE_START -->"
 TABLE_END   = "<!-- CACHE_AUDIT_TABLE_END -->"
 
-# 内网 IP/域名前缀，检测到则视为已接入缓存
-INTRANET_PATTERNS = [
-    r'192\.168\.',
-    r'10\.',
-    r'172\.(1[6-9]|2[0-9]|3[01])\.',
-    r'localhost',
-    r'\.svc\.cluster\.local',
-    r'\.internal',
-]
-INTRANET_RE = re.compile('|'.join(INTRANET_PATTERNS))
-
 # ---------- 读取 repos.txt 默认值 ----------
-defaults = {}  # repo -> (pypi_default, apt_default, ccache_default)
-workflow_map = {}  # repo -> workflow_file (unused here, for reference)
+# 格式: org/repo|workflow.yml|pypi_default|apt_default|ccache_default|uv_default
+defaults = {}  # repo -> (pypi_default, apt_default, ccache_default, uv_default)
 
 with open(REPOS_FILE) as f:
     for line in f:
@@ -43,19 +32,30 @@ with open(REPOS_FILE) as f:
             continue
         parts = line.split("|")
         repo    = parts[0].strip()
-        wf      = parts[1].strip() if len(parts) > 1 else ""
         pypi    = parts[2].strip() if len(parts) > 2 else ""
         apt     = parts[3].strip() if len(parts) > 3 else ""
         ccache  = parts[4].strip() if len(parts) > 4 else ""
         uv      = parts[5].strip() if len(parts) > 5 else ""
-        workflow_map[repo] = wf
         defaults[repo] = (pypi or None, apt or None, ccache or None, uv or None)
 
 # ---------- 解析审计结果 ----------
-# 格式：| repo | run | runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 |
+# 格式: | repo | run | runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 |
 audit_results = {}  # repo -> (pypi, apt, ccache, uv)
 
-UNDECIDED = {"⚙️", "⚠️", "🔍"}
+
+def resolve(val, default):
+    """Resolve cache status from script output, trusting the script's verdict.
+
+    ✅ → ✅  (confirmed in use)
+    ❌ → ❌  (confirmed NOT in use)
+    -  → default (unknown, fall back to repos.txt default if available)
+    """
+    if val == "\u2705":  # ✅
+        return "\u2705"
+    if val == "\u274c":  # ❌
+        return "\u274c"
+    return default  # None = unknown
+
 
 with open(AUDIT_FILE) as f:
     for line in f:
@@ -64,11 +64,7 @@ with open(AUDIT_FILE) as f:
         cols = [c.strip() for c in line.split("|")]
         if len(cols) < 9:
             continue
-        repo_col   = cols[1]
-        pypi_col   = cols[4]
-        apt_col    = cols[5]
-        ccache_col = cols[6]
-        uv_col     = cols[7]
+        repo_col = cols[1]
 
         # 提取 org/repo（去掉 markdown 链接格式）
         m = re.search(r'([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)', repo_col)
@@ -76,29 +72,16 @@ with open(AUDIT_FILE) as f:
             continue
         repo = m.group(1)
 
-        evidence_col = cols[8] if len(cols) > 8 else ""
+        pypi_col   = cols[4]
+        apt_col    = cols[5]
+        ccache_col = cols[6]
+        uv_col     = cols[7]
 
-        def resolve(val, evidence, default):
-            if val == "✅":
-                return "✅"
-            if val == "❌":
-                # ❌ 但证据里有内网 IP/域名，视为已接入
-                if INTRANET_RE.search(evidence):
-                    return "✅"
-                return "❌"
-            # ⚙️/⚠️/🔍 不确定，用默认值
-            return default  # None = 不知道
-
-        def resolve_simple(val, default):
-            # 只有正面证据，⚙️/⚠️/🔍 均视为无数据
-            if val == "✅":
-                return "✅"
-            return default  # None = 不知道
-
-        pypi   = resolve(pypi_col, evidence_col, defaults.get(repo, (None, None, None, None))[0])
-        apt    = resolve(apt_col,  evidence_col, defaults.get(repo, (None, None, None, None))[1])
-        ccache = resolve_simple(ccache_col, defaults.get(repo, (None, None, None, None))[2])
-        uv     = resolve_simple(uv_col,     defaults.get(repo, (None, None, None, None))[3])
+        defs = defaults.get(repo, (None, None, None, None))
+        pypi   = resolve(pypi_col,   defs[0])
+        apt    = resolve(apt_col,    defs[1])
+        ccache = resolve(ccache_col, defs[2])
+        uv     = resolve(uv_col,     defs[3])
         audit_results[repo] = (pypi, apt, ccache, uv)
 
 # ---------- 读取 Repo.md，提取仓库顺序 ----------
@@ -141,9 +124,9 @@ new_table = "\n".join([TABLE_START] + rows + [TABLE_END])
 
 # 构建注释行
 if RUN_URL:
-    footer = f"> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [{RUN_URL}]({RUN_URL})"
+    footer = f"> Cache audit runs daily. \u2705 = confirmed in use \u00b7 \u274c = confirmed NOT in use \u00b7 - = unknown \u00b7 Results sourced from [{RUN_URL}]({RUN_URL})"
 else:
-    footer = "> Cache audit runs daily. ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown"
+    footer = "> Cache audit runs daily. \u2705 = confirmed in use \u00b7 \u274c = confirmed NOT in use \u00b7 - = unknown"
 
 FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新)[.。].*$', re.MULTILINE)
 
