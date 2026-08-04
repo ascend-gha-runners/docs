@@ -17,6 +17,7 @@
 | Atlas 800T A2 376T  | arm64  | 910B2 | linux-aarch64-a2b2-x  |
 | Atlas 800T A2 313T  | arm64  | 910B3 | linux-aarch64-a2b3-x  |
 | Atlas 800I A2 560T  | arm64  | 910B4 | linux-aarch64-a2b4-x  |
+| Atlas A5 (Ascend950DT) | arm64  | NA    | linux-aarch64-a5-x    |
 
 ### Runner pod 资源配额
 
@@ -58,6 +59,10 @@
 |linux-aarch64-a2b4-2|2|46|128Gi|
 |linux-aarch64-a2b4-4|4|92|256Gi|
 |linux-aarch64-a2b4-8|8|184|512Gi|
+|linux-aarch64-a5-0|0|16|32Gi|
+|linux-aarch64-a5-2|2|82|384Gi|
+|linux-aarch64-a5-4|4|164|768Gi|
+|linux-aarch64-a5-8|8|360|1350Gi|
 
 ### Runner pod 命名规范
 
