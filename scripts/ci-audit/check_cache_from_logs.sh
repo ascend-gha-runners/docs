@@ -4,11 +4,12 @@ set -euo pipefail
 # ==============================================================================
 # CI 缓存审计脚本 — 基于 GitHub Actions 运行日志分析
 #
-# 优化策略（v3）：
+# 优化策略（v4）：
 #   1. GraphQL 查询替代 REST 翻页（获取 runs，1 次 GraphQL 替代 2-4 次 REST）
-#   2. 候选收集：从 30 个 run 中收集最多 MAX_CANDIDATES 个 NPU job 候选
+#   2. 候选收集：从 runs 中收集最多 MAX_CANDIDATES 个 NPU job 候选
 #   3. 聚合证据：Phase 2 扫描多个候选日志，对每种缓存类型取"任一日志有正面证据→✅"
 #   4. 并发：repo 级 PARALLEL 并发处理
+#   5. 全量扫描：设 MAX_NPU_SEARCH=0 获取所有 run（REST 分页），适合一次性准确审计
 #
 # 标记图例：
 #   ✅ = confirmed in use（任一日志中找到缓存使用证据）
@@ -19,11 +20,11 @@ set -euo pipefail
 #   org/repo                           — 自动模式，GraphQL 查询
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
 #
-# 环境变量：
+# 环境变量（设 0 = 无上限/全量）：
 #   RUNNER_FILTER     — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
-#   MAX_NPU_SEARCH    — 自动模式最多搜多少个 run，默认 50
-#   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15
-#   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10
+#   MAX_NPU_SEARCH    — 最多搜多少个 run，默认 50；0 = 全部（REST 分页）
+#   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15；0 = 无上限
+#   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10；0 = 无上限
 #   PARALLEL          — 并发 repo 数，默认 4
 #   PYPI_CACHE_HOST   — PyPI 缓存主机名
 #   APT_CACHE_PORT    — APT 缓存端口
@@ -66,14 +67,26 @@ else
     APT_PATTERN=":${APT_CACHE_PORT}"
 fi
 
-echo "Log-based Cache Audit Configuration (v3 — optimized + aggregated):"
+echo "Log-based Cache Audit Configuration (v4 — optimized + aggregated):"
 echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
 echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
+if [ "$MAX_NPU_SEARCH" = "0" ]; then
+echo " - Max NPU Search:   ALL (REST pagination)"
+else
 echo " - Max NPU Search:   $MAX_NPU_SEARCH runs"
+fi
+if [ "$MAX_CANDIDATES" = "0" ]; then
+echo " - Max Candidates:   UNLIMITED"
+else
 echo " - Max Candidates:   $MAX_CANDIDATES"
+fi
+if [ "$MAX_LOGS_TO_CHECK" = "0" ]; then
+echo " - Max Logs to Check: UNLIMITED (full aggregation)"
+else
 echo " - Max Logs to Check: $MAX_LOGS_TO_CHECK (aggregation)"
+fi
 echo " - Parallel:         $PARALLEL repos"
 echo "------------------------------------------------------------------"
 
@@ -83,15 +96,26 @@ echo "------------------------------------------------------------------"
 
 # GraphQL: get recent runs for a repo (replaces REST pagination)
 # NOTE: GraphQL returns UPPERCASE enum values for conclusion/status
+# When MAX_NPU_SEARCH=0, falls back to REST pagination for ALL runs
 graphql_get_runs() {
     local REPO="$1"
     local ORG="${REPO%%/*}"
     local NAME="${REPO#*/}"
 
+    # Unlimited mode: use REST pagination to get ALL runs
+    if [ "$MAX_NPU_SEARCH" = "0" ]; then
+        rest_get_all_runs "$REPO"
+        return
+    fi
+
+    # GraphQL: fetch up to MAX_NPU_SEARCH runs (capped at 100 per GitHub limit)
+    local first_count
+    first_count=$(( MAX_NPU_SEARCH < 100 ? MAX_NPU_SEARCH : 100 ))
+
     gh api graphql \
-        -f query='query($owner: String!, $name: String!) {
+        -f query='query($owner: String!, $name: String!, $first: Int!) {
             repository(owner: $owner, name: $name) {
-                workflowRuns(first: 30, orderBy: {field: CREATED_AT, direction: DESC}) {
+                workflowRuns(first: $first, orderBy: {field: CREATED_AT, direction: DESC}) {
                     nodes {
                         databaseId
                         headBranch
@@ -104,6 +128,7 @@ graphql_get_runs() {
         }' \
         -f owner="$ORG" \
         -f name="$NAME" \
+        -F first="$first_count" \
         2>/dev/null \
     | jq -r '
         (.data.repository.workflowRuns.nodes // [])[]
@@ -112,12 +137,41 @@ graphql_get_runs() {
     ' 2>/dev/null || true
 }
 
+# REST: get ALL runs for a repo (used when MAX_NPU_SEARCH=0)
+# Paginates through all pages of success+failure runs
+rest_get_all_runs() {
+    local REPO="$1"
+    local page=1
+
+    while true; do
+        local runs_success runs_failure runs_json
+        runs_success=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=success" 2>/dev/null) || true
+        runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=failure" 2>/dev/null) || true
+        runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
+            {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
+        ' 2>/dev/null) || true
+
+        [ -z "$runs_json" ] && break
+        local run_count
+        run_count=$(echo "$runs_json" | jq -r '.workflow_runs | length' 2>/dev/null || echo "0")
+        [ "$run_count" = "0" ] && break
+
+        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"'
+        page=$((page + 1))
+    done
+}
+
 # REST fallback: get runs for a specific workflow file (when repos.txt specifies |workflow.yml)
 rest_get_runs() {
     local REPO="$1"
     local WF="$2"
     local page=1
-    local max_pages=$(( (MAX_NPU_SEARCH + PER_PAGE - 1) / PER_PAGE ))
+    local max_pages
+    if [ "$MAX_NPU_SEARCH" = "0" ]; then
+        max_pages=999  # effectively unlimited
+    else
+        max_pages=$(( (MAX_NPU_SEARCH + PER_PAGE - 1) / PER_PAGE ))
+    fi
 
     while [ "$page" -le "$max_pages" ]; do
         local runs_success runs_failure runs_json
@@ -385,8 +439,8 @@ process_repo() {
         [ -z "$run_id" ] && continue
         runs_scanned=$((runs_scanned + 1))
 
-        # Safety cap
-        [ "$runs_scanned" -gt "$MAX_NPU_SEARCH" ] && break
+        # Safety cap (0 = unlimited)
+        [ "$MAX_NPU_SEARCH" -gt 0 ] && [ "$runs_scanned" -gt "$MAX_NPU_SEARCH" ] && break
 
         local npu_jobs
         npu_jobs=$(get_npu_jobs "$REPO" "$run_id")
@@ -397,8 +451,8 @@ process_repo() {
                 [ -z "$job_id" ] && continue
                 candidates="$candidates"$'\n'"$run_id|$run_branch|$run_name|$job_id|$job_name|$job_labels"
                 candidate_count=$((candidate_count + 1))
-                # Stop collecting once we have enough candidates
-                [ "$candidate_count" -ge "$MAX_CANDIDATES" ] && break 2
+                # Stop collecting once we have enough candidates (0 = unlimited)
+                [ "$MAX_CANDIDATES" -gt 0 ] && [ "$candidate_count" -ge "$MAX_CANDIDATES" ] && break 2
             done <<< "$npu_jobs"
         fi
     done <<< "$run_lines"
@@ -438,8 +492,8 @@ process_repo() {
     while IFS='|' read -r c_run_id c_run_branch c_run_name c_job_id c_job_name c_job_labels; do
         [ -z "$c_job_id" ] && continue
 
-        # Limit how many logs we download for aggregation
-        [ "$logs_checked" -ge "$MAX_LOGS_TO_CHECK" ] && break
+        # Limit how many logs we download for aggregation (0 = unlimited)
+        [ "$MAX_LOGS_TO_CHECK" -gt 0 ] && [ "$logs_checked" -ge "$MAX_LOGS_TO_CHECK" ] && break
 
         local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
         gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>/dev/null || {
@@ -585,6 +639,8 @@ process_repo() {
     local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
     evidence="${evidence# ; }"
     evidence="${evidence% ; }"
+    # Sanitize: replace pipe chars to prevent markdown table column corruption
+    evidence="${evidence//|/¦}"
 
     row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | ${evidence:0:400} $job_link |"
     echo "$row" > "$row_file"
