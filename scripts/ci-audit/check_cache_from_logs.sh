@@ -4,14 +4,15 @@ set -euo pipefail
 # ==============================================================================
 # CI 缓存审计脚本 — 基于 GitHub Actions 运行日志分析
 #
-# 优化策略（v2）：
+# 优化策略（v3）：
 #   1. GraphQL 查询替代 REST 翻页（获取 runs，1 次 GraphQL 替代 2-4 次 REST）
-#   2. 早停：找到 MAX_CANDIDATES 个 NPU job 候选即停止扫描
-#   3. 并发：repo 级 PARALLEL 并发处理
+#   2. 候选收集：从 30 个 run 中收集最多 MAX_CANDIDATES 个 NPU job 候选
+#   3. 聚合证据：Phase 2 扫描多个候选日志，对每种缓存类型取"任一日志有正面证据→✅"
+#   4. 并发：repo 级 PARALLEL 并发处理
 #
 # 标记图例：
-#   ✅ = confirmed in use（日志中找到缓存使用证据）
-#   ❌ = confirmed NOT in use（日志中找到反面证据）
+#   ✅ = confirmed in use（任一日志中找到缓存使用证据）
+#   ❌ = confirmed NOT in use（所有日志均有反面证据，无正面证据）
 #   -  = unknown（无证据或无法确定）
 #
 # repos.txt 格式：
@@ -19,13 +20,14 @@ set -euo pipefail
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
 #
 # 环境变量：
-#   RUNNER_FILTER    — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
-#   MAX_NPU_SEARCH   — 自动模式最多搜多少个 run，默认 50
-#   MAX_CANDIDATES   — 早停：最多收集多少个候选 job，默认 3
-#   PARALLEL         — 并发 repo 数，默认 4
-#   PYPI_CACHE_HOST  — PyPI 缓存主机名
-#   APT_CACHE_PORT   — APT 缓存端口
-#   CCACHE_KEYWORD   — ccache 检测关键词（默认 "ccache"）
+#   RUNNER_FILTER     — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
+#   MAX_NPU_SEARCH    — 自动模式最多搜多少个 run，默认 50
+#   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15
+#   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10
+#   PARALLEL          — 并发 repo 数，默认 4
+#   PYPI_CACHE_HOST   — PyPI 缓存主机名
+#   APT_CACHE_PORT    — APT 缓存端口
+#   CCACHE_KEYWORD    — ccache 检测关键词（默认 "ccache"）
 # ==============================================================================
 
 if ! command -v jq &>/dev/null; then
@@ -51,7 +53,8 @@ APT_CACHE_HOST="${APT_CACHE_HOST:-}"
 CCACHE_KEYWORD="${CCACHE_KEYWORD:-ccache}"
 RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-50}"
-MAX_CANDIDATES="${MAX_CANDIDATES:-3}"
+MAX_CANDIDATES="${MAX_CANDIDATES:-15}"
+MAX_LOGS_TO_CHECK="${MAX_LOGS_TO_CHECK:-10}"
 PARALLEL="${PARALLEL:-4}"
 PER_PAGE="${PER_PAGE:-30}"
 
@@ -63,13 +66,14 @@ else
     APT_PATTERN=":${APT_CACHE_PORT}"
 fi
 
-echo "Log-based Cache Audit Configuration (v2 — optimized):"
+echo "Log-based Cache Audit Configuration (v3 — optimized + aggregated):"
 echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
 echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
 echo " - Max NPU Search:   $MAX_NPU_SEARCH runs"
-echo " - Max Candidates:   $MAX_CANDIDATES (early stop)"
+echo " - Max Candidates:   $MAX_CANDIDATES"
+echo " - Max Logs to Check: $MAX_LOGS_TO_CHECK (aggregation)"
 echo " - Parallel:         $PARALLEL repos"
 echo "------------------------------------------------------------------"
 
@@ -153,14 +157,16 @@ get_npu_jobs() {
 }
 
 # ==============================================================================
-# Phase 2: search log for cache evidence
+# Phase 2: search ONE log for cache evidence
+# Sets globals: repo_pypi repo_apt repo_ccache repo_uv
+#               ev_pypi ev_apt ev_ccache ev_uv
+#               counter_evidence_pypi counter_evidence_apt
+#               counter_evidence_ccache counter_evidence_uv
+# Returns: 0 = log has package activity (evidence searched)
+#          1 = log has no package activity (skip)
 # ==============================================================================
 search_log_evidence() {
     local log_file="$1"
-    # Sets via globals: repo_pypi repo_apt repo_ccache repo_uv
-    # ev_pypi ev_apt ev_ccache ev_uv
-    # counter_evidence_pypi counter_evidence_apt
-    # counter_evidence_ccache counter_evidence_uv
 
     # Pre-check: skip jobs with no package installation activity
     if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja" "$log_file" 2>/dev/null; then
@@ -360,7 +366,7 @@ process_repo() {
     # Stats for this repo
     local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_no_cache=0 s_no_npu=0 s_error=0
 
-    # ===== Phase 1: Collect candidates (max MAX_CANDIDATES) =====
+    # ===== Phase 1: Collect candidates (up to MAX_CANDIDATES) =====
     local candidates=""
     local candidate_count=0
     local runs_scanned=0
@@ -374,7 +380,7 @@ process_repo() {
         run_lines=$(graphql_get_runs "$REPO")
     fi
 
-    # For each run, get jobs, find NPU candidates (early stop at MAX_CANDIDATES)
+    # For each run, get jobs, find NPU candidates (stop at MAX_CANDIDATES)
     while IFS='|' read -r run_id run_branch run_name; do
         [ -z "$run_id" ] && continue
         runs_scanned=$((runs_scanned + 1))
@@ -391,7 +397,7 @@ process_repo() {
                 [ -z "$job_id" ] && continue
                 candidates="$candidates"$'\n'"$run_id|$run_branch|$run_name|$job_id|$job_name|$job_labels"
                 candidate_count=$((candidate_count + 1))
-                # Early stop: collected enough candidates
+                # Stop collecting once we have enough candidates
                 [ "$candidate_count" -ge "$MAX_CANDIDATES" ] && break 2
             done <<< "$npu_jobs"
         fi
@@ -413,14 +419,17 @@ process_repo() {
         return 0
     fi
 
-    # ===== Phase 2: Try candidates one by one until a usable log is found =====
-    local repo_pypi=false repo_apt=false repo_ccache=false repo_uv=false
-    local ev_pypi="" ev_apt="" ev_ccache="" ev_uv=""
-    local counter_evidence_pypi="" counter_evidence_apt=""
-    local counter_evidence_ccache="" counter_evidence_uv=""
-    local repo_run="" repo_runner="" repo_job_url=""
-    local log_ok=false
+    # ===== Phase 2: Aggregate evidence from multiple candidate logs =====
+    # For each cache type:
+    #   ✅ = ANY log has positive evidence
+    #   ❌ = NO log has positive evidence AND ANY log has counter-evidence
+    #   -  = otherwise (no evidence in any direction)
+    local agg_pypi=false agg_apt=false agg_ccache=false agg_uv=false
+    local agg_ev_pypi="" agg_ev_apt="" agg_ev_ccache="" agg_ev_uv=""
+    local agg_counter_pypi="" agg_counter_apt="" agg_counter_ccache="" agg_counter_uv=""
+    local logs_checked=0
     local log_no_pkg_activity=0
+    local repo_run="" repo_runner="" repo_job_url=""
 
     # Deduplicate and sort candidates (newest run first)
     local sorted_candidates
@@ -428,6 +437,9 @@ process_repo() {
 
     while IFS='|' read -r c_run_id c_run_branch c_run_name c_job_id c_job_name c_job_labels; do
         [ -z "$c_job_id" ] && continue
+
+        # Limit how many logs we download for aggregation
+        [ "$logs_checked" -ge "$MAX_LOGS_TO_CHECK" ] && break
 
         local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
         gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>/dev/null || {
@@ -452,7 +464,7 @@ process_repo() {
         sed -i 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\.[0-9]*Z //' "$log_file" 2>/dev/null || true
         sed -i 's/\x1b\[[0-9;]*m//g' "$log_file" 2>/dev/null || true
 
-        # Search for evidence
+        # Search for evidence in this log
         if ! search_log_evidence "$log_file"; then
             # Log downloaded OK but no package installation activity
             log_no_pkg_activity=1
@@ -462,17 +474,59 @@ process_repo() {
 
         rm -f "$log_file"
 
-        repo_run="${c_run_branch}/${c_run_name}"
-        repo_runner="$c_job_labels"
-        repo_job_url="https://github.com/${REPO}/actions/runs/${c_run_id}/job/${c_job_id}"
-        log_ok=true
-        break
+        # This log has package activity — aggregate evidence
+        logs_checked=$((logs_checked + 1))
+
+        # Record first usable log's metadata (for the output row)
+        if [ "$logs_checked" = 1 ]; then
+            repo_run="${c_run_branch}/${c_run_name}"
+            repo_runner="$c_job_labels"
+            repo_job_url="https://github.com/${REPO}/actions/runs/${c_run_id}/job/${c_job_id}"
+        fi
+
+        # Aggregate positive evidence (take first found for each type)
+        if [ "$repo_pypi" = true ] && [ "$agg_pypi" = false ]; then
+            agg_pypi=true
+            agg_ev_pypi="$ev_pypi"
+        fi
+        if [ "$repo_apt" = true ] && [ "$agg_apt" = false ]; then
+            agg_apt=true
+            agg_ev_apt="$ev_apt"
+        fi
+        if [ "$repo_ccache" = true ] && [ "$agg_ccache" = false ]; then
+            agg_ccache=true
+            agg_ev_ccache="$ev_ccache"
+        fi
+        if [ "$repo_uv" = true ] && [ "$agg_uv" = false ]; then
+            agg_uv=true
+            agg_ev_uv="$ev_uv"
+        fi
+
+        # Aggregate counter-evidence (take first found, only if no positive yet)
+        if [ "$repo_pypi" = false ] && [ -n "$counter_evidence_pypi" ] && [ -z "$agg_counter_pypi" ]; then
+            agg_counter_pypi="$counter_evidence_pypi"
+        fi
+        if [ "$repo_apt" = false ] && [ -n "$counter_evidence_apt" ] && [ -z "$agg_counter_apt" ]; then
+            agg_counter_apt="$counter_evidence_apt"
+        fi
+        if [ "$repo_ccache" = false ] && [ -n "$counter_evidence_ccache" ] && [ -z "$agg_counter_ccache" ]; then
+            agg_counter_ccache="$counter_evidence_ccache"
+        fi
+        if [ "$repo_uv" = false ] && [ -n "$counter_evidence_uv" ] && [ -z "$agg_counter_uv" ]; then
+            agg_counter_uv="$counter_evidence_uv"
+        fi
+
+        # Early exit: all 4 cache types have positive evidence, no need to check more logs
+        if [ "$agg_pypi" = true ] && [ "$agg_apt" = true ] && [ "$agg_ccache" = true ] && [ "$agg_uv" = true ]; then
+            break
+        fi
 
     done <<< "$sorted_candidates"
 
     # ===== Output =====
     local row=""
-    if [ "$log_ok" = false ]; then
+    if [ "$logs_checked" -eq 0 ]; then
+        # No usable logs found (all expired or no package activity)
         local first_candidate first_run_id first_job_id first_runner first_url
         first_candidate=$(echo "$sorted_candidates" | grep -v '^$' | head -1)
         first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
@@ -493,37 +547,37 @@ process_repo() {
 
     local job_link="[日志](${repo_job_url})"
 
-    # Determine marks
+    # Determine marks based on aggregated evidence
     local pypi_mark pypi_detail apt_mark apt_detail ccache_mark ccache_detail uv_mark uv_detail
 
-    if [ "$repo_pypi" = true ]; then
-        pypi_mark="✅"; pypi_detail="$ev_pypi"; s_pypi=1
-    elif [ -n "$counter_evidence_pypi" ]; then
-        pypi_mark="❌"; pypi_detail="反面证据: ${counter_evidence_pypi}"; s_no_cache=1
+    if [ "$agg_pypi" = true ]; then
+        pypi_mark="✅"; pypi_detail="$agg_ev_pypi"; s_pypi=1
+    elif [ -n "$agg_counter_pypi" ]; then
+        pypi_mark="❌"; pypi_detail="反面证据: ${agg_counter_pypi}"; s_no_cache=1
     else
         pypi_mark="-"; pypi_detail="无证据(日志中未出现 pip index 相关输出)"
     fi
 
-    if [ "$repo_apt" = true ]; then
-        apt_mark="✅"; apt_detail="$ev_apt"; s_apt=1
-    elif [ -n "$counter_evidence_apt" ]; then
-        apt_mark="❌"; apt_detail="反面证据: ${counter_evidence_apt}"; s_no_cache=1
+    if [ "$agg_apt" = true ]; then
+        apt_mark="✅"; apt_detail="$agg_ev_apt"; s_apt=1
+    elif [ -n "$agg_counter_apt" ]; then
+        apt_mark="❌"; apt_detail="反面证据: ${agg_counter_apt}"; s_no_cache=1
     else
         apt_mark="-"; apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
     fi
 
-    if [ "$repo_ccache" = true ]; then
-        ccache_mark="✅"; ccache_detail="$ev_ccache"; s_ccache=1
-    elif [ -n "$counter_evidence_ccache" ]; then
-        ccache_mark="❌"; ccache_detail="反面证据: ${counter_evidence_ccache}"; s_no_cache=1
+    if [ "$agg_ccache" = true ]; then
+        ccache_mark="✅"; ccache_detail="$agg_ev_ccache"; s_ccache=1
+    elif [ -n "$agg_counter_ccache" ]; then
+        ccache_mark="❌"; ccache_detail="反面证据: ${agg_counter_ccache}"; s_no_cache=1
     else
         ccache_mark="-"; ccache_detail="无证据(日志中未出现 ccache 相关输出)"
     fi
 
-    if [ "$repo_uv" = true ]; then
-        uv_mark="✅"; uv_detail="$ev_uv"; s_uv=1
-    elif [ -n "$counter_evidence_uv" ]; then
-        uv_mark="❌"; uv_detail="反面证据: ${counter_evidence_uv}"; s_no_cache=1
+    if [ "$agg_uv" = true ]; then
+        uv_mark="✅"; uv_detail="$agg_ev_uv"; s_uv=1
+    elif [ -n "$agg_counter_uv" ]; then
+        uv_mark="❌"; uv_detail="反面证据: ${agg_counter_uv}"; s_no_cache=1
     else
         uv_mark="-"; uv_detail="无证据(日志中未出现 uv 相关输出)"
     fi
