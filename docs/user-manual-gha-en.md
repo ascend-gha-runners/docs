@@ -6,11 +6,16 @@ We implement GitHub Action tasks on Ascend cluster nodes based on [ARC](https://
 
 Ascend clusters create runner pods to execute GitHub Action jobs. We offer the following types of Ascend chips. If no name is specified, the default naming will be applied.
 
-|Type|Architecture|Default name(x = chip count)|
-|--|--|--|
-|Atlas 300I DUO|arm64|linux-aarch64-310p-x|
-|Atlas 800 A3|arm64|linux-aarch64-a3-x|
-|Atlas 800 A2|arm64|linux-aarch64-a2-x or linux-aarch64-a2b3-x|
+| Type                  | Architecture     | Configuration    | Default name(x = chip count)           |
+|---------------------|--------|-------|-----------------------|
+| Atlas 300I DUO 280T | arm64  | 910C  | linux-aarch64-310p-x  |
+| Atlas A3  Mixed        | arm64 | NA    | linux-aarch64-a3-x    |
+| Atlas 800I A3 560T  | arm64 | 910C  | linux-aarch64-a3-800i-x |
+| Atlas 800T A3 752T  | arm64 | 910C  | linux-aarch64-a3-800t-x |
+| Atlas A2 Mixed         | arm64  | NA    | linux-aarch64-a2-x    |
+| Atlas 800T A2 376T  | arm64  | 910B2 | linux-aarch64-a2b2-x  |
+| Atlas 800T A2 313T  | arm64  | 910B3 | linux-aarch64-a2b3-x  |
+| Atlas 800I A2 560T  | arm64  | 910B4 | linux-aarch64-a2b4-x  |
 
 ### Runner Pod Resource Quota
 
@@ -21,18 +26,37 @@ CPU and memory quota of each runner pod scales proportionally with the number of
 |linux-aarch64-310p-1|1|11|40Gi|
 |linux-aarch64-310p-2|2|22|80Gi|
 |linux-aarch64-310p-4|4|44|160Gi|
+|linux-aarch64-a3-0|0|4|8Gi|
 |linux-aarch64-a3-2|2|39|64Gi|
 |linux-aarch64-a3-4|4|78|128Gi|
 |linux-aarch64-a3-8|8|156|256Gi|
 |linux-aarch64-a3-16|16|312|512Gi|
+|linux-aarch64-a3-800i-0|0|4|8Gi|
+|linux-aarch64-a3-800i-2|2|39|64Gi|
+|linux-aarch64-a3-800i-4|4|78|128Gi|
+|linux-aarch64-a3-800i-8|8|156|256Gi|
+|linux-aarch64-a3-800i-16|16|312|512Gi|
+|linux-aarch64-a3-800t-0|0|4|8Gi|
+|linux-aarch64-a3-800t-2|2|39|64Gi|
+|linux-aarch64-a3-800t-4|4|78|128Gi|
+|linux-aarch64-a3-800t-8|8|156|256Gi|
+|linux-aarch64-a3-800t-16|16|312|512Gi|
 |linux-aarch64-a2-1|1|23|64Gi|
 |linux-aarch64-a2-2|2|46|128Gi|
 |linux-aarch64-a2-4|4|92|256Gi|
 |linux-aarch64-a2-8|8|184|512Gi|
+|linux-aarch64-a2b2-1|1|23|64Gi|
+|linux-aarch64-a2b2-2|2|46|128Gi|
+|linux-aarch64-a2b2-4|4|92|256Gi|
+|linux-aarch64-a2b2-8|8|184|512Gi|
 |linux-aarch64-a2b3-1|1|23|64Gi|
 |linux-aarch64-a2b3-2|2|46|128Gi|
 |linux-aarch64-a2b3-4|4|92|256Gi|
 |linux-aarch64-a2b3-8|8|184|512Gi|
+|linux-aarch64-a2b4-1|1|23|64Gi|
+|linux-aarch64-a2b4-2|2|46|128Gi|
+|linux-aarch64-a2b4-4|4|92|256Gi|
+|linux-aarch64-a2b4-8|8|184|512Gi|
 
 ### Runner Naming Convention
 
