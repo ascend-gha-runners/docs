@@ -104,8 +104,8 @@ graphql_get_runs() {
 
     # Unlimited mode: use REST pagination to get ALL runs
     if [ "$MAX_NPU_SEARCH" = "0" ]; then
-        rest_get_all_runs "$REPO"
-        return
+        rest_get_all_runs "$REPO" || true
+        return 0
     fi
 
     # GraphQL: fetch up to MAX_NPU_SEARCH runs (capped at 100 per GitHub limit)
@@ -147,7 +147,7 @@ rest_get_all_runs() {
         local runs_success runs_failure runs_json
         runs_success=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=success" 2>/dev/null) || true
         runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=failure" 2>/dev/null) || true
-        runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
+        runs_json=$(printf '%s\n%s\n' "$runs_success" "$runs_failure" | jq -sc '
             {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
         ' 2>/dev/null) || true
 
@@ -156,7 +156,7 @@ rest_get_all_runs() {
         run_count=$(echo "$runs_json" | jq -r '.workflow_runs | length' 2>/dev/null || echo "0")
         [ "$run_count" = "0" ] && break
 
-        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"'
+        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"' 2>/dev/null || true
         page=$((page + 1))
     done
 }
@@ -177,7 +177,7 @@ rest_get_runs() {
         local runs_success runs_failure runs_json
         runs_success=$(gh api "repos/$REPO/actions/workflows/${WF}/runs?per_page=$PER_PAGE&page=$page&status=success" 2>/dev/null) || true
         runs_failure=$(gh api "repos/$REPO/actions/workflows/${WF}/runs?per_page=$PER_PAGE&page=$page&status=failure" 2>/dev/null) || true
-        runs_json=$(echo "${runs_success}${runs_failure}" | jq -sc '
+        runs_json=$(printf '%s\n%s\n' "$runs_success" "$runs_failure" | jq -sc '
             {workflow_runs: ([.[].workflow_runs] | add // [] | sort_by(-.id))}
         ' 2>/dev/null) || true
 
@@ -186,7 +186,7 @@ rest_get_runs() {
         run_count=$(echo "$runs_json" | jq -r '.workflow_runs | length' 2>/dev/null || echo "0")
         [ "$run_count" = "0" ] && break
 
-        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"'
+        echo "$runs_json" | jq -r '.workflow_runs[] | "\(.id)|\(.head_branch)|\(.name)"' 2>/dev/null || true
         page=$((page + 1))
     done
 }
@@ -197,7 +197,7 @@ get_npu_jobs() {
     local RUN_ID="$2"
 
     local jobs_json
-    jobs_json=$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs" 2>/dev/null) || return 1
+    jobs_json=$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs" 2>/dev/null) || return 0
 
     echo "$jobs_json" | jq -r "
         .jobs[]
@@ -208,6 +208,7 @@ get_npu_jobs() {
           )
         | [.id, .name, (.labels | join(\",\"))] | join(\"|\")
     " 2>/dev/null || true
+    return 0
 }
 
 # ==============================================================================
@@ -427,11 +428,12 @@ process_repo() {
     local npu_found=false
 
     # Get runs: GraphQL (common) or REST (workflow filter fallback)
+    # NOTE: || true needed because set -e would kill the background process
     local run_lines
     if [ -n "$WORKFLOW_FILTER" ]; then
-        run_lines=$(rest_get_runs "$REPO" "$WORKFLOW_FILTER")
+        run_lines=$(rest_get_runs "$REPO" "$WORKFLOW_FILTER") || run_lines=""
     else
-        run_lines=$(graphql_get_runs "$REPO")
+        run_lines=$(graphql_get_runs "$REPO") || run_lines=""
     fi
 
     # For each run, get jobs, find NPU candidates (stop at MAX_CANDIDATES)
@@ -443,7 +445,7 @@ process_repo() {
         [ "$MAX_NPU_SEARCH" -gt 0 ] && [ "$runs_scanned" -gt "$MAX_NPU_SEARCH" ] && break
 
         local npu_jobs
-        npu_jobs=$(get_npu_jobs "$REPO" "$run_id")
+        npu_jobs=$(get_npu_jobs "$REPO" "$run_id") || npu_jobs=""
 
         if [ -n "$npu_jobs" ]; then
             npu_found=true
@@ -487,7 +489,7 @@ process_repo() {
 
     # Deduplicate and sort candidates (newest run first)
     local sorted_candidates
-    sorted_candidates=$(echo "$candidates" | grep -v '^$' | sort -t'|' -k1 -rn | uniq)
+    sorted_candidates=$(echo "$candidates" | grep -v '^$' | sort -t'|' -k1 -rn | uniq) || sorted_candidates=""
 
     while IFS='|' read -r c_run_id c_run_branch c_run_name c_job_id c_job_name c_job_labels; do
         [ -z "$c_job_id" ] && continue
