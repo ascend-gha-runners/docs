@@ -9,6 +9,11 @@ set -euo pipefail
 #   2. 早停：找到 MAX_CANDIDATES 个 NPU job 候选即停止扫描
 #   3. 并发：repo 级 PARALLEL 并发处理
 #
+# 标记图例：
+#   ✅ = confirmed in use（日志中找到缓存使用证据）
+#   ❌ = confirmed NOT in use（日志中找到反面证据）
+#   -  = unknown（无证据或无法确定）
+#
 # repos.txt 格式：
 #   org/repo                           — 自动模式，GraphQL 查询
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
@@ -73,6 +78,7 @@ echo "------------------------------------------------------------------"
 # ==============================================================================
 
 # GraphQL: get recent runs for a repo (replaces REST pagination)
+# NOTE: GraphQL returns UPPERCASE enum values for conclusion/status
 graphql_get_runs() {
     local REPO="$1"
     local ORG="${REPO%%/*}"
@@ -81,7 +87,7 @@ graphql_get_runs() {
     gh api graphql \
         -f query='query($owner: String!, $name: String!) {
             repository(owner: $owner, name: $name) {
-                workflowRuns(first: 10, orderBy: {field: CREATED_AT, direction: DESC}) {
+                workflowRuns(first: 30, orderBy: {field: CREATED_AT, direction: DESC}) {
                     nodes {
                         databaseId
                         headBranch
@@ -97,7 +103,7 @@ graphql_get_runs() {
         2>/dev/null \
     | jq -r '
         (.data.repository.workflowRuns.nodes // [])[]
-        | select(.conclusion == "success" or .conclusion == "failure")
+        | select(.conclusion == "SUCCESS" or .conclusion == "FAILURE")
         | "\(.databaseId)|\(.headBranch)|\(.name)"
     ' 2>/dev/null || true
 }
@@ -154,9 +160,10 @@ search_log_evidence() {
     # Sets via globals: repo_pypi repo_apt repo_ccache repo_uv
     # ev_pypi ev_apt ev_ccache ev_uv
     # counter_evidence_pypi counter_evidence_apt
+    # counter_evidence_ccache counter_evidence_uv
 
     # Pre-check: skip jobs with no package installation activity
-    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake" "$log_file" 2>/dev/null; then
+    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja" "$log_file" 2>/dev/null; then
         return 1
     fi
 
@@ -199,6 +206,13 @@ search_log_evidence() {
             if [ -n "$grep_line" ]; then
                 repo_pypi=true
                 ev_pypi="pip-broad(配置): ${grep_line:0:200}"
+            fi
+        fi
+        # Counter-evidence: pip install with non-cache index
+        if [ "$repo_pypi" = false ]; then
+            grep_line=$(grep -m1 -iE "pip[3]? install |pip[3]? download " "$log_file" 2>/dev/null || true)
+            if [ -n "$grep_line" ]; then
+                counter_evidence_pypi="用pip但非缓存: ${grep_line:0:200}"
             fi
         fi
     fi
@@ -248,6 +262,7 @@ search_log_evidence() {
 
     # ---------- CCache evidence ----------
     ev_ccache=""
+    counter_evidence_ccache=""
     repo_ccache=false
 
     grep_line=$(grep -m1 -iE "cache hit|cache miss|Cache hit|Cache miss|cache_hit|cache_miss|cachehit|cachemiss" "$log_file" 2>/dev/null || true)
@@ -277,9 +292,17 @@ search_log_evidence() {
             ev_ccache="ccache-broad: ${grep_line:0:200}"
         fi
     fi
+    # Counter-evidence: compilation activity but no ccache
+    if [ "$repo_ccache" = false ]; then
+        grep_line=$(grep -m1 -iE "(^|[^a-z])(gcc|g\+\+|cmake --build|ninja|make)([^a-z]|$)" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_ccache="编译活动无ccache: ${grep_line:0:200}"
+        fi
+    fi
 
     # ---------- uv evidence ----------
     ev_uv=""
+    counter_evidence_uv=""
     repo_uv=false
 
     grep_line=$(grep -m1 -iE "^\s*uv (pip |sync|install|add|run pip)" "$log_file" 2>/dev/null || true)
@@ -299,6 +322,13 @@ search_log_evidence() {
         if [ -n "$grep_line" ]; then
             repo_uv=true
             ev_uv="uv-setup(配置): ${grep_line:0:200}"
+        fi
+    fi
+    # Counter-evidence: pip install but no uv
+    if [ "$repo_uv" = false ]; then
+        grep_line=$(grep -m1 -iE "pip[3]? install " "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_uv="用pip非uv: ${grep_line:0:200}"
         fi
     fi
 
@@ -371,10 +401,10 @@ process_repo() {
     if [ "$candidate_count" -eq 0 ]; then
         local row=""
         if [ "$runs_scanned" -gt 0 ]; then
-            row="| $REPO | (scanned $runs_scanned runs) | - | 🔍 | 🔍 | 🔍 | 🔍 | No NPU runner jobs found in last $runs_scanned runs |"
+            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
             s_no_npu=1
         else
-            row="| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | No completed runs / no access |"
+            row="| $REPO | - | - | - | - | - | - | No completed runs / no access |"
             s_error=1
         fi
         echo "$row" > "$row_file"
@@ -387,8 +417,10 @@ process_repo() {
     local repo_pypi=false repo_apt=false repo_ccache=false repo_uv=false
     local ev_pypi="" ev_apt="" ev_ccache="" ev_uv=""
     local counter_evidence_pypi="" counter_evidence_apt=""
+    local counter_evidence_ccache="" counter_evidence_uv=""
     local repo_run="" repo_runner="" repo_job_url=""
     local log_ok=false
+    local log_no_pkg_activity=0
 
     # Deduplicate and sort candidates (newest run first)
     local sorted_candidates
@@ -422,6 +454,8 @@ process_repo() {
 
         # Search for evidence
         if ! search_log_evidence "$log_file"; then
+            # Log downloaded OK but no package installation activity
+            log_no_pkg_activity=1
             rm -f "$log_file"
             continue
         fi
@@ -445,7 +479,11 @@ process_repo() {
         first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
         first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
-        row="| $REPO | (NPU jobs found, logs expired) | $first_runner | ⚠️ | ⚠️ | ⚠️ | ⚠️ | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
+        if [ "$log_no_pkg_activity" = 1 ]; then
+            row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | NPU runner jobs found but no package installation in recent logs — [查看]($first_url) |"
+        else
+            row="| $REPO | (NPU jobs found, logs expired) | $first_runner | - | - | - | - | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
+        fi
         s_error=1
         echo "$row" > "$row_file"
         echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
@@ -463,27 +501,31 @@ process_repo() {
     elif [ -n "$counter_evidence_pypi" ]; then
         pypi_mark="❌"; pypi_detail="反面证据: ${counter_evidence_pypi}"; s_no_cache=1
     else
-        pypi_mark="⚙️"; pypi_detail="无证据(日志中未出现 pip index 相关输出)"
+        pypi_mark="-"; pypi_detail="无证据(日志中未出现 pip index 相关输出)"
     fi
 
     if [ "$repo_apt" = true ]; then
         apt_mark="✅"; apt_detail="$ev_apt"; s_apt=1
     elif [ -n "$counter_evidence_apt" ]; then
-        apt_mark="❌"; apt_detail="反面证据: ${counter_evidence_apt}"
+        apt_mark="❌"; apt_detail="反面证据: ${counter_evidence_apt}"; s_no_cache=1
     else
-        apt_mark="⚙️"; apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
+        apt_mark="-"; apt_detail="无证据(日志中未出现 apt Get/Hit 相关输出)"
     fi
 
     if [ "$repo_ccache" = true ]; then
         ccache_mark="✅"; ccache_detail="$ev_ccache"; s_ccache=1
+    elif [ -n "$counter_evidence_ccache" ]; then
+        ccache_mark="❌"; ccache_detail="反面证据: ${counter_evidence_ccache}"; s_no_cache=1
     else
-        ccache_mark="⚙️"; ccache_detail="无证据(日志中未出现 ccache 相关输出)"
+        ccache_mark="-"; ccache_detail="无证据(日志中未出现 ccache 相关输出)"
     fi
 
     if [ "$repo_uv" = true ]; then
         uv_mark="✅"; uv_detail="$ev_uv"; s_uv=1
+    elif [ -n "$counter_evidence_uv" ]; then
+        uv_mark="❌"; uv_detail="反面证据: ${counter_evidence_uv}"; s_no_cache=1
     else
-        uv_mark="⚙️"; uv_detail="无证据(日志中未出现 uv 相关输出)"
+        uv_mark="-"; uv_detail="无证据(日志中未出现 uv 相关输出)"
     fi
 
     local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
@@ -558,7 +600,7 @@ for line in "${REPO_LINES[@]}"; do
     if [ -f "$row_file" ]; then
         cat "$row_file"
     else
-        echo "| $REPO | - | - | ⚠️ | ⚠️ | ⚠️ | ⚠️ | Processing error — no output |"
+        echo "| $REPO | - | - | - | - | - | - | Processing error — no output |"
         echo "0|0|0|0|0|0|1" > "$stat_file"
     fi
 
@@ -579,12 +621,12 @@ echo ""
 echo "## Summary"
 echo ""
 echo "- Total repos checked: **$TOTAL**"
-echo "- PyPI cache hit: **$STAT_PYPI** / $TOTAL"
-echo "- APT cache hit: **$STAT_APT** / $TOTAL"
-echo "- CCache hit: **$STAT_CCACHE** / $TOTAL"
-echo "- uv hit: **$STAT_UV** / $TOTAL"
-echo "- NPU job found but no cache (❌): **$STAT_NO_CACHE** — need cache config"
-echo "- No NPU runner jobs found (🔍): **$STAT_NO_NPU** — repos don't use our NPU runners"
-echo "- Logs expired / unavailable (⚠️): **$STAT_ERROR**"
+echo "- PyPI cache confirmed (✅): **$STAT_PYPI** / $TOTAL"
+echo "- APT cache confirmed (✅): **$STAT_APT** / $TOTAL"
+echo "- CCache confirmed (✅): **$STAT_CCACHE** / $TOTAL"
+echo "- uv confirmed (✅): **$STAT_UV** / $TOTAL"
+echo "- Confirmed NOT in use (❌): **$STAT_NO_CACHE** — need cache config"
+echo "- No NPU runner jobs found: **$STAT_NO_NPU** — repos don't use our NPU runners"
+echo "- Unknown / logs unavailable (-): **$STAT_ERROR**"
 echo ""
 echo "Audit complete."
