@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       full_scan:
-        description: 'Full scan: query ALL runs for maximum accuracy (slow, ~10+ min)'
+        description: 'Full scan: capped at 200 runs + 30 candidates + unlimited log aggregation (avoids API rate limit)'
         required: false
         default: 'false'
         type: choice
@@ -102,6 +102,7 @@ jobs:
             echo "No changes to Repo.md"
           else
             git commit -m "docs: update cache audit status in Repo.md"
+            git pull --rebase "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" main
             git push "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
           fi
 

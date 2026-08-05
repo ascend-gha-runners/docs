@@ -9,7 +9,8 @@ set -euo pipefail
 #   2. 候选收集：从 runs 中收集最多 MAX_CANDIDATES 个 NPU job 候选
 #   3. 聚合证据：Phase 2 扫描多个候选日志，对每种缓存类型取"任一日志有正面证据→✅"
 #   4. 并发：repo 级 PARALLEL 并发处理
-#   5. 全量扫描：设 MAX_NPU_SEARCH=0 获取所有 run（REST 分页），适合一次性准确审计
+#   5. 全量扫描：设 MAX_NPU_SEARCH=0 触发全量模式（内部 cap 200 runs + 30 candidates
+#      + unlimited log aggregation），避免 API rate limit (5000/hr) 耗尽导致静默失败
 #
 # 标记图例：
 #   ✅ = confirmed in use（任一日志中找到缓存使用证据）
@@ -20,11 +21,11 @@ set -euo pipefail
 #   org/repo                           — 自动模式，GraphQL 查询
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
 #
-# 环境变量（设 0 = 无上限/全量）：
+# 环境变量（设 0 = 全量模式，内部使用 cap 防止 rate limit）：
 #   RUNNER_FILTER     — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
-#   MAX_NPU_SEARCH    — 最多搜多少个 run，默认 50；0 = 全部（REST 分页）
-#   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15；0 = 无上限
-#   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10；0 = 无上限
+#   MAX_NPU_SEARCH    — 最多搜多少个 run，默认 50；0 = 全量模式（cap 200）
+#   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15；0 = 全量模式（cap 30）
+#   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10；0 = 无上限（全量聚合）
 #   PARALLEL          — 并发 repo 数，默认 4
 #   PYPI_CACHE_HOST   — PyPI 缓存主机名
 #   APT_CACHE_PORT    — APT 缓存端口
@@ -61,6 +62,20 @@ PER_PAGE="${PER_PAGE:-30}"
 
 RUNNER_REGEX=$(echo "$RUNNER_FILTER" | sed 's/,/|/g')
 
+# Full scan mode: 0 means "use caps" (not unlimited) to prevent API rate limit exhaustion
+# GitHub rate limit: 5000 req/hour. Scanning 2000+ runs per repo = 2000+ API calls,
+# which exhausts the limit and causes get_npu_jobs() to silently return empty.
+# Caps: 200 runs scan + 30 candidates + unlimited log aggregation = ~230 API calls/repo
+FULL_SCAN_MODE=false
+if [ "$MAX_NPU_SEARCH" = "0" ]; then
+    FULL_SCAN_MODE=true
+    MAX_NPU_SEARCH=200
+fi
+if [ "$MAX_CANDIDATES" = "0" ]; then
+    MAX_CANDIDATES=30
+fi
+# MAX_LOGS_TO_CHECK=0 remains unlimited (log downloads don't use API rate limit)
+
 if [ -n "$APT_CACHE_HOST" ]; then
     APT_PATTERN="${APT_CACHE_HOST}"
 else
@@ -72,14 +87,10 @@ echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
 echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
-if [ "$MAX_NPU_SEARCH" = "0" ]; then
-echo " - Max NPU Search:   ALL (REST pagination)"
+if [ "$FULL_SCAN_MODE" = true ]; then
+echo " - Mode:             FULL SCAN (capped at $MAX_NPU_SEARCH runs, $MAX_CANDIDATES candidates, unlimited logs)"
 else
 echo " - Max NPU Search:   $MAX_NPU_SEARCH runs"
-fi
-if [ "$MAX_CANDIDATES" = "0" ]; then
-echo " - Max Candidates:   UNLIMITED"
-else
 echo " - Max Candidates:   $MAX_CANDIDATES"
 fi
 if [ "$MAX_LOGS_TO_CHECK" = "0" ]; then
@@ -96,14 +107,14 @@ echo "------------------------------------------------------------------"
 
 # GraphQL: get recent runs for a repo (replaces REST pagination)
 # NOTE: GraphQL returns UPPERCASE enum values for conclusion/status
-# When MAX_NPU_SEARCH=0, falls back to REST pagination for ALL runs
+# In full scan mode (MAX_NPU_SEARCH was 0, now capped at 200), uses REST pagination
 graphql_get_runs() {
     local REPO="$1"
     local ORG="${REPO%%/*}"
     local NAME="${REPO#*/}"
 
-    # Unlimited mode: use REST pagination to get ALL runs
-    if [ "$MAX_NPU_SEARCH" = "0" ]; then
+    # Full scan mode: use REST pagination to get more runs (capped by MAX_NPU_SEARCH)
+    if [ "$FULL_SCAN_MODE" = true ]; then
         rest_get_all_runs "$REPO" || true
         return 0
     fi
@@ -137,13 +148,14 @@ graphql_get_runs() {
     ' 2>/dev/null || true
 }
 
-# REST: get ALL runs for a repo (used when MAX_NPU_SEARCH=0)
-# Paginates through all pages of success+failure runs
+# REST: get runs for a repo (used in full scan mode, capped by MAX_NPU_SEARCH)
+# Fetches success+failure runs with pagination, capped at max_pages
 rest_get_all_runs() {
     local REPO="$1"
     local page=1
+    local max_pages=$(( (MAX_NPU_SEARCH + 99) / 100 ))
 
-    while true; do
+    while [ "$page" -le "$max_pages" ]; do
         local runs_success runs_failure runs_json
         runs_success=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=success" 2>/dev/null) || true
         runs_failure=$(gh api "repos/$REPO/actions/runs?per_page=100&page=$page&status=failure" 2>/dev/null) || true
@@ -167,11 +179,7 @@ rest_get_runs() {
     local WF="$2"
     local page=1
     local max_pages
-    if [ "$MAX_NPU_SEARCH" = "0" ]; then
-        max_pages=999  # effectively unlimited
-    else
-        max_pages=$(( (MAX_NPU_SEARCH + PER_PAGE - 1) / PER_PAGE ))
-    fi
+    max_pages=$(( (MAX_NPU_SEARCH + PER_PAGE - 1) / PER_PAGE ))
 
     while [ "$page" -le "$max_pages" ]; do
         local runs_success runs_failure runs_json
@@ -191,10 +199,35 @@ rest_get_runs() {
     done
 }
 
+# Check GitHub API rate limit and sleep if running low
+# Call before API-heavy operations to prevent silent failures
+_api_calls_since_check=0
+check_rate_limit() {
+    _api_calls_since_check=$((_api_calls_since_check + 1))
+    # Only check every 50 calls to avoid wasting API calls on rate_limit endpoint
+    [ $((_api_calls_since_check % 50)) -ne 0 ] && return 0
+
+    local remaining
+    remaining=$(gh api rate_limit --jq '.rate.remaining' 2>/dev/null || echo "5000")
+    if [ "$remaining" -lt 200 ]; then
+        local reset_ts now_ts wait_sec
+        reset_ts=$(gh api rate_limit --jq '.rate.reset' 2>/dev/null || echo "0")
+        now_ts=$(date +%s)
+        wait_sec=$((reset_ts - now_ts + 5))
+        if [ "$wait_sec" -gt 0 ] && [ "$wait_sec" -lt 3600 ]; then
+            echo "  [rate-limit] $remaining calls left, sleeping ${wait_sec}s..." >&2
+            sleep "$wait_sec"
+        fi
+    fi
+}
+
 # Get jobs for a run, filter NPU runner jobs
+# Includes retry logic for rate-limited requests
 get_npu_jobs() {
     local REPO="$1"
     local RUN_ID="$2"
+
+    check_rate_limit
 
     local jobs_json
     jobs_json=$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs" 2>/dev/null) || return 0
