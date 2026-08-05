@@ -18,6 +18,8 @@
 | Atlas 800T A2 313T  | arm64  | 910B3 | linux-aarch64-a2b3-x  |
 | Atlas 800I A2 560T  | arm64  | 910B4 | linux-aarch64-a2b4-x  |
 | Atlas A5 (Ascend950DT) | arm64  | NA    | linux-aarch64-a5-x    |
+| CPU Builder (x86)     | amd64  | NA    | linux-amd64-cpu-4     |
+| CPU Builder (ARM)     | arm64  | NA    | linux-aarch64-cpu-4   |
 
 ### Runner pod 资源配额
 
@@ -63,6 +65,8 @@
 |linux-aarch64-a5-2|2|82|384Gi|
 |linux-aarch64-a5-4|4|164|768Gi|
 |linux-aarch64-a5-8|8|360|1350Gi|
+|linux-aarch64-cpu-4|0|4|8Gi|
+|linux-amd64-cpu-4|0|4|8Gi|
 
 ### Runner pod 命名规范
 
