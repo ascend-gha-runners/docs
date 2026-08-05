@@ -91,6 +91,10 @@ jobs:
 
       - name: Update Repo.md with audit results
         run: |
+          # Fetch latest Repo.md from origin/main to avoid stale data
+          # (concurrent runs may have pushed updates after our checkout)
+          git fetch origin main
+          git checkout origin/main -- docs/Repo.md
           python3 scripts/ci-audit/update_repo_md.py \
             audit_result.md \
             scripts/ci-audit/repos.txt \
@@ -102,14 +106,45 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/Repo.md docs/Cluster.md scripts/ci-audit/repos.txt
-          if git diff --cached --quiet; then
-            echo "No changes to Repo.md"
-          else
+
+          # Push with retry: if another run pushed between our fetch and push,
+          # re-fetch latest, re-run update_repo_md.py, re-commit
+          for attempt in 1 2 3; do
+            git add docs/Repo.md docs/Cluster.md scripts/ci-audit/repos.txt
+            if git diff --cached --quiet; then
+              echo "No changes to Repo.md"
+              break
+            fi
             git commit -m "docs: update cache audit status in Repo.md"
-            git pull --rebase "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" main
-            git push "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
-          fi
+
+            if git push "https://x-access-token:${{ secrets.CACHE_AUDIT_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main 2>/dev/null; then
+              echo "Push succeeded (attempt $attempt)"
+              break
+            fi
+
+            if [ "$attempt" -lt 3 ]; then
+              echo "Push attempt $attempt failed, re-fetching latest..."
+              # Save untracked files that update_repo_md.py needs
+              cp audit_result.md /tmp/audit_result_retry.md
+              cp scripts/ci-audit/repos.txt /tmp/repos_retry.txt 2>/dev/null || true
+              # Reset to latest origin/main
+              git fetch origin main
+              git reset --hard origin/main
+              # Restore saved files
+              cp /tmp/audit_result_retry.md audit_result.md
+              cp /tmp/repos_retry.txt scripts/ci-audit/repos.txt 2>/dev/null || true
+              # Re-run update with fresh Repo.md
+              python3 scripts/ci-audit/update_repo_md.py \
+                audit_result.md \
+                scripts/ci-audit/repos.txt \
+                docs/Repo.md \
+                "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+                "$IS_INCREMENTAL"
+            else
+              echo "::error::All push attempts failed"
+              exit 1
+            fi
+          done
 
       - name: Write job summary
         if: always()
