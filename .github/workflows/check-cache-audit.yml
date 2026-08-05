@@ -31,9 +31,13 @@ jobs:
       PYPI_CACHE_HOST: ${{ vars.PYPI_CACHE_HOST || 'cache-service.nginx-pypi-cache.svc.cluster.local' }}
       APT_CACHE_PORT: ${{ vars.APT_CACHE_PORT || '8081' }}
       RUNNER_FILTER: ${{ vars.RUNNER_FILTER || 'linux-aarch64,linux-amd64' }}
-      MAX_NPU_SEARCH: ${{ (inputs.full_scan == 'true') && '0' || (vars.MAX_NPU_SEARCH || '50') }}
-      MAX_CANDIDATES: ${{ (inputs.full_scan == 'true') && '0' || (vars.MAX_CANDIDATES || '15') }}
-      MAX_LOGS_TO_CHECK: ${{ (inputs.full_scan == 'true') && '0' || (vars.MAX_LOGS_TO_CHECK || '10') }}
+      # 每日定时 = 全量扫描；repository_dispatch = 增量（只更新有证据的格子）
+      # 手动触发 = 按 full_scan 选项
+      IS_FULL_SCAN: ${{ (github.event_name == 'schedule' || inputs.full_scan == 'true') }}
+      IS_INCREMENTAL: ${{ github.event_name == 'repository_dispatch' }}
+      MAX_NPU_SEARCH: ${{ (github.event_name == 'schedule' || inputs.full_scan == 'true') && '0' || (vars.MAX_NPU_SEARCH || '50') }}
+      MAX_CANDIDATES: ${{ (github.event_name == 'schedule' || inputs.full_scan == 'true') && '0' || (vars.MAX_CANDIDATES || '15') }}
+      MAX_LOGS_TO_CHECK: ${{ (github.event_name == 'schedule' || inputs.full_scan == 'true') && '0' || (vars.MAX_LOGS_TO_CHECK || '10') }}
       PARALLEL: ${{ vars.PARALLEL || '4' }}
 
     steps:
@@ -91,7 +95,8 @@ jobs:
             audit_result.md \
             scripts/ci-audit/repos.txt \
             docs/Repo.md \
-            "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "$IS_INCREMENTAL"
 
       - name: Commit updated Repo.md
         run: |
