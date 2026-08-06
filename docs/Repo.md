@@ -24,26 +24,6 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-08-06 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (full scan). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/30989274615](https://github.com/ascend-gha-runners/docs/actions/runs/30989274615)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/30991533780](https://github.com/ascend-gha-runners/docs/actions/runs/30991533780)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/30992377717](https://github.com/ascend-gha-runners/docs/actions/runs/30992377717)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/30995263124](https://github.com/ascend-gha-runners/docs/actions/runs/30995263124)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31000441656](https://github.com/ascend-gha-runners/docs/actions/runs/31000441656)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31067604625](https://github.com/ascend-gha-runners/docs/actions/runs/31067604625)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31067951604](https://github.com/ascend-gha-runners/docs/actions/runs/31067951604)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31068091926](https://github.com/ascend-gha-runners/docs/actions/runs/31068091926)
-
-> Cache audit runs daily (full scan). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31074240270](https://github.com/ascend-gha-runners/docs/actions/runs/31074240270)
-
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31076177169](https://github.com/ascend-gha-runners/docs/actions/runs/31076177169)
-
 > Cache audit runs daily (full scan). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31079102095](https://github.com/ascend-gha-runners/docs/actions/runs/31079102095)
 
 > Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31080619484](https://github.com/ascend-gha-runners/docs/actions/runs/31080619484)

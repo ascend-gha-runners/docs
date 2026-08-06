@@ -171,7 +171,7 @@ else:
               f"\u00b7 {CROSS_MARK} = confirmed NOT in use "
               f"\u00b7 - = unknown")
 
-FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新)[.。].*$', re.MULTILINE)
+FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新).*$', re.MULTILINE)
 
 # ---------- 替换 Repo.md 中的表格区域 ----------
 if TABLE_START in content and TABLE_END in content:
