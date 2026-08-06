@@ -51,6 +51,8 @@ with open(REPO_MD) as f:
     content = f.read()
 
 # ---------- 解析现有表格值（增量模式用） ----------
+# Repo.md 表格格式: | Repository | PyPI | APT | CCache | uv | Last Checked |
+# split("|") 后: cols[0]="" cols[1]=repo cols[2]=PyPI cols[3]=APT cols[4]=CCache cols[5]=uv cols[6]=Date cols[7]=""
 # repo -> (pypi, apt, ccache, uv, date)  全是字符串
 existing = {}
 if TABLE_START in content and TABLE_END in content:
@@ -60,15 +62,17 @@ if TABLE_START in content and TABLE_END in content:
             if not line.startswith("| "):
                 continue
             cols = [c.strip() for c in line.split("|")]
-            if len(cols) < 9:
+            # Repo.md 行只有 8 个元素（6 列 + 首尾空串），不需要 9
+            if len(cols) < 8:
                 continue
             if "Repository" in cols[1] or "---" in cols[1]:
                 continue
             rm = re.search(r'([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)', cols[1])
             if rm:
                 repo = rm.group(1)
-                existing[repo] = (cols[4], cols[5], cols[6], cols[7],
-                                   cols[8] if len(cols) > 8 else TODAY)
+                # Repo.md 列索引: cols[2]=PyPI cols[3]=APT cols[4]=CCache cols[5]=uv cols[6]=Date
+                existing[repo] = (cols[2], cols[3], cols[4], cols[5],
+                                   cols[6] if len(cols) > 6 else TODAY)
 
 # ---------- 解析审计结果（原始脚本输出） ----------
 raw_results = {}  # repo -> (pypi, apt, ccache, uv)
@@ -180,14 +184,15 @@ if TABLE_START in content and TABLE_END in content:
 else:
     new_content = content.rstrip() + "\n\n" + new_table + "\n"
 
-# 替换或添加 footer
-if FOOTER_RE.search(new_content):
-    new_content = FOOTER_RE.sub(footer, new_content)
-else:
-    new_content = new_content.rstrip() + "\n\n" + footer + "\n"
+# 移除所有旧 footer 行（可能有多个），然后只添加一个
+new_content = FOOTER_RE.sub("", new_content)
+# 清除删除 footer 后可能残留的连续空行
+new_content = re.sub(r'\n{3,}', '\n\n', new_content)
+new_content = new_content.rstrip() + "\n\n" + footer + "\n"
 
 with open(REPO_MD, "w") as f:
     f.write(new_content)
 
 mode_str = "incremental" if INCREMENTAL else "full scan"
 print(f"Updated {REPO_MD} with {len(repos_ordered)} repos ({TODAY}, {mode_str})")
+print(f"  Parsed {len(existing)} existing table rows, {len(raw_results)} audit results")
