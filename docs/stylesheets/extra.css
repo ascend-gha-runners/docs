@@ -201,6 +201,12 @@
   font-weight: 500;
   color: var(--md-primary-fg-color);
 }
+.project-ns {
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+  font-family: var(--md-code-font-family);
+  margin-left: 0.25rem;
+}
 .project-count {
   flex-shrink: 0;
   margin-left: auto;

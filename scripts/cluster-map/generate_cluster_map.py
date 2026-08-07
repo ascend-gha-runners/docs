@@ -148,7 +148,7 @@ def parse_applications(text):
     """
     Split multi-doc YAML by '---', extract Application docs with source.path
     starting with 'projects/' (runner apps, not config apps).
-    Returns list of dicts: {destination_name, source_path}
+    Returns list of dicts: {destination_name, namespace, source_path}
     """
     apps = []
     for doc in text.split("\n---"):
@@ -157,11 +157,17 @@ def parse_applications(text):
             continue
         if "kind: Application" not in doc:
             continue
-        # destination name
-        dest_m = re.search(r"destination:\s*\n(?:.*\n)*?.*?name:\s*(\S+)", doc)
-        if not dest_m:
+        # destination block — extract both name and namespace
+        dest_block = re.search(r"destination:\s*\n((?:[ \t]+\S[^\n]*\n?)+)", doc)
+        if not dest_block:
             continue
-        dest_name = dest_m.group(1)
+        dest_text = dest_block.group(1)
+        name_m = re.search(r"name:\s*(\S+)", dest_text)
+        ns_m   = re.search(r"namespace:\s*(\S+)", dest_text)
+        if not name_m:
+            continue
+        dest_name = name_m.group(1)
+        namespace = ns_m.group(1) if ns_m else ""
 
         # source path
         path_m = re.search(r"path:\s*(projects/\S+)", doc)
@@ -174,7 +180,7 @@ def parse_applications(text):
         if last_seg.startswith("config") or last_seg == "config":
             continue
 
-        apps.append({"destination_name": dest_name, "source_path": source_path})
+        apps.append({"destination_name": dest_name, "namespace": namespace, "source_path": source_path})
     return apps
 
 
@@ -183,7 +189,7 @@ def parse_applications(text):
 # ---------------------------------------------------------------------------
 
 def build_app_index():
-    """source.path -> destination.name for every projects/ Application."""
+    """source.path -> {destination_name, namespace} for every projects/ Application."""
     index = {}
     for entry in list_dir(CLUSTERS_DIR):
         if entry.get("type") != "dir":
@@ -196,7 +202,10 @@ def build_app_index():
             if not content:
                 continue
             for app in parse_applications(content):
-                index.setdefault(app["source_path"], app["destination_name"])
+                index.setdefault(app["source_path"], {
+                    "destination_name": app["destination_name"],
+                    "namespace": app["namespace"],
+                })
     return index
 
 
@@ -220,6 +229,8 @@ def scan_clusters():
                 continue
             repo_name = repo["name"]
             project = f"{org_name}/{repo_name}"
+            # namespace: prefer config/namespace.yaml, fall back to ArgoCD app destination.namespace
+            project_ns = _namespace_from_config(org_name, repo_name)
             for sub in list_dir(f"{PROJECTS_DIR}/{org_name}/{repo_name}"):
                 if sub.get("type") != "dir":
                     continue
@@ -227,11 +238,13 @@ def scan_clusters():
                 if not runner_dir.startswith("linux-"):
                     continue
                 rel = f"{PROJECTS_DIR}/{org_name}/{repo_name}/{runner_dir}"
-                dest = index.get(rel)
-                if not dest:
+                app_info = index.get(rel)
+                if not app_info:
                     # runner dir not referenced by any ArgoCD Application
                     # (e.g. sgl-kernel-npu linux-arm64-npu-*): skip
                     continue
+                dest = app_info["destination_name"]
+                namespace = app_info["namespace"]
 
                 values_text = get_file_content(f"{rel}/values.yaml")
                 labels, npu_count, npu_model = parse_values_yaml(values_text)
@@ -258,6 +271,7 @@ def scan_clusters():
                     "npu_count": npu_count or "-",
                     "npu_model": npu_model or "-",
                     "repo_full": repo_full,
+                    "namespace": project_ns or namespace,  # config ns preferred, ArgoCD ns fallback
                 }
 
                 clusters.setdefault(dest, {}).setdefault(project, []).append(runner_info)
@@ -279,6 +293,28 @@ def _project_display(project, runners):
         if r.get("repo_full"):
             return r["repo_full"]
     return project
+
+
+def _project_namespace(runners):
+    """Most common namespace across all runners of a project."""
+    from collections import Counter
+    ns_list = [r.get("namespace", "") for r in runners if r.get("namespace")]
+    if not ns_list:
+        return ""
+    return Counter(ns_list).most_common(1)[0][0]
+
+
+def _namespace_from_config(org, repo):
+    """Read namespace from projects/{org}/{repo}/config/namespace.yaml.
+    Falls back to empty string if not found."""
+    for config_dir in (f"projects/{org}/{repo}/config",):
+        content = get_file_content(f"{config_dir}/namespace.yaml")
+        if not content:
+            continue
+        m = re.search(r"^\s*name:\s*(\S+)", content, re.MULTILINE)
+        if m:
+            return m.group(1)
+    return ""
 
 
 def _machine(runner):
@@ -433,6 +469,7 @@ def render_cluster_md(clusters):
             runners = sorted(projects[project], key=lambda r: (len(r["runner_dir"]), r["runner_dir"]))
             machines = "".join(f"        {_machine(r)}" for r in runners)
             display = _project_display(project, runners)
+            ns = _project_namespace(runners)  # same for all runners in project
 
             # searchable text: display name + all runner labels
             label_text = " ".join(
@@ -446,6 +483,8 @@ def render_cluster_md(clusters):
             lines.append('        <button type="button" class="project-head" aria-expanded="false">')
             lines.append('          <span class="project-toggle"></span>')
             lines.append(f'          <span class="project-name-text">{_esc(display)}</span>')
+            if ns:
+                lines.append(f'          <span class="project-ns">{_esc(ns)}</span>')
             lines.append(
                 f'          <span class="project-count">{n_machines} label{"s" if n_machines != 1 else ""}</span>'
             )
