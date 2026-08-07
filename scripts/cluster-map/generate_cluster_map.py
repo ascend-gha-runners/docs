@@ -483,8 +483,6 @@ def render_cluster_md(clusters):
             lines.append('        <button type="button" class="project-head" aria-expanded="false">')
             lines.append('          <span class="project-toggle"></span>')
             lines.append(f'          <span class="project-name-text">{_esc(display)}</span>')
-            if ns:
-                lines.append(f'          <span class="project-ns">{_esc(ns)}</span>')
             lines.append(
                 f'          <span class="project-count">{n_machines} label{"s" if n_machines != 1 else ""}</span>'
             )
@@ -496,6 +494,10 @@ def render_cluster_md(clusters):
             lines.append("      </div>")
             lines.append('      <div class="machine-list" hidden>')
             lines.append(machines)
+            if ns:
+                lines.append(
+                    f'        <div class="project-ns">namespace: <code>{_esc(ns)}</code></div>'
+                )
             lines.append("      </div>")
             lines.append("    </div>")
 
