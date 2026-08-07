@@ -205,6 +205,8 @@
   font-size: 0.68rem;
   color: var(--md-default-fg-color--lighter);
   margin-top: 0.25rem;
+  /* align text with machine pill inner text (chip horizontal padding) */
+  padding-left: 0.55rem;
 }
 .project-ns code {
   font-size: 0.68rem;
