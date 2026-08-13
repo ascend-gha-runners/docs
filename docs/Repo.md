@@ -9,9 +9,9 @@
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | 2026-08-12 |
 | [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | 2026-08-12 |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-08-12 |
-| [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | 2026-08-12 |
-| [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | 2026-08-12 |
-| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | 2026-08-12 |
+| [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | 2026-08-13 |
+| [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | 2026-08-13 |
+| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | 2026-08-13 |
 | [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | ❌ | 2026-08-12 |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ✅ | ❌ | ❌ | ❌ | 2026-08-12 |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | - | - | ❌ | - | 2026-08-12 |
@@ -24,4 +24,4 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-08-12 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31598579078](https://github.com/ascend-gha-runners/docs/actions/runs/31598579078)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/31664825253](https://github.com/ascend-gha-runners/docs/actions/runs/31664825253)
