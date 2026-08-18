@@ -8,7 +8,7 @@
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | 2026-08-17 |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | 2026-08-17 |
 | [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | - | - | 2026-08-17 |
-| [sgl-project/sglang](https://github.com/sgl-project/sglang) | - | - | ❌ | - | 2026-08-17 |
+| [sgl-project/sglang](https://github.com/sgl-project/sglang) | - | - | ❌ | - | 2026-08-18 |
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | - | - | 2026-08-17 |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | - | - | - | - | 2026-08-17 |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | - | - | - | - | 2026-08-17 |
@@ -24,4 +24,4 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | - | - | - | - | 2026-08-17 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/32025476893](https://github.com/ascend-gha-runners/docs/actions/runs/32025476893)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/32088981738](https://github.com/ascend-gha-runners/docs/actions/runs/32088981738)
