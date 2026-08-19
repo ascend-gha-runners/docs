@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">172</span>
+    <span class="stat-num">176</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -24,14 +24,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 107</option>
   <option value="cpu">CPU (no NPU) · 35</option>
-  <option value="npu">npu · 12</option>
-  <option value="on-demand">on-demand · 9</option>
+  <option value="npu">npu · 15</option>
+  <option value="on-demand">on-demand · 10</option>
   <option value="Ascend910">Ascend910 · 4</option>
   <option value="ascend-310">ascend-310 · 3</option>
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 172 labels</span>
+<span class="cluster-hint">11 clusters · 176 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -512,9 +512,23 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-sh-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-sh-001-cluster</span>
-    <span class="cluster-meta">1 project · 4 labels</span>
+    <span class="cluster-meta">2 projects · 8 labels</span>
   </div>
   <div class="cluster-body">
+    <div class="project-row" data-search="vllm-ascend/vllm-ascend-recipes linux-aarch64-a5-0 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">vllm-ascend/vllm-ascend-recipes</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/vllm-ascend/vllm-ascend-recipes" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine machine--ondemand" data-label="linux-aarch64-a5-0" data-npu="on-demand"><span class="machine-label">linux-aarch64-a5-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a5-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
+        <div class="project-ns">namespace: <code>vllm-ascend-vllm-ascend-recipes</code></div>
+      </div>
+    </div>
     <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a5-0 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
