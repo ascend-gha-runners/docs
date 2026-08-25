@@ -429,7 +429,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-310p-1-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-1-vllm-omni</span><span class="machine-npu"> · 1 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-2-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2-vllm-omni</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4-vllm-omni</span><span class="machine-npu"> · 4 × ascend-310</span></div>
-        <div class="project-ns">namespace: <code>vllm-project</code></div>
+        <div class="project-ns">namespace: <code>vllm-project-vllm-omni</code></div>
       </div>
     </div>
   </div>
@@ -568,7 +568,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       </div>
       <div class="machine-list" hidden>
         <div class="machine machine--ondemand" data-label="linux-aarch64-a5-0-sh-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a5-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a5-2-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-4-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-8-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
-        <div class="project-ns">namespace: <code>vllm-project</code></div>
+        <div class="project-ns">namespace: <code>vllm-project-vllm-omni</code></div>
       </div>
     </div>
   </div>
