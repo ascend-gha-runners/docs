@@ -40,6 +40,12 @@
 |linux-aarch64-a3-800i-4|4|78|128Gi|
 |linux-aarch64-a3-800i-8|8|156|256Gi|
 |linux-aarch64-a3-800i-16|16|312|512Gi|
+|linux-aarch64-a3-800i-2-aiframe|2|32|128Gi|
+|linux-aarch64-a3-800i-4-aiframe|4|64|256Gi|
+|linux-aarch64-a3-800i-8-aiframe|8|128|512Gi|
+|linux-aarch64-a3-800i-2-mind|2|32|128Gi|
+|linux-aarch64-a3-800i-4-mind|4|64|256Gi|
+|linux-aarch64-a3-800i-8-mind|8|128|512Gi|
 |linux-aarch64-a3-800t-0|0|4|8Gi|
 |linux-aarch64-a3-800t-2|2|39|64Gi|
 |linux-aarch64-a3-800t-4|4|78|128Gi|
