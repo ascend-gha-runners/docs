@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">184</span>
+    <span class="stat-num">190</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,7 +22,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter clusters, projects or labels…" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 108</option>
+  <option value="ascend-1980">ascend-1980 · 114</option>
   <option value="cpu">CPU (no NPU) · 35</option>
   <option value="npu">npu · 18</option>
   <option value="on-demand">on-demand · 11</option>
@@ -31,7 +31,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 184 labels</span>
+<span class="cluster-hint">11 clusters · 190 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -578,7 +578,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="ascend-aiframework">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-aiframework</span>
-    <span class="cluster-meta">1 project · 4 labels</span>
+    <span class="cluster-meta">2 projects · 7 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
@@ -595,15 +595,43 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
+    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a3-800i-2-aiframe linux-aarch64-a3-800i-4-aiframe linux-aarch64-a3-800i-8-aiframe">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">vllm-project/vllm-ascend</span>
+          <span class="project-count">3 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a3-800i-2-aiframe" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2-aiframe</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-aiframe" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4-aiframe</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-aiframe" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8-aiframe</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>vllm-project</code></div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="cluster-card" data-name="ascend-mind-third-ci">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-mind-third-ci</span>
-    <span class="cluster-meta">1 project · 4 labels</span>
+    <span class="cluster-meta">2 projects · 7 labels</span>
   </div>
   <div class="cluster-body">
+    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a3-800i-2-mind linux-aarch64-a3-800i-4-mind linux-aarch64-a3-800i-8-mind">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">vllm-project/vllm-ascend</span>
+          <span class="project-count">3 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a3-800i-2-mind" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2-mind</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-mind" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4-mind</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-mind" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8-mind</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>vllm-project</code></div>
+      </div>
+    </div>
     <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
