@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">191</span>
+    <span class="stat-num">186</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -23,15 +23,15 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 115</option>
-  <option value="cpu">CPU (no NPU) · 35</option>
-  <option value="npu">npu · 18</option>
-  <option value="on-demand">on-demand · 11</option>
-  <option value="ascend-310">ascend-310 · 6</option>
+  <option value="cpu">CPU (no NPU) · 37</option>
+  <option value="npu">npu · 15</option>
+  <option value="on-demand">on-demand · 10</option>
   <option value="Ascend910">Ascend910 · 4</option>
+  <option value="ascend-310">ascend-310 · 3</option>
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 191 labels</span>
+<span class="cluster-hint">11 clusters · 186 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -401,7 +401,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-003-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-003-cluster</span>
-    <span class="cluster-meta">2 projects · 6 labels</span>
+    <span class="cluster-meta">2 projects · 4 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-310p-1 linux-aarch64-310p-2 linux-aarch64-310p-4">
@@ -418,18 +418,18 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="vllm-project/vllm-omni linux-aarch64-310p-1-vllm-omni linux-aarch64-310p-2-vllm-omni linux-aarch64-310p-4-vllm-omni">
+    <div class="project-row" data-search="vllm-project/vllm-omni linux-aarch64-310p">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-omni</span>
-          <span class="project-count">3 labels</span>
+          <span class="project-count">1 label</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-310p-1-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-1-vllm-omni</span><span class="machine-npu"> · 1 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-2-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2-vllm-omni</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4-vllm-omni" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4-vllm-omni</span><span class="machine-npu"> · 4 × ascend-310</span></div>
-        <div class="project-ns">namespace: <code>vllm-project-vllm-omni</code></div>
+        <div class="machine machine--cpu" data-label="linux-aarch64-310p" data-npu="cpu"><span class="machine-label">linux-aarch64-310p</span><span class="machine-npu"> · cpu</span></div>
+        <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
   </div>
@@ -526,7 +526,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-sh-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-sh-001-cluster</span>
-    <span class="cluster-meta">3 projects · 12 labels</span>
+    <span class="cluster-meta">3 projects · 9 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="vllm-ascend/vllm-ascend-recipes linux-aarch64-a5-0 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
@@ -557,18 +557,18 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="vllm-project/vllm-omni linux-aarch64-a5-0 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
+    <div class="project-row" data-search="vllm-project/vllm-omni linux-aarch64-a5">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-omni</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">1 label</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--ondemand" data-label="linux-aarch64-a5-0-sh-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a5-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a5-2-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-4-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-8-sh-001" data-npu="npu"><span class="machine-label">linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
-        <div class="project-ns">namespace: <code>vllm-project-vllm-omni</code></div>
+        <div class="machine machine--cpu" data-label="linux-aarch64-a5" data-npu="cpu"><span class="machine-label">linux-aarch64-a5</span><span class="machine-npu"> · cpu</span></div>
+        <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
   </div>
