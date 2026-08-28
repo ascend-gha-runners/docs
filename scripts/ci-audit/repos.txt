@@ -18,3 +18,7 @@ areal-project/AReaL|||||
 fla-org/flash-linear-attention|||||
 tile-ai/tilelang-mlir-ascend|||||
 verl-project/verl-SpeCo|||||
+
+vllm-ascend/config-cn12-001|||||
+vllm-ascend/linux-aarch64-cpu-4-cn12-001|||||
+vllm-ascend/linux-amd64-cpu-4-cn12-001|||||
