@@ -24,4 +24,4 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | - | - | - | - | 2026-08-28 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (full scan). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/33180080644](https://github.com/ascend-gha-runners/docs/actions/runs/33180080644)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/33181027643](https://github.com/ascend-gha-runners/docs/actions/runs/33181027643)
