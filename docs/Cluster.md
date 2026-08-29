@@ -503,9 +503,23 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-005-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-005-cluster</span>
-    <span class="cluster-meta">2 projects · 17 labels</span>
+    <span class="cluster-meta">3 projects · 18 labels</span>
   </div>
   <div class="cluster-body">
+    <div class="project-row" data-search="Ascend/pytorch linux-aarch64-cpu-24">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">Ascend/pytorch</span>
+          <span class="project-count">1 label</span>
+        </button>
+        <a class="project-link" href="https://github.com/Ascend/pytorch" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine machine--cpu" data-label="linux-aarch64-cpu-24" data-npu="cpu"><span class="machine-label">linux-aarch64-cpu-24</span><span class="machine-npu"> · cpu</span></div>
+        <div class="project-ns">namespace: <code>ascend</code></div>
+      </div>
+    </div>
     <div class="project-row" data-search="triton-lang/triton-ascend linux-amd64-cpu-8 linux-amd64-cpu-16 linux-aarch64-cpu-1 linux-aarch64-cpu-2 linux-aarch64-cpu-8 linux-aarch64-cpu-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
@@ -592,20 +606,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="ascend-aiframework">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-aiframework</span>
-    <span class="cluster-meta">2 projects · 8 labels</span>
+    <span class="cluster-meta">2 projects · 7 labels</span>
   </div>
   <div class="cluster-body">
-    <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-aarch64-cpu-7">
+    <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/pytorch</span>
-          <span class="project-count">5 labels</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/pytorch" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-cpu-7" data-npu="cpu"><span class="machine-label">linux-aarch64-cpu-7</span><span class="machine-npu"> · cpu</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
