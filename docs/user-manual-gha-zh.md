@@ -73,6 +73,7 @@
 |linux-aarch64-a5-8|8|360|1350Gi|
 |linux-aarch64-cpu-4|0|4|8Gi|
 |linux-amd64-cpu-4|0|4|8Gi|
+|linux-aarch64-cpu-24|0|24|32Gi|
 
 ### Runner pod 命名规范
 
