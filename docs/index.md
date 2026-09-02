@@ -10,6 +10,8 @@ If your organization would like to use Buildkite CI with Ascend NPU, follow the 
 
 If you encounter any issues while using the documentation, please submit an [issue](https://github.com/ascend-gha-runners/docs/issues).
 
+If you encounter a problem with a specific project build (e.g., failed PR or job), please register it via the [Problem Report](./problem-report/) page.
+
 # Future Plans
 Currently, the only way to connect to NPU Runners is using Github App.
 We plan to provide a Github application, such as `pr-robot`, to run NPU Runners without installing Github App and update this document accordingly.
