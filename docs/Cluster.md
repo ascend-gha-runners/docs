@@ -671,7 +671,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
-        <div class="project-ns">namespace: <code>volcengine</code></div>
+        <div class="project-ns">namespace: <code>verl-project</code></div>
       </div>
     </div>
   </div>
@@ -694,7 +694,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2b3-1" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-1</span><span class="machine-npu"> · 1 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-2" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-2</span><span class="machine-npu"> · 2 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-4" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-4</span><span class="machine-npu"> · 4 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a2b3-8" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a2b3-8</span><span class="machine-npu"> · 8 × Ascend910</span></div>
-        <div class="project-ns">namespace: <code>volcengine</code></div>
+        <div class="project-ns">namespace: <code>verl</code></div>
       </div>
     </div>
   </div>
