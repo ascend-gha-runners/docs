@@ -1,0 +1,31 @@
+docs/assets/problem-labels.json
+  s_c1684a58147c77::t_99e5ca245d00f3 12,42-46,207,383-385,389-391,401-403,413-415,425-427,464-466
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "f152aaed8807ea9d8396fd282367a968f0d9dfcf",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "deepseek_v4_flash_official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "operation_id": "6a97c84412b31195294fa785",
+        "source_scene": "agent",
+        "external_session_id": "6a96418c12b31195294f990d",
+        "tool_use_id": "6a97c84412b31195294fa785",
+        "runtime_client": "trae-tob-git-ai",
+        "display_model_name": "DeepSeek-V4-Flash 正式版",
+        "session_id": "6a96418c12b31195294f990d",
+        "tool_name": "RunCommand",
+        "edit_kind": "bash",
+        "client_type": "ide"
+      }
+    }
+  }
+}
