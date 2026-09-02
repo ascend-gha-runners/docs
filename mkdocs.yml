@@ -37,6 +37,7 @@ extra_css:
 extra_javascript:
   - javascripts/tablesort.js
   - javascripts/cluster-map.js
+  - javascripts/problem-report.js
 
 plugins:
   - search
