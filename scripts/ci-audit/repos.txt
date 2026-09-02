@@ -26,3 +26,5 @@ vllm-ascend/linux-amd64-cpu-4-cn12-001|||||
 vllm-ascend/config-for-guiyang-006|||||
 vllm-ascend/linux-aarch64-cpu-4-gy006|||||
 vllm-ascend/linux-amd64-cpu-4-gy006|||||
+
+sgl-project/sglang-omni|||||

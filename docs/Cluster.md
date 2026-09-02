@@ -10,11 +10,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Clusters</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">17</span>
+    <span class="stat-num">18</span>
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">204</span>
+    <span class="stat-num">208</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -23,7 +23,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 131</option>
-  <option value="cpu">CPU (no NPU) · 38</option>
+  <option value="cpu">CPU (no NPU) · 42</option>
   <option value="npu">npu · 15</option>
   <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 4</option>
@@ -31,7 +31,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 204 labels</span>
+<span class="cluster-hint">11 clusters · 208 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -187,7 +187,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="ascend-hk-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-hk-001-cluster</span>
-    <span class="cluster-meta">11 projects · 53 labels</span>
+    <span class="cluster-meta">12 projects · 57 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-aarch64-a2b3-1 linux-aarch64-a2b3-2 linux-aarch64-a2b3-4 linux-aarch64-a2b3-8">
@@ -272,6 +272,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>sgl-project</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="sgl-project/sglang-omni linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">sgl-project/sglang-omni</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/sgl-project/sglang-omni" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine machine--cpu" data-label="linux-aarch64-a2-1" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-2" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-4" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-8" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · cpu</span></div>
+        <div class="project-ns">namespace: <code>sgl-project-sglang-omni</code></div>
       </div>
     </div>
     <div class="project-row" data-search="triton-lang/triton-ascend linux-amd64-cpu-2-hk linux-amd64-cpu-4-hk linux-amd64-cpu-8-hk linux-amd64-cpu-16-hk">
