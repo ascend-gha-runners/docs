@@ -9,7 +9,7 @@
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
       "linux-aarch64-a3-800i-8-cn12-001",
-      "linux-aarch64-cpu-7"
+      "linux-aarch64-cpu-24"
     ],
     "Ascend/sglang": [
       "linux-aarch64-a2b3-1",
@@ -39,7 +39,11 @@
       "linux-aarch64-a3-16",
       "linux-aarch64-a3-2",
       "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8"
+      "linux-aarch64-a3-8",
+      "linux-aarch64-a3-800i-16",
+      "linux-aarch64-a3-800i-2",
+      "linux-aarch64-a3-800i-4",
+      "linux-aarch64-a3-800i-8"
     ],
     "fla-org/flash-linear-attention": [
       "linux-aarch64-a2-1",
@@ -200,6 +204,7 @@
       "linux-aarch64-a3-800i-8-aiframe",
       "linux-aarch64-a3-800i-8-cn12-001",
       "linux-aarch64-a3-800i-8-mind",
+      "linux-aarch64-a3-800t-0-cn12-001",
       "linux-aarch64-a3-800t-16-cn12-001",
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
@@ -375,7 +380,13 @@
     "linux-aarch64-a3-8-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-800i-16": [
+      "ascend-cn12-001-cluster"
+    ],
     "linux-aarch64-a3-800i-16-cn12-001": [
+      "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-800i-2": [
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800i-2-aiframe": [
@@ -387,6 +398,9 @@
     "linux-aarch64-a3-800i-2-mind": [
       "ascend-mind-third-ci"
     ],
+    "linux-aarch64-a3-800i-4": [
+      "ascend-cn12-001-cluster"
+    ],
     "linux-aarch64-a3-800i-4-aiframe": [
       "ascend-aiframework"
     ],
@@ -396,6 +410,9 @@
     "linux-aarch64-a3-800i-4-mind": [
       "ascend-mind-third-ci"
     ],
+    "linux-aarch64-a3-800i-8": [
+      "ascend-cn12-001-cluster"
+    ],
     "linux-aarch64-a3-800i-8-aiframe": [
       "ascend-aiframework"
     ],
@@ -404,6 +421,9 @@
     ],
     "linux-aarch64-a3-800i-8-mind": [
       "ascend-mind-third-ci"
+    ],
+    "linux-aarch64-a3-800t-0-cn12-001": [
+      "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800t-16-cn12-001": [
       "ascend-cn12-001-cluster"
@@ -441,14 +461,14 @@
     "linux-aarch64-cpu-2": [
       "openmerlin-guiyang-005-cluster"
     ],
+    "linux-aarch64-cpu-24": [
+      "openmerlin-guiyang-005-cluster"
+    ],
     "linux-aarch64-cpu-4-buildkit-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-cpu-4-cn12-001": [
       "ascend-cn12-001-cluster"
-    ],
-    "linux-aarch64-cpu-7": [
-      "ascend-aiframework"
     ],
     "linux-aarch64-cpu-8": [
       "openmerlin-guiyang-005-cluster"
