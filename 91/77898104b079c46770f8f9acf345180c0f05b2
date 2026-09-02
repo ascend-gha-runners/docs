@@ -1,0 +1,31 @@
+docs/index.md
+  s_c1684a58147c77::t_eaf05578348260 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "9177898104b079c46770f8f9acf345180c0f05b2",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "deepseek_v4_flash_official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "edit_kind": "file_edit",
+        "display_model_name": "DeepSeek-V4-Flash 正式版",
+        "client_type": "ide",
+        "source_scene": "agent",
+        "tool_name": "Edit",
+        "session_id": "6a96418c12b31195294f990d",
+        "external_session_id": "6a96418c12b31195294f990d",
+        "operation_id": "6a97c18e12b31195294fa745",
+        "tool_use_id": "6a97c18e12b31195294fa745",
+        "runtime_client": "trae-tob-git-ai"
+      }
+    }
+  }
+}
