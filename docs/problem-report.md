@@ -153,23 +153,23 @@ title: 问题登记
     <ol class="pr-steps-v" aria-label="登记流程">
       <li class="pr-step is-active" data-step="1">
         <span class="pr-step-dot">1</span>
-        <span class="pr-step-meta"><span class="pr-step-title">选择项目</span><span class="pr-step-sub">仓库 / 社区</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">自查与自助</span><span class="pr-step-sub">先自查能否解决</span></span>
       </li>
       <li class="pr-step" data-step="2">
         <span class="pr-step-dot">2</span>
-        <span class="pr-step-meta"><span class="pr-step-title">确认标签</span><span class="pr-step-sub">runs-on</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">选择项目</span><span class="pr-step-sub">仓库 / 社区</span></span>
       </li>
       <li class="pr-step" data-step="3">
         <span class="pr-step-dot">3</span>
-        <span class="pr-step-meta"><span class="pr-step-title">描述问题</span><span class="pr-step-sub">URL / 现象</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">确认标签</span><span class="pr-step-sub">runs-on</span></span>
       </li>
       <li class="pr-step" data-step="4">
         <span class="pr-step-dot">4</span>
-        <span class="pr-step-meta"><span class="pr-step-title">提单与自查</span><span class="pr-step-sub">提单人 / 自查</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">描述问题</span><span class="pr-step-sub">URL / 现象</span></span>
       </li>
       <li class="pr-step" data-step="5">
         <span class="pr-step-dot">5</span>
-        <span class="pr-step-meta"><span class="pr-step-title">生成提交</span><span class="pr-step-sub">生成 Issue</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">提单与生成</span><span class="pr-step-sub">提单人 / Issue</span></span>
       </li>
     </ol>
   </aside>
@@ -178,23 +178,33 @@ title: 问题登记
     <form id="pr-form" autocomplete="off">
 
       <section class="pr-panel" data-step="1">
-        <h2>1 · 选择项目</h2>
+        <h2>1 · 自查与自助</h2>
+        <p class="pr-hint">先按以下清单自查，很多问题可以自助解决、无需登记；确认仍需要登记再点「下一步」继续。</p>
+        <div class="pr-selfcheck">
+          <h3>自查清单</h3>
+          <label><input type="checkbox" id="pr-running"> 是否正在运行？（正在运行可查看后台日志，信息更丰富）</label>
+          <label><input type="checkbox" id="pr-known"> 是否为已知问题？（可查看 <a href="/docs/error-types/" target="_blank" rel="noopener">Job Failure Reference</a>，新标签页打开）</label>
+        </div>
+      </section>
+
+      <section class="pr-panel" data-step="2" hidden>
+        <h2>2 · 选择项目</h2>
         <p class="pr-hint">输入关键字搜索，或从列表中选择出现问题的仓库。</p>
         <input type="search" id="pr-repo-input" class="cluster-filter pr-repo-search"
                placeholder="搜索项目，例如 vllm-ascend…" autocomplete="off" aria-label="搜索项目">
         <div id="pr-repo-options" class="pr-pills pr-options"></div>
       </section>
 
-      <section class="pr-panel" data-step="2" hidden>
-        <h2>2 · 确认 runs-on 标签</h2>
+      <section class="pr-panel" data-step="3" hidden>
+        <h2>3 · 确认 runs-on 标签</h2>
         <p class="pr-hint" id="pr-label-hint"></p>
         <input type="search" id="pr-label-search" class="pr-repo-search"
                placeholder="搜索标签，例如 a2b3…" autocomplete="off" aria-label="搜索 runs-on 标签">
         <div id="pr-label-options" class="pr-pills pr-options"></div>
       </section>
 
-      <section class="pr-panel" data-step="3" hidden>
-        <h2>3 · 描述问题</h2>
+      <section class="pr-panel" data-step="4" hidden>
+        <h2>4 · 描述问题</h2>
         <div class="pr-field">
           <label for="pr-url">问题 URL * <span class="pr-hint">（出问题的 PR 或 Job，GitHub Action 页面可见）</span></label>
           <textarea id="pr-url" rows="2" placeholder="粘贴出问题的 PR 或 GitHub Action Job 链接，可粘贴多个，用换行/空格/中英文逗号分隔"></textarea>
@@ -247,21 +257,12 @@ title: 问题登记
         </div>
       </section>
 
-      <section class="pr-panel" data-step="4" hidden>
-        <h2>4 · 提单与自查</h2>
+      <section class="pr-panel" data-step="5" hidden>
+        <h2>5 · 提单与生成提交</h2>
         <div class="pr-field">
           <label for="pr-reporter">提单人 *</label>
           <input type="text" id="pr-reporter" placeholder="姓名 工号，例如：张三 12345">
         </div>
-        <div class="pr-selfcheck">
-          <h3>提交前自查（帮助理清问题，可选）</h3>
-          <label><input type="checkbox" id="pr-running"> 是否正在运行？（正在运行可查看后台日志，信息更丰富）</label>
-          <label><input type="checkbox" id="pr-known"> 是否为已知问题？（可查看 <a href="/docs/error-types/" target="_blank" rel="noopener">Job Failure Reference</a>，新标签页打开）</label>
-        </div>
-      </section>
-
-      <section class="pr-panel" data-step="5" hidden>
-        <h2>5 · 生成并提交 Issue</h2>
         <p class="pr-hint">确认信息无误后，点击按钮打开预填好的 GitHub Issue 页，提交即完成登记。</p>
         <div id="pr-summary" class="pr-summary"></div>
         <button type="button" id="pr-generate" class="pr-btn">打开预填的 GitHub Issue 页</button>

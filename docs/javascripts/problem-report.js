@@ -1,5 +1,5 @@
 /* 问题登记页（独立页，不进入文档导航）：
-   左侧节点流程分步引导：选择项目 → 确认 runs-on 标签 → 描述问题 → 提单与自查 → 生成预填 GitHub Issue 链接。
+   左侧节点流程分步引导：自查与自助 → 选择项目 → 确认 runs-on 标签 → 描述问题 → 提单与生成提交。
    仓库/标签数据来自 assets/problem-labels.json（由导出脚本从 Cluster.md 生成）。
    生成的 Issue 正文以 ### 字段标题 组织，导出脚本按标题解析。 */
 (function () {
@@ -253,14 +253,15 @@
   }
 
   // ---------- 校验 ----------
+  // 第 1 步为自查（可选），无需必填校验；2/3/4/5 逐步校验必填项
   function validate(step) {
-    if (step === 1 && !state.repo) return '请先选择项目（第 1 步）';
-    if (step === 2 && !state.label) return '请选择 runs-on 标签（第 2 步）';
-    if (step === 3) {
+    if (step === 2 && !state.repo) return '请先选择项目（第 2 步）';
+    if (step === 3 && !state.label) return '请选择 runs-on 标签（第 3 步）';
+    if (step === 4) {
       if (!urlInput.value.trim()) return '请填写问题 URL';
-      if (!descProblem.value.trim()) return '请描述出现的问题（第 3 项）';
+      if (!descProblem.value.trim()) return '请描述出现的问题（第 4 步）';
     }
-    if (step === 4 && !reporterInput.value.trim()) return '请填写提单人（姓名 工号）';
+    if (step === 5 && !reporterInput.value.trim()) return '请填写提单人（姓名 工号）';
     return '';
   }
 
@@ -333,8 +334,9 @@
   }
 
   genBtn.addEventListener('click', function () {
-    var err = validate(1) || validate(2) || validate(3) || validate(4);
-    if (err) { showError(err); setStep(1); return; }
+    // 第 1 步为自查（无需必填），2/3/4/5 为必填步骤
+    var err = validate(2) || validate(3) || validate(4) || validate(5);
+    if (err) { showError(err); setStep(2); return; }
     window.open(buildLink(), '_blank');
     genBtn.disabled = true;
     copyBtn.disabled = true;
