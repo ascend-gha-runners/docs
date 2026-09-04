@@ -1,0 +1,41 @@
+docs/problem-report.md
+  s_c1684a58147c77::t_5ea7ad0041e472 198-199
+  s_c1684a58147c77::t_0edd30f87330f2 260-261
+  s_c1684a58147c77::t_cd78a60f94155b 156,160,164,168,172
+  s_c1684a58147c77::t_f0f396e478dbd5 181-191
+  s_c1684a58147c77::t_6010f639e367d7 206-207
+.github/workflows/label-problem-tracking.yml
+  s_c1684a58147c77::t_717f928ed67b6f 1-22
+docs/javascripts/problem-report.js
+  s_c1684a58147c77::t_3d9e21306bb133 2
+  s_c1684a58147c77::t_c8c18ce0651946 256,258-260,262,264
+  s_c1684a58147c77::t_390df92f1afe64 337-339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "eaa7199ab0b3506fdc90f764d450d5a45eef180a",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "deepseek_v4_flash_official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "operation_id": "6a9a4bbf761062e9cfc0ab4a",
+        "tool_use_id": "6a9a4bbf761062e9cfc0ab4a",
+        "session_id": "6a96418c12b31195294f990d",
+        "source_scene": "agent",
+        "runtime_client": "trae-tob-git-ai",
+        "client_type": "ide",
+        "display_model_name": "DeepSeek-V4-Flash 正式版",
+        "tool_name": "Write",
+        "external_session_id": "6a96418c12b31195294f990d",
+        "edit_kind": "file_edit"
+      }
+    }
+  }
+}
