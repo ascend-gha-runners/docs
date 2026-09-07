@@ -1,0 +1,34 @@
+scripts/cluster-map/generate_cluster_map.py
+  s_c1684a58147c77::t_6ef476a6b4e99a 425
+docs/Cluster.md
+  s_c1684a58147c77::t_90fbe03646c9e1 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "1b026921e607f2936249ca775285cd6dc11d8c70",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "DeepSeek-V4-Pro-Official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "runtime_client": "trae-tob-git-ai",
+        "tool_type": "agent",
+        "operation_id": "6a9e6405761062e9cfc0b3dd",
+        "external_session_id": "6a96418c12b31195294f990d",
+        "source_scene": "unknown",
+        "tool_id": "Edit",
+        "session_id": "6a96418c12b31195294f990d",
+        "tool_use_id": "6a9e6405761062e9cfc0b3dd",
+        "client_type": "ide",
+        "edit_kind": "file_edit",
+        "dedupe_key": "6a96418c12b31195294f990d:6a9e6405761062e9cfc0b3dd:afterEdit:4f1b0f99"
+      }
+    }
+  }
+}
