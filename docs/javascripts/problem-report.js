@@ -42,6 +42,16 @@
   var currentStep = 1;
   var MAX_STEP = 5;
 
+  // ---------- 决策树（自查与自助） ----------
+  var treeContainer = $('pr-tree');
+  var treePathEl = $('pr-tree-path');
+  var treeNodeEl = $('pr-tree-node');
+  var TREE_URL = '../assets/problem-tree.json';
+  var treeData = null;
+  var treeStart = null;
+  var treePath = [];   // [{ from, label, to }]，记录每步选择以支持面包屑回退
+  var treeCurrent = null;
+
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -369,6 +379,8 @@
     genBtn.disabled = false;
     copyBtn.disabled = false;
     resetBtn.hidden = true;
+    treeReset();
+    treeRenderNode();
     setStep(1);
   }
   resetBtn.addEventListener('click', resetForm);
@@ -383,6 +395,91 @@
     }
   });
 
+  // ---------- 决策树：渲染与导航 ----------
+  function treeReset() {
+    treePath = [];
+    treeCurrent = treeData && treeStart ? treeStart : null;
+  }
+
+  function treeRenderPath() {
+    if (!treePathEl) return;
+    treePathEl.innerHTML = treePath.map(function (c, i) {
+      return '<button type="button" class="pr-tree-crumb" data-index="' + i + '">' +
+        escapeHtml(c.label) + '</button>';
+    }).join('<span class="pr-tree-arrow">→</span>');
+  }
+
+  function treeRenderNode() {
+    if (!treeNodeEl || !treeData || !treeCurrent) return;
+    var node = treeData.nodes[treeCurrent];
+    if (!node) return;
+    treeRenderPath();
+
+    if (node.type === 'question') {
+      var branches = (node.branches || []).map(function (b) {
+        return '<button type="button" class="pr-tree-branch" data-to="' +
+          escapeHtml(b.to) + '" data-label="' + escapeHtml(b.label) + '">' +
+          escapeHtml(b.label) + '</button>';
+      }).join('');
+      treeNodeEl.innerHTML =
+        '<p class="pr-tree-qtitle">' + escapeHtml(node.title || '') + '</p>' +
+        (node.text ? '<p class="pr-tree-qtext">' + escapeHtml(node.text) + '</p>' : '') +
+        '<div class="pr-tree-branches">' + branches + '</div>';
+      return;
+    }
+
+    if (node.type === 'leaf') {
+      var steps = (node.steps || []).map(function (s) {
+        return '<li>' + escapeHtml(s) + '</li>';
+      }).join('');
+      var links = (node.links || []).map(function (l) {
+        return '<a href="' + escapeHtml(l.href) + '" target="_blank" rel="noopener">' +
+          escapeHtml(l.text) + '</a>';
+      }).join('');
+      treeNodeEl.innerHTML =
+        '<div class="pr-leaf">' +
+          '<p class="pr-leaf-title">' + escapeHtml(node.title || '') + '</p>' +
+          '<p class="pr-leaf-summary">' + escapeHtml(node.summary || '') + '</p>' +
+          (steps ? '<ol class="pr-leaf-steps">' + steps + '</ol>' : '') +
+          (links ? '<div class="pr-leaf-links">' + links + '</div>' : '') +
+          '<div class="pr-leaf-actions">' +
+            '<button type="button" class="pr-btn pr-btn-sm pr-leaf-solved">已解决，无需登记</button>' +
+            '<button type="button" class="pr-btn pr-btn-sm" id="pr-leaf-continue">仍未解决 → 继续登记</button>' +
+          '</div>' +
+        '</div>';
+    }
+  }
+
+  if (treeNodeEl) {
+    treeNodeEl.addEventListener('click', function (e) {
+      var branch = e.target.closest('.pr-tree-branch');
+      if (branch) {
+        treePath.push({
+          from: treeCurrent,
+          label: branch.getAttribute('data-label'),
+          to: branch.getAttribute('data-to')
+        });
+        treeCurrent = branch.getAttribute('data-to');
+        treeRenderNode();
+        return;
+      }
+      if (e.target.closest('#pr-leaf-continue')) { setStep(2); return; }
+      if (e.target.closest('.pr-leaf-solved')) { treeReset(); treeRenderNode(); }
+    });
+  }
+
+  if (treePathEl) {
+    treePathEl.addEventListener('click', function (e) {
+      var crumb = e.target.closest('.pr-tree-crumb');
+      if (!crumb) return;
+      var idx = parseInt(crumb.getAttribute('data-index'), 10);
+      if (isNaN(idx) || !treePath[idx]) return;
+      treeCurrent = treePath[idx].from;
+      treePath = treePath.slice(0, idx);
+      treeRenderNode();
+    });
+  }
+
   // ---------- 初始化 ----------
   fetch('../assets/problem-labels.json', { cache: 'no-store' })
     .then(function (r) { return r.json(); })
@@ -393,6 +490,20 @@
     .catch(function () {
       renderRepos();
     });
+
+  if (treeContainer && treeNodeEl) {
+    fetch(TREE_URL, { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        treeData = data || null;
+        treeStart = treeData && treeData.start ? treeData.start : null;
+        treeReset();
+        treeRenderNode();
+      })
+      .catch(function () {
+        treeNodeEl.innerHTML = '<p class="pr-hint">自助决策树加载失败，可直接点「下一步」继续登记。</p>';
+      });
+  }
 
   setStep(1);
 })();

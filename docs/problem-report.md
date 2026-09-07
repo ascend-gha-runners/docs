@@ -110,10 +110,37 @@ title: 问题登记
 .pr-cb-list li[hidden] { display: none; }
 .pr-cb-list .pr-cb-empty { cursor: default; color: var(--md-default-fg-color--light); }
 
-/* 自查清单 */
-.pr-selfcheck { margin-top: 0.9rem; padding: 0.6rem 0.9rem; border: 1px dashed var(--md-default-fg-color--lightest); border-radius: 10px; font-size: 0.82rem; }
-.pr-selfcheck label { display: block; margin: 0.25rem 0; cursor: pointer; }
-.pr-selfcheck .pr-field { margin: 0.55rem 0 0.3rem; }
+/* 决策树：自查与自助 */
+.pr-tree-path { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin: 0.4rem 0 0.6rem; min-height: 1.5rem; }
+.pr-tree-crumb {
+  display: inline-flex; align-items: center; font-size: 0.78rem;
+  color: var(--md-typeset-color); background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest); border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+.pr-tree-arrow { color: var(--md-default-fg-color--light); font-size: 0.7rem; }
+.pr-tree-node .pr-tree-qtitle { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.2rem; }
+.pr-tree-node .pr-tree-qtext { font-size: 0.82rem; color: var(--md-default-fg-color--light); margin: 0 0 0.5rem; }
+.pr-tree-branches { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pr-tree-branch {
+  padding: 0.4rem 0.9rem; font-size: 0.82rem; color: var(--md-typeset-color);
+  background: var(--md-default-bg-color); border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 999px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.pr-tree-branch:hover { border-color: var(--md-primary-fg-color); color: var(--md-primary-fg-color); }
+
+/* 叶子：案例卡 */
+.pr-leaf { border: 1px solid var(--md-default-fg-color--lightest); border-left: 3px solid var(--md-primary-fg-color); border-radius: 10px; padding: 0.6rem 0.9rem; }
+.pr-leaf-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
+.pr-leaf-summary { font-size: 0.82rem; color: var(--md-default-fg-color--light); margin: 0 0 0.45rem; }
+.pr-leaf-steps { margin: 0 0 0.5rem; padding-left: 1.2rem; font-size: 0.82rem; }
+.pr-leaf-steps li { margin: 0.2rem 0; }
+.pr-leaf-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
+.pr-leaf-links a { font-size: 0.8rem; }
+.pr-leaf-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem; }
+
+/* 补充信息复选框 */
+.pr-field .pr-chk-inline { display: inline-flex; align-items: center; gap: 0.3rem; margin-right: 1.2rem; font-size: 0.82rem; cursor: pointer; font-weight: 400; }
 
 /* 摘要 */
 .pr-summary { margin-bottom: 1rem; }
@@ -179,11 +206,10 @@ title: 问题登记
 
       <section class="pr-panel" data-step="1">
         <h2>1 · 自查与自助</h2>
-        <p class="pr-hint">先按以下清单自查，很多问题可以自助解决、无需登记；确认仍需要登记再点「下一步」继续。</p>
-        <div class="pr-selfcheck">
-          <h3>自查清单</h3>
-          <label><input type="checkbox" id="pr-running"> 是否正在运行？（正在运行可查看后台日志，信息更丰富）</label>
-          <label><input type="checkbox" id="pr-known"> 是否为已知问题？（可查看 <a href="/docs/error-types/" target="_blank" rel="noopener">Job Failure Reference</a>，新标签页打开）</label>
+        <p class="pr-hint">按下面的分叉流程逐步判断，能自助解决的当场处理；确实解决不了再点叶子节点里的「仍未解决 → 继续登记」进入提单。</p>
+        <div class="pr-tree" id="pr-tree">
+          <div class="pr-tree-path" id="pr-tree-path" aria-label="已选择路径"></div>
+          <div class="pr-tree-node" id="pr-tree-node"></div>
         </div>
       </section>
 
@@ -254,6 +280,11 @@ title: 问题登记
               </div>
             </div>
           </div>
+        </div>
+        <div class="pr-field">
+          <label>补充信息（可选）</label>
+          <label class="pr-chk-inline"><input type="checkbox" id="pr-running"> 是否正在运行（可看后台日志）</label>
+          <label class="pr-chk-inline"><input type="checkbox" id="pr-known"> 是否为已知问题</label>
         </div>
       </section>
 

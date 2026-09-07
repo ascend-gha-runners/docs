@@ -1,0 +1,239 @@
+{
+  "start": "root",
+  "nodes": {
+    "root": {
+      "type": "question",
+      "title": "问题分类",
+      "text": "先给遇到的问题分个类：",
+      "branches": [
+        { "label": "报错 / Job 失败", "to": "error_phase" },
+        { "label": "一直等待 / 排队", "to": "wait_reason" },
+        { "label": "构建 / 打包失败", "to": "leaf_build" },
+        { "label": "其它", "to": "leaf_other" }
+      ]
+    },
+
+    "error_phase": {
+      "type": "question",
+      "title": "失败阶段",
+      "text": "Job 卡在哪个阶段？（看 GitHub Actions 左侧的阶段名）",
+      "branches": [
+        { "label": "Pending（排队 / 调度）", "to": "pending_error" },
+        { "label": "Running（运行中报错）", "to": "running_error" }
+      ]
+    },
+
+    "pending_error": {
+      "type": "question",
+      "title": "Pending 错误类型",
+      "text": "Pending 阶段具体是什么报错？",
+      "branches": [
+        { "label": "镜像拉取失败", "to": "leaf_err_image_pull" },
+        { "label": "镜像名非法", "to": "leaf_invalid_image_name" },
+        { "label": "容器创建失败（Secret）", "to": "leaf_create_container" },
+        { "label": "调度失败（资源 / 节点）", "to": "leaf_scheduling" },
+        { "label": "PVC 不存在", "to": "leaf_binding" }
+      ]
+    },
+
+    "running_error": {
+      "type": "question",
+      "title": "Running 错误类型",
+      "text": "Running 阶段具体是什么报错？",
+      "branches": [
+        { "label": "容器退出（崩溃）", "to": "leaf_container_crash" },
+        { "label": "OOM 内存不足", "to": "leaf_oom" },
+        { "label": "用户脚本报错", "to": "leaf_user_script" }
+      ]
+    },
+
+    "wait_reason": {
+      "type": "question",
+      "title": "等待原因",
+      "text": "一直等待 / 排队，最可能是哪种原因？",
+      "branches": [
+        { "label": "可能在等资源（队列满）", "to": "leaf_wait_resource" },
+        { "label": "runs-on 标签可能不存在", "to": "leaf_wait_label" },
+        { "label": "Runner 可能未上线", "to": "leaf_runner_offline" }
+      ]
+    },
+
+    "leaf_err_image_pull": {
+      "type": "leaf",
+      "title": "ErrImagePull（镜像拉取失败）",
+      "summary": "镜像不存在、名称或版本写错，或私有镜像缺拉取凭证。",
+      "steps": [
+        "核对 workflow 中 container.image 的镜像名、tag 是否真实存在",
+        "若是私有镜像，确认镜像仓库凭证（imagepullsecret）已配置",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#errimagepull" }
+      ]
+    },
+
+    "leaf_invalid_image_name": {
+      "type": "leaf",
+      "title": "InvalidImageName（镜像名非法）",
+      "summary": "镜像名格式错误。",
+      "steps": [
+        "检查镜像名拼写、大小写、tag 是否规范",
+        "确认没有多余空格或非法字符",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#invalidimagename" }
+      ]
+    },
+
+    "leaf_create_container": {
+      "type": "leaf",
+      "title": "CreateContainerConfigError（容器创建失败）",
+      "summary": "引用了不存在的 Secret 或配置项。",
+      "steps": [
+        "确认 workflow 引用的 Secret 已创建且名称一致",
+        "检查 Secret 是否在正确的命名空间",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#createcontainerconfigerror" }
+      ]
+    },
+
+    "leaf_scheduling": {
+      "type": "leaf",
+      "title": "FailedScheduling（调度失败）",
+      "summary": "nodeSelector 无匹配节点，或资源请求超过节点上限。",
+      "steps": [
+        "检查 runs-on / nodeSelector 是否有匹配的节点",
+        "确认申请的 NPU 卡数 / 资源没有超过该标签的上限",
+        "前往 Cluster 文档核对标签与机器规格"
+      ],
+      "links": [
+        { "text": "案例：nodeSelector", "href": "/docs/error-types/#failedscheduling-nodeselector" },
+        { "text": "案例：资源上限", "href": "/docs/error-types/#failedscheduling-resource-limit" },
+        { "text": "核对 Cluster 映射", "href": "/docs/Cluster/" }
+      ]
+    },
+
+    "leaf_binding": {
+      "type": "leaf",
+      "title": "FailedBinding（PVC 不存在）",
+      "summary": "引用的 PVC 不存在。",
+      "steps": [
+        "确认 workflow 引用的 PVC 已创建",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#failedbinding" }
+      ]
+    },
+
+    "leaf_container_crash": {
+      "type": "leaf",
+      "title": "Container crash（容器崩溃）",
+      "summary": "容器启动后立即退出（exit non-zero）。",
+      "steps": [
+        "查看日志中的 exit code 与报错信息",
+        "常见原因：启动命令错误、依赖缺失、环境变量不对",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#container-crash" }
+      ]
+    },
+
+    "leaf_oom": {
+      "type": "leaf",
+      "title": "OOMKilled（内存不足）",
+      "summary": "容器被内核 OOM killer 终止。",
+      "steps": [
+        "确认任务内存占用是否超出该标签资源上限",
+        "考虑降低 batch size / 并发，或改用内存更大的标签",
+        "前往 Cluster 文档查看各标签规格"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#oomkilled" },
+        { "text": "核对 Cluster 映射", "href": "/docs/Cluster/" }
+      ]
+    },
+
+    "leaf_user_script": {
+      "type": "leaf",
+      "title": "UserScriptError（用户脚本报错）",
+      "summary": "workflow 自身 step 脚本执行失败。",
+      "steps": [
+        "定位出错的 step 与报错行",
+        "检查命令、路径、依赖是否就绪",
+        "修正后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types/#userscripterror" }
+      ]
+    },
+
+    "leaf_wait_resource": {
+      "type": "leaf",
+      "title": "等待资源（队列可能已满）",
+      "summary": "集群 NPU 资源被占用，Job 排队等待。",
+      "steps": [
+        "在 GitHub Actions 查看该 Job 是否处于 Queued 状态",
+        "前往 Cluster 文档确认所用标签对应的机器规格与数量",
+        "若高峰忙，可稍后重试，或改用空闲的其它标签"
+      ],
+      "links": [
+        { "text": "核对 Cluster 映射", "href": "/docs/Cluster/" }
+      ]
+    },
+
+    "leaf_wait_label": {
+      "type": "leaf",
+      "title": "runs-on 标签可能不存在",
+      "summary": "workflow 的 runs-on 值在部署仓库没有对应标签。",
+      "steps": [
+        "在 Cluster 文档搜索你的 runs-on 值是否存在",
+        "确认标签名与申请时完全一致（大小写 / 连字符）",
+        "若确实缺失，联系基础设施团队登记该标签"
+      ],
+      "links": [
+        { "text": "搜索 Cluster", "href": "/docs/Cluster/" }
+      ]
+    },
+
+    "leaf_runner_offline": {
+      "type": "leaf",
+      "title": "Runner 可能未上线",
+      "summary": "Runner 未注册或状态不是 Online。",
+      "steps": [
+        "在仓库 Settings → Actions → Runners 查看 Runner 状态是否 Online",
+        "确认仓库 / 组织有权访问该 Runner Group",
+        "若长期离线，联系基础设施团队排查"
+      ],
+      "links": [
+        { "text": "安装 / 排障 FAQ", "href": "/docs/user-manual-gha-zh/" }
+      ]
+    },
+
+    "leaf_build": {
+      "type": "leaf",
+      "title": "构建 / 打包失败",
+      "summary": "编译期错误，多与镜像、依赖、环境有关。",
+      "steps": [
+        "查看 Job 日志定位报错位置",
+        "常见原因：依赖未安装、pip 源未走本地缓存、环境变量缺失",
+        "可先查看 Running 阶段的工作流错误案例"
+      ],
+      "links": [
+        { "text": "Job Failure Reference", "href": "/docs/error-types/" }
+      ]
+    },
+
+    "leaf_other": {
+      "type": "leaf",
+      "title": "其它问题",
+      "summary": "不属于上面几类，直接登记即可。",
+      "steps": [],
+      "links": []
+    }
+  }
+}
