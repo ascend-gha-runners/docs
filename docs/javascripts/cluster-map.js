@@ -30,16 +30,23 @@
     });
 
     // --- filtering -------------------------------------------------------
-    function matchesSearch(q, cardName, rowSearch) {
-      if (!q) return true;
-      if (cardName.toLowerCase().indexOf(q) !== -1) return true;
-      return rowSearch.toLowerCase().indexOf(q) !== -1;
+    // 支持多关键词：按空白（空格/Tab）分隔，所有关键词都命中（AND）才显示。
+    // 例如「sglang a3」筛出 sglang 相关且含 a3 标签的项目。
+    function tokenize(q) {
+      return q ? q.split(/\s+/).filter(Boolean) : [];
+    }
+
+    function matchesSearch(tokens, cardName, rowSearch) {
+      if (!tokens.length) return true;
+      var hay = (cardName + '\n' + rowSearch).toLowerCase();
+      return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
     }
 
     function apply() {
       var q = input.value.trim().toLowerCase();
+      var tokens = tokenize(q);
       var npu = npuSelect.value;
-      var hasFilter = !!(q || npu);
+      var hasFilter = !!(tokens.length || npu);
       var totalCards = 0;
       var visible = 0;
 
@@ -47,7 +54,7 @@
         var cardName = card.getAttribute("data-name");
         var cardShown = false;
         card.querySelectorAll(".project-row").forEach(function (row) {
-          var searchOk = matchesSearch(q, cardName, row.getAttribute("data-search") || "");
+          var searchOk = matchesSearch(tokens, cardName, row.getAttribute("data-search") || "");
           var anyMachine = false;
           row.querySelectorAll(".machine").forEach(function (m) {
             var mNpu = m.getAttribute("data-npu") || "";

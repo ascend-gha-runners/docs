@@ -1,5 +1,5 @@
 /* 问题登记页（独立页，不进入文档导航）：
-   左侧节点流程分步引导：选择项目 → 确认 runs-on 标签 → 描述问题 → 提单与自查 → 生成预填 GitHub Issue 链接。
+   左侧节点流程分步引导：自查与自助 → 选择项目 → 确认 runs-on 标签 → 描述问题 → 提单与生成提交。
    仓库/标签数据来自 assets/problem-labels.json（由导出脚本从 Cluster.md 生成）。
    生成的 Issue 正文以 ### 字段标题 组织，导出脚本按标题解析。 */
 (function () {
@@ -41,6 +41,16 @@
   var state = { repo: '', label: '' };
   var currentStep = 1;
   var MAX_STEP = 5;
+
+  // ---------- 决策树（自查与自助） ----------
+  var treeContainer = $('pr-tree');
+  var treePathEl = $('pr-tree-path');
+  var treeNodeEl = $('pr-tree-node');
+  var TREE_URL = '../assets/problem-tree.json';
+  var treeData = null;
+  var treeStart = null;
+  var treePath = [];   // [{ from, label, to }]，记录每步选择以支持面包屑回退
+  var treeCurrent = null;
 
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -253,14 +263,15 @@
   }
 
   // ---------- 校验 ----------
+  // 第 1 步为自查（可选），无需必填校验；2/3/4/5 逐步校验必填项
   function validate(step) {
-    if (step === 1 && !state.repo) return '请先选择项目（第 1 步）';
-    if (step === 2 && !state.label) return '请选择 runs-on 标签（第 2 步）';
-    if (step === 3) {
+    if (step === 2 && !state.repo) return '请先选择项目（第 2 步）';
+    if (step === 3 && !state.label) return '请选择 runs-on 标签（第 3 步）';
+    if (step === 4) {
       if (!urlInput.value.trim()) return '请填写问题 URL';
-      if (!descProblem.value.trim()) return '请描述出现的问题（第 3 项）';
+      if (!descProblem.value.trim()) return '请描述出现的问题（第 4 步）';
     }
-    if (step === 4 && !reporterInput.value.trim()) return '请填写提单人（姓名 工号）';
+    if (step === 5 && !reporterInput.value.trim()) return '请填写提单人（姓名 工号）';
     return '';
   }
 
@@ -333,8 +344,9 @@
   }
 
   genBtn.addEventListener('click', function () {
-    var err = validate(1) || validate(2) || validate(3) || validate(4);
-    if (err) { showError(err); setStep(1); return; }
+    // 第 1 步为自查（无需必填），2/3/4/5 为必填步骤
+    var err = validate(2) || validate(3) || validate(4) || validate(5);
+    if (err) { showError(err); setStep(2); return; }
     window.open(buildLink(), '_blank');
     genBtn.disabled = true;
     copyBtn.disabled = true;
@@ -367,6 +379,8 @@
     genBtn.disabled = false;
     copyBtn.disabled = false;
     resetBtn.hidden = true;
+    treeReset();
+    treeRenderNode();
     setStep(1);
   }
   resetBtn.addEventListener('click', resetForm);
@@ -381,6 +395,91 @@
     }
   });
 
+  // ---------- 决策树：渲染与导航 ----------
+  function treeReset() {
+    treePath = [];
+    treeCurrent = treeData && treeStart ? treeStart : null;
+  }
+
+  function treeRenderPath() {
+    if (!treePathEl) return;
+    treePathEl.innerHTML = treePath.map(function (c, i) {
+      return '<button type="button" class="pr-tree-crumb" data-index="' + i + '">' +
+        escapeHtml(c.label) + '</button>';
+    }).join('<span class="pr-tree-arrow">→</span>');
+  }
+
+  function treeRenderNode() {
+    if (!treeNodeEl || !treeData || !treeCurrent) return;
+    var node = treeData.nodes[treeCurrent];
+    if (!node) return;
+    treeRenderPath();
+
+    if (node.type === 'question') {
+      var branches = (node.branches || []).map(function (b) {
+        return '<button type="button" class="pr-tree-branch" data-to="' +
+          escapeHtml(b.to) + '" data-label="' + escapeHtml(b.label) + '">' +
+          escapeHtml(b.label) + '</button>';
+      }).join('');
+      treeNodeEl.innerHTML =
+        '<p class="pr-tree-qtitle">' + escapeHtml(node.title || '') + '</p>' +
+        (node.text ? '<p class="pr-tree-qtext">' + escapeHtml(node.text) + '</p>' : '') +
+        '<div class="pr-tree-branches">' + branches + '</div>';
+      return;
+    }
+
+    if (node.type === 'leaf') {
+      var steps = (node.steps || []).map(function (s) {
+        return '<li>' + escapeHtml(s) + '</li>';
+      }).join('');
+      var links = (node.links || []).map(function (l) {
+        return '<a href="' + escapeHtml(l.href) + '" target="_blank" rel="noopener">' +
+          escapeHtml(l.text) + '</a>';
+      }).join('');
+      treeNodeEl.innerHTML =
+        '<div class="pr-leaf">' +
+          '<p class="pr-leaf-title">' + escapeHtml(node.title || '') + '</p>' +
+          '<p class="pr-leaf-summary">' + escapeHtml(node.summary || '') + '</p>' +
+          (steps ? '<ol class="pr-leaf-steps">' + steps + '</ol>' : '') +
+          (links ? '<div class="pr-leaf-links">' + links + '</div>' : '') +
+          '<div class="pr-leaf-actions">' +
+            '<button type="button" class="pr-btn pr-btn-sm pr-leaf-solved">已解决，无需登记</button>' +
+            '<button type="button" class="pr-btn pr-btn-sm" id="pr-leaf-continue">仍未解决 → 继续登记</button>' +
+          '</div>' +
+        '</div>';
+    }
+  }
+
+  if (treeNodeEl) {
+    treeNodeEl.addEventListener('click', function (e) {
+      var branch = e.target.closest('.pr-tree-branch');
+      if (branch) {
+        treePath.push({
+          from: treeCurrent,
+          label: branch.getAttribute('data-label'),
+          to: branch.getAttribute('data-to')
+        });
+        treeCurrent = branch.getAttribute('data-to');
+        treeRenderNode();
+        return;
+      }
+      if (e.target.closest('#pr-leaf-continue')) { setStep(2); return; }
+      if (e.target.closest('.pr-leaf-solved')) { treeReset(); treeRenderNode(); }
+    });
+  }
+
+  if (treePathEl) {
+    treePathEl.addEventListener('click', function (e) {
+      var crumb = e.target.closest('.pr-tree-crumb');
+      if (!crumb) return;
+      var idx = parseInt(crumb.getAttribute('data-index'), 10);
+      if (isNaN(idx) || !treePath[idx]) return;
+      treeCurrent = treePath[idx].from;
+      treePath = treePath.slice(0, idx);
+      treeRenderNode();
+    });
+  }
+
   // ---------- 初始化 ----------
   fetch('../assets/problem-labels.json', { cache: 'no-store' })
     .then(function (r) { return r.json(); })
@@ -391,6 +490,20 @@
     .catch(function () {
       renderRepos();
     });
+
+  if (treeContainer && treeNodeEl) {
+    fetch(TREE_URL, { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        treeData = data || null;
+        treeStart = treeData && treeData.start ? treeData.start : null;
+        treeReset();
+        treeRenderNode();
+      })
+      .catch(function () {
+        treeNodeEl.innerHTML = '<p class="pr-hint">自助决策树加载失败，可直接点「下一步」继续登记。</p>';
+      });
+  }
 
   setStep(1);
 })();

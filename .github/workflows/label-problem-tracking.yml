@@ -1,0 +1,22 @@
+name: Label Problem Tracking Issues
+
+# 「问题登记」页生成的 issue 标题以「[缺陷]: 业务反馈」开头。
+# 新建 issue 页的 labels 参数提交时不保证生效，此工作流兜底：
+# 标题匹配即自动补打 problem-tracking 标签，确保导出脚本能收录所有业务反馈。
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.issue.title, '[缺陷]: 业务反馈')
+    steps:
+      - name: Add problem-tracking label
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "problem-tracking"
+        env:
+          GH_TOKEN: ${{ github.token }}
