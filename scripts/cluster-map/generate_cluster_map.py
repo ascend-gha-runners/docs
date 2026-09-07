@@ -422,7 +422,7 @@ def render_cluster_md(clusters):
     lines.append('<div class="cluster-toolbar">')
     lines.append(
         '<input type="search" id="cluster-filter" class="cluster-filter" '
-        'placeholder="Filter by keywords, space to combine (e.g. sglang a3)…" aria-label="Filter clusters">'
+        'placeholder="Filter clusters, projects or labels（空格分隔多关键词）" aria-label="Filter clusters">'
     )
     lines.append('<select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">')
     lines.append(f'  <option value="">All hardware</option>')

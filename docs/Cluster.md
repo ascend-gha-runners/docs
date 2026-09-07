@@ -19,7 +19,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   </div>
 </div>
 <div class="cluster-toolbar">
-<input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords, space to combine (e.g. sglang a3)…" aria-label="Filter clusters">
+<input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter clusters, projects or labels（空格分隔多关键词）" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 147</option>
