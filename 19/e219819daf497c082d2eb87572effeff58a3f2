@@ -1,0 +1,41 @@
+docs/assets/problem-tree.json
+  s_c1684a58147c77::t_4994adc6cb675a 1-239
+docs/javascripts/problem-report.js
+  s_c1684a58147c77::t_78fb346a200be1 382-383
+  s_c1684a58147c77::t_4a6c0d42372ccf 499
+  s_c1684a58147c77::t_974abb1b3b1069 398-482,494-498,500-506
+  s_c1684a58147c77::t_ac3a73d55f27c4 45-54,507
+docs/problem-report.md
+  s_c1684a58147c77::t_fad4510790352d 113-143
+  s_c1684a58147c77::t_2f683b00efdde8 209-212
+  s_c1684a58147c77::t_e13a59f2de1626 284-288
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "19e219819daf497c082d2eb87572effeff58a3f2",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "DeepSeek-V4-Pro-Official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "tool_type": "agent",
+        "operation_id": "6a9e4291761062e9cfc0b2c1",
+        "client_type": "ide",
+        "session_id": "6a96418c12b31195294f990d",
+        "tool_use_id": "6a9e4291761062e9cfc0b2c1",
+        "source_scene": "unknown",
+        "runtime_client": "trae-tob-git-ai",
+        "external_session_id": "6a96418c12b31195294f990d",
+        "dedupe_key": "6a96418c12b31195294f990d:6a9e4291761062e9cfc0b2c1:afterEdit:4c82a5b2",
+        "edit_kind": "file_edit",
+        "tool_id": "Edit"
+      }
+    }
+  }
+}
