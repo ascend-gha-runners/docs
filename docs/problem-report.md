@@ -291,8 +291,9 @@ title: 问题登记
       <section class="pr-panel" data-step="5" hidden>
         <h2>5 · 提单与生成提交</h2>
         <div class="pr-field">
-          <label for="pr-reporter">提单人 *</label>
-          <input type="text" id="pr-reporter" placeholder="姓名 工号，例如：张三 12345">
+          <label for="pr-reporter">提单人（可选，脱敏）</label>
+          <input type="text" id="pr-reporter" placeholder="名字缩写 + 工号前5位，如 zs 12345">
+          <p class="pr-hint">保护隐私：请勿填全名与完整工号，用「名字缩写 + 工号前 5 位」即可，内部据此定位到你；也可留空或填任意可标识信息。</p>
         </div>
         <p class="pr-hint">确认信息无误后，点击按钮打开预填好的 GitHub Issue 页，提交即完成登记。</p>
         <div id="pr-summary" class="pr-summary"></div>
