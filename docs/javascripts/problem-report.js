@@ -263,7 +263,7 @@
   }
 
   // ---------- 校验 ----------
-  // 第 1 步为自查（可选），无需必填校验；2/3/4/5 逐步校验必填项
+  // 第 1 步自查与第 5 步提单人均为可选，不强制；2/3/4 逐步校验必填项
   function validate(step) {
     if (step === 2 && !state.repo) return '请先选择项目（第 2 步）';
     if (step === 3 && !state.label) return '请选择 runs-on 标签（第 3 步）';
@@ -271,7 +271,6 @@
       if (!urlInput.value.trim()) return '请填写问题 URL';
       if (!descProblem.value.trim()) return '请描述出现的问题（第 4 步）';
     }
-    if (step === 5 && !reporterInput.value.trim()) return '请填写提单人（姓名 工号）';
     return '';
   }
 
@@ -305,7 +304,7 @@
       ['对应集群', labelClustersText()],
       ['问题 URL', urlInput.value.trim()],
       ['现象描述', descBullets()],
-      ['提单人', reporterInput.value.trim()],
+      ['提单人', reporterInput.value.trim() || '未填写'],
       ['是否正在运行', runningChk.checked ? '是' : '否'],
       ['紧急程度', urgencyText()],
       ['错误信息', errInput.value.trim() || '无'],
@@ -327,7 +326,7 @@
       '### 对应集群', '', '```\n' + labelClustersText() + '\n```', '',
       '### 问题 URL', '', urlBlock, '',
       '### 简单描述你看到的现象', '', descBullets(), '',
-      '### 提单人', '', '```\n' + reporterInput.value.trim() + '\n```', '',
+      '### 提单人', '', '```\n' + (reporterInput.value.trim() || '未填写') + '\n```', '',
       '### 是否正在运行', '', runningChk.checked ? '是' : '否', '',
       '### 紧急程度', '', urgencyText(), '',
       '### 错误信息', '', errInput.value.trim() || '无', '',
