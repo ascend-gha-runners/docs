@@ -497,7 +497,9 @@ process_repo() {
 
         local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
         local log_stderr="$log_dir/gh_api_stderr.log"
-        gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>"$log_stderr" || {
+        curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/actions/jobs/$c_job_id/logs" \
+            >"$log_file" 2>"$log_stderr" || {
             echo "  [log download failed] $REPO job=$c_job_id:" >&2
             cat "$log_stderr" >&2 2>/dev/null || true
             rm -f "$log_file"
