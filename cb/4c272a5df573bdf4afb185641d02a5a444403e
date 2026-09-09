@@ -1,0 +1,37 @@
+scripts/export-problem-issues/export_problems.py
+  s_0c8559e6378560::t_590c6b35012322 123-144
+  s_0c8559e6378560::t_5ccf8d8b45b14b 155-163
+docs/javascripts/problem-report.js
+  s_0c8559e6378560::t_1f5600d4fe2f4f 341
+  s_0c8559e6378560::t_50e0cf64d53af6 296-300
+  s_0c8559e6378560::t_0ab6cadb9315b8 324,326-335,337,339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "cb4c272a5df573bdf4afb185641d02a5a444403e",
+  "prompts": {},
+  "sessions": {
+    "s_0c8559e6378560": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6aa0d612761062e9cfc0c43c",
+        "model": "DeepSeek-V4-Pro-Official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "tool_type": "agent",
+        "source_scene": "unknown",
+        "edit_kind": "file_edit",
+        "tool_use_id": "6aa11b5f761062e9cfc0c740",
+        "session_id": "6aa0d612761062e9cfc0c43c",
+        "external_session_id": "6aa0d612761062e9cfc0c43c",
+        "runtime_client": "trae-tob-git-ai",
+        "operation_id": "6aa11b5f761062e9cfc0c740",
+        "dedupe_key": "6aa0d612761062e9cfc0c43c:6aa11b5f761062e9cfc0c740:afterEdit:d38fa08d",
+        "tool_id": "Edit",
+        "client_type": "ide"
+      }
+    }
+  }
+}
