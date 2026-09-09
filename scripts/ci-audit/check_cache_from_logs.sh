@@ -105,47 +105,12 @@ echo "------------------------------------------------------------------"
 # Phase 1 helpers: get runs and filter NPU jobs
 # ==============================================================================
 
-# GraphQL: get recent runs for a repo (replaces REST pagination)
-# NOTE: GraphQL returns UPPERCASE enum values for conclusion/status
-# In full scan mode (MAX_NPU_SEARCH was 0, now capped at 200), uses REST pagination
+# Get recent runs for a repo (no workflow filter).
+# NOTE: GitHub GraphQL has no `workflowRuns` field on `Repository`, so use REST instead.
 graphql_get_runs() {
     local REPO="$1"
-    local ORG="${REPO%%/*}"
-    local NAME="${REPO#*/}"
-
-    # Full scan mode: use REST pagination to get more runs (capped by MAX_NPU_SEARCH)
-    if [ "$FULL_SCAN_MODE" = true ]; then
-        rest_get_all_runs "$REPO" || true
-        return 0
-    fi
-
-    # GraphQL: fetch up to MAX_NPU_SEARCH runs (capped at 100 per GitHub limit)
-    local first_count
-    first_count=$(( MAX_NPU_SEARCH < 100 ? MAX_NPU_SEARCH : 100 ))
-
-    gh api graphql \
-        -f query='query($owner: String!, $name: String!, $first: Int!) {
-            repository(owner: $owner, name: $name) {
-                workflowRuns(first: $first, orderBy: {field: CREATED_AT, direction: DESC}) {
-                    nodes {
-                        databaseId
-                        headBranch
-                        name
-                        conclusion
-                        status
-                    }
-                }
-            }
-        }' \
-        -f owner="$ORG" \
-        -f name="$NAME" \
-        -F first="$first_count" \
-        2>/dev/null \
-    | jq -r '
-        (.data.repository.workflowRuns.nodes // [])[]
-        | select(.conclusion == "SUCCESS" or .conclusion == "FAILURE")
-        | "\(.databaseId)|\(.headBranch)|\(.name)"
-    ' 2>/dev/null || true
+    rest_get_all_runs "$REPO" || true
+    return 0
 }
 
 # REST: get runs for a repo (used in full scan mode, capped by MAX_NPU_SEARCH)
@@ -531,7 +496,10 @@ process_repo() {
         [ "$MAX_LOGS_TO_CHECK" -gt 0 ] && [ "$logs_checked" -ge "$MAX_LOGS_TO_CHECK" ] && break
 
         local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
-        gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>/dev/null || {
+        local log_stderr="$log_dir/gh_api_stderr.log"
+        gh api "repos/$REPO/actions/jobs/$c_job_id/logs" >"$log_file" 2>"$log_stderr" || {
+            echo "  [log download failed] $REPO job=$c_job_id:" >&2
+            cat "$log_stderr" >&2 2>/dev/null || true
             rm -f "$log_file"
             continue
         }
@@ -615,7 +583,7 @@ process_repo() {
     # ===== Output =====
     local row=""
     if [ "$logs_checked" -eq 0 ]; then
-        # No usable logs found (all expired or no package activity)
+        # No usable logs found (download failed/empty or no package activity)
         local first_candidate first_run_id first_job_id first_runner first_url
         first_candidate=$(echo "$sorted_candidates" | grep -v '^$' | head -1)
         first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
@@ -625,7 +593,7 @@ process_repo() {
         if [ "$log_no_pkg_activity" = 1 ]; then
             row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | NPU runner jobs found but no package installation in recent logs — [查看]($first_url) |"
         else
-            row="| $REPO | (NPU jobs found, logs expired) | $first_runner | - | - | - | - | NPU runner jobs found but all logs expired (>90 days) — [查看]($first_url) |"
+            row="| $REPO | (NPU jobs found, log download failed) | $first_runner | - | - | - | - | NPU runner jobs found but logs could not be downloaded (expired or fetch failed) — [查看]($first_url) |"
         fi
         s_error=1
         echo "$row" > "$row_file"
