@@ -293,7 +293,11 @@
       ['预期', descExpected.value.trim()]
     ];
     var lines = parts.filter(function (p) { return p[1]; })
-      .map(function (p) { return '- ' + p[0] + '：' + p[1]; });
+      .map(function (p) {
+        // 多行文本缩进两空格，保持在同一列表项内；加粗字段名便于区分
+        var v = p[1].replace(/\n+/g, '\n  ');
+        return '- **' + p[0] + '**：' + v;
+      });
     return lines.length ? lines.join('\n') : '';
   }
 
@@ -317,20 +321,24 @@
   }
 
   function buildLink() {
-    // 问题 URL：按换行 / 空格 / 中英文逗号 分隔，每个链接单独一个 ``` 代码块，方便复制
+    // 问题 URL：按换行 / 空格 / 中英文逗号 分隔；裸 URL 由 GitHub 自动渲染为可点击链接
     var urls = urlInput.value.trim().split(/[\n\s,，]+/).filter(Boolean);
-    var urlBlock = urls.map(function (u) { return '```\n' + u + '\n```'; }).join('\n');
+    var urlText = urls.join('\n');
+    var runningText = runningChk.checked ? '是' : '否';
+    var knownText = knownChk.checked ? '是' : '否';
+    // 概览：开头用紧凑表格一眼看清关键信息
+    var overview =
+      '| 社区/仓库 | 集群 | 提单人 | 紧急程度 | 运行中 | 已知问题 |\n' +
+      '| :--- | :--- | :--- | :--- | :---: | :---: |\n' +
+      '| ' + (state.repo || '-') + ' | ' + (labelClustersText() || '-') +
+      ' | ' + (reporterInput.value.trim() || '未填写') + ' | ' + urgencyText() +
+      ' | ' + runningText + ' | ' + knownText + ' |';
     var body = [
-      '### 问题社区/仓库', '', state.repo, '',
+      '### 概览', '', overview, '',
       '### runs-on 标签', '', '```\n' + state.label + '\n```', '',
-      '### 对应集群', '', '```\n' + labelClustersText() + '\n```', '',
-      '### 问题 URL', '', urlBlock, '',
+      '### 问题 URL', '', urlText, '',
       '### 简单描述你看到的现象', '', descBullets(), '',
-      '### 提单人', '', '```\n' + (reporterInput.value.trim() || '未填写') + '\n```', '',
-      '### 是否正在运行', '', runningChk.checked ? '是' : '否', '',
-      '### 紧急程度', '', urgencyText(), '',
-      '### 错误信息', '', errInput.value.trim() || '无', '',
-      '### 是否为已知问题', '', knownChk.checked ? '是' : '否'
+      '### 错误信息', '', '```bash\n' + (errInput.value.trim() || '无') + '\n```', ''
     ].join('\n');
     var task = descTask.value.trim();
     var title = '[缺陷]: 业务反馈 ' + state.repo + (task ? ' 的 ' + task : '') + ' 出现问题';

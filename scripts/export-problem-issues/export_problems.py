@@ -120,6 +120,28 @@ def parse_body(body):
     return {k: re.sub(r"\n{2,}", "\n", "\n".join(v).strip()) for k, v in sections.items()}
 
 
+def parse_overview(txt):
+    """从『概览』表格文本中提取 {字段: 值}。
+
+    「问题登记」页生成的正文已把「问题社区/仓库」「提单人」等合并进开头概览表，
+    这里从表格行解析，供导出脚本回填对应列。
+    """
+    result = {}
+    if not txt:
+        return result
+    rows = [ln for ln in txt.splitlines() if ln.strip().startswith("|")]
+    if len(rows) < 2:
+        return result
+    headers = [c.strip() for c in rows[0].strip("|").split("|")]
+    data = [c.strip() for c in rows[-1].strip("|").split("|")]
+    mapping = {"社区/仓库": "问题社区/仓库", "提单人": "提单人"}
+    for i, h in enumerate(headers):
+        field = mapping.get(h)
+        if field and i < len(data) and data[i]:
+            result[field] = data[i]
+    return result
+
+
 def format_date(created_at):
     """把 ISO 时间 (2026-08-31T..Z) 转成 2026/8/31。"""
     try:
@@ -130,8 +152,15 @@ def format_date(created_at):
 
 
 def build_row(issue):
-    fields = parse_body(issue.get("body", ""))
-    values = [fields.get(label, "").strip() for label in FIELD_LABELS]
+    body = issue.get("body", "")
+    fields = parse_body(body)
+    overview = parse_overview(fields.get("概览", ""))
+    values = []
+    for label in FIELD_LABELS:
+        val = fields.get(label, "").strip()
+        if not val:
+            val = overview.get(label, "")
+        values.append(val)
     return [format_date(issue.get("created_at", "")), *values]
 
 
