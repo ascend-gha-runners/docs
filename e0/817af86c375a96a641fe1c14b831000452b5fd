@@ -1,0 +1,31 @@
+scripts/ci-audit/check_cache_from_logs.sh
+  s_0c8559e6378560::t_ead07c86010db4 108-109,112-113,499-502,586,596
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "e0817af86c375a96a641fe1c14b831000452b5fd",
+  "prompts": {},
+  "sessions": {
+    "s_0c8559e6378560": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6aa0d612761062e9cfc0c43c",
+        "model": "DeepSeek-V4-Pro-Official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "client_type": "ide",
+        "tool_use_id": "6aa0f905761062e9cfc0c572",
+        "tool_name": "RunCommand",
+        "display_model_name": "DeepSeek-V4-Pro 正式版",
+        "source_scene": "agent",
+        "edit_kind": "bash",
+        "session_id": "6aa0d612761062e9cfc0c43c",
+        "runtime_client": "trae-tob-git-ai",
+        "operation_id": "6aa0f905761062e9cfc0c572",
+        "external_session_id": "6aa0d612761062e9cfc0c43c"
+      }
+    }
+  }
+}
