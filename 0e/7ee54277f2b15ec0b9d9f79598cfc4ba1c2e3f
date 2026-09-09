@@ -1,0 +1,31 @@
+docs/assets/problem-labels.json
+  s_c1684a58147c77::t_a07aba259487ae 12,28-31,39-43,50-54,112-117,122-126,137-140,169-173,233,409-411,415-417,427-429,439-441,451-453,490-492
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "0e7ee54277f2b15ec0b9d9f79598cfc4ba1c2e3f",
+  "prompts": {},
+  "sessions": {
+    "s_c1684a58147c77": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a96418c12b31195294f990d",
+        "model": "DeepSeek-V4-Pro-Official__dev"
+      },
+      "human_author": "Longwt123 <1075015495@qq.com>",
+      "custom_attributes": {
+        "edit_kind": "bash",
+        "client_type": "ide",
+        "tool_use_id": "6aa0025c761062e9cfc0c1d9",
+        "tool_name": "RunCommand",
+        "source_scene": "agent",
+        "runtime_client": "trae-tob-git-ai",
+        "session_id": "6a96418c12b31195294f990d",
+        "operation_id": "6aa0025c761062e9cfc0c1d9",
+        "display_model_name": "DeepSeek-V4-Pro 正式版",
+        "external_session_id": "6a96418c12b31195294f990d"
+      }
+    }
+  }
+}
