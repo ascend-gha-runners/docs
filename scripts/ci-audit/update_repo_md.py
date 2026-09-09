@@ -6,8 +6,9 @@
   python3 update_repo_md.py <audit_result.md> <repos.txt> <docs/Repo.md> [run_url] [incremental]
 
 模式：
-  全量（默认）：用脚本输出覆盖所有仓库的所有格子
-  增量（incremental=true）：只更新脚本找到 ✅/❌ 的格子，其余保留 Repo.md 旧值
+  全量（默认）与增量（incremental=true）行为一致：脚本找到 ✅/❌ 就更新该格子；
+  脚本未找到证据（-）时优先保留 Repo.md 旧值，旧值也是 - 时才回落到 repos.txt 默认值。
+  两者区别仅在于「Last Checked」日期：全量总是刷新为当天，增量仅在找到证据时刷新。
 """
 
 import re
@@ -116,16 +117,10 @@ def resolve_cell(raw_val, old_val, default_val):
         return CHECK_MARK, True
     if raw_val == CROSS_MARK:
         return CROSS_MARK, True
-    # 脚本说 "-"（未找到证据）
-    if INCREMENTAL:
-        # 增量模式：保留 Repo.md 旧值（如果旧值有意义）
-        if old_val and old_val != "-":
-            return old_val, False
-        # 旧值也是 "-"，尝试 repos.txt 默认值
-        return default_val, False
-    else:
-        # 全量模式：用默认值
-        return default_val, True
+    # 脚本说 "-"（未找到证据）：优先保留 Repo.md 旧值，其次回落到 repos.txt 默认值
+    if old_val and old_val != "-":
+        return old_val, False
+    return default_val, False
 
 # ---------- 生成新表格 ----------
 rows = []
