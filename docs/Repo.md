@@ -7,21 +7,21 @@
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | 2026-09-10 |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | 2026-09-10 |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | 2026-09-10 |
-| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-09-10 |
-| [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | 2026-09-10 |
-| [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | 2026-09-10 |
-| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | 2026-09-10 |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | ❌ | 2026-09-10 |
-| [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ✅ | - | ❌ | ❌ | 2026-09-10 |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | 2026-09-11 |
+| [sgl-project/sglang](https://github.com/sgl-project/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-09-11 |
+| [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | 2026-09-11 |
+| [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | 2026-09-11 |
+| [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | 2026-09-11 |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ✅ | ✅ | ❌ | 2026-09-11 |
+| [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ✅ | - | ❌ | ❌ | 2026-09-11 |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | - | 2026-09-10 |
-| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | - | ✅ | ❌ | 2026-09-10 |
-| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ❌ | ✅ | 2026-09-10 |
+| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | - | ✅ | ❌ | 2026-09-11 |
+| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-09-11 |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | 2026-09-10 |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ❌ | ❌ | 2026-09-10 |
-| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | 2026-09-10 |
-| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ❌ | ✅ | 2026-09-10 |
-| [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-09-10 |
+| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | 2026-09-11 |
+| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ❌ | ✅ | 2026-09-11 |
+| [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-09-11 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (full scan). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/34481071508](https://github.com/ascend-gha-runners/docs/actions/runs/34481071508)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/34500370520](https://github.com/ascend-gha-runners/docs/actions/runs/34500370520)
