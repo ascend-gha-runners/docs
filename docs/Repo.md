@@ -16,7 +16,7 @@
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ✅ | - | ❌ | ❌ | 2026-09-12 |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | - | 2026-09-12 |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | - | ✅ | ❌ | 2026-09-12 |
-| [Ascend/sglang](https://github.com/Ascend/sglang) | ❌ | ✅ | ❌ | ❌ | 2026-09-12 |
+| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ❌ | ✅ | 2026-09-12 |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | 2026-09-12 |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ❌ | ❌ | 2026-09-12 |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ❌ | ❌ | 2026-09-12 |
@@ -24,4 +24,4 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-09-12 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/34682950810](https://github.com/ascend-gha-runners/docs/actions/runs/34682950810)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/34691586803](https://github.com/ascend-gha-runners/docs/actions/runs/34691586803)
