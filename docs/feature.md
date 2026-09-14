@@ -84,6 +84,29 @@ Proxies `repo.huaweicloud.com/openeuler` for openEuler RPM packages.
 
 ---
 
+### crates.io Cache (Port 8085)
+
+Proxies the crates.io sparse index for Rust crate dependencies.
+
+**Configure in your workflow:**
+
+```yaml
+- name: Configure cargo cache
+  env:
+    CRATES_IO_INDEX: http://cache-service.nginx-pypi-cache.svc.cluster.local:8085/index/
+  run: |
+    mkdir -p $HOME/.cargo
+    cat > $HOME/.cargo/config.toml <<EOF
+    [source.crates-io]
+    replace-with = "huaweicloud"
+
+    [source.huaweicloud]
+    registry = "sparse+http://cache-service.nginx-pypi-cache.svc.cluster.local:8085/index/"
+    EOF
+```
+
+---
+
 ### Summary
 
 | Cache Type | Port | Upstream | Client |
@@ -92,3 +115,4 @@ Proxies `repo.huaweicloud.com/openeuler` for openEuler RPM packages.
 | APT | 8081 | ports/archive.ubuntu.com | apt-get |
 | Rust | 8082 | mirrors.huaweicloud.com/rustup | rustup |
 | YUM | 8083 | repo.huaweicloud.com/openeuler | dnf / yum |
+| crates.io | 8085 | crates.io sparse index | cargo |
