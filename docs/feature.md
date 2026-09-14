@@ -62,8 +62,8 @@ Proxies `mirrors.huaweicloud.com/rustup` for Rust toolchain downloads.
 ```yaml
 - name: Configure rustup cache
   env:
-    RUSTUP_DIST_SERVER: http://cache-service.nginx-pypi-cache.svc.cluster.local:8082
-    RUSTUP_UPDATE_ROOT: http://cache-service.nginx-pypi-cache.svc.cluster.local:8082/rustup
+    RUSTUP_DIST_SERVER: http://cache-service.nginx-pypi-cache.svc.cluster.local:8082/rustup
+    RUSTUP_UPDATE_ROOT: http://cache-service.nginx-pypi-cache.svc.cluster.local:8082/rustup/rustup
   run: |
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ```
