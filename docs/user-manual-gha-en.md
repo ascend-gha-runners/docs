@@ -13,6 +13,7 @@ Ascend clusters create runner pods to execute GitHub Action jobs. We offer the f
 | Atlas 800I A3 560T  | arm64 | 910C  | linux-aarch64-a3-800i-x |
 | Atlas 800T A3 752T  | arm64 | 910C  | linux-aarch64-a3-800t-x |
 | Atlas A2 Mixed         | arm64  | NA    | linux-aarch64-a2-x    |
+| Atlas 800T A2 376T  | arm64  | 910B1 | linux-aarch64-a2b1-x  |
 | Atlas 800T A2 376T  | arm64  | 910B2 | linux-aarch64-a2b2-x  |
 | Atlas 800T A2 313T  | arm64  | 910B3 | linux-aarch64-a2b3-x  |
 | Atlas 800I A2 560T  | arm64  | 910B4 | linux-aarch64-a2b4-x  |
@@ -45,6 +46,10 @@ CPU and memory quota of each runner pod scales proportionally with the number of
 |linux-aarch64-a2-2|2|46|128Gi|
 |linux-aarch64-a2-4|4|92|256Gi|
 |linux-aarch64-a2-8|8|184|512Gi|
+|linux-aarch64-a2b1-1|1|23|64Gi|
+|linux-aarch64-a2b1-2|2|46|128Gi|
+|linux-aarch64-a2b1-4|4|92|256Gi|
+|linux-aarch64-a2b1-8|8|184|512Gi|
 |linux-aarch64-a2b2-1|1|23|64Gi|
 |linux-aarch64-a2b2-2|2|46|128Gi|
 |linux-aarch64-a2b2-4|4|92|256Gi|
