@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">242</span>
+    <span class="stat-num">246</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,7 +22,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords (space-separated)" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 159</option>
+  <option value="ascend-1980">ascend-1980 · 163</option>
   <option value="cpu">CPU (no NPU) · 43</option>
   <option value="npu">npu · 15</option>
   <option value="on-demand">on-demand · 12</option>
@@ -31,14 +31,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 242 labels</span>
+<span class="cluster-hint">11 clusters · 246 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
 <div class="cluster-card" data-name="ascend-cn12-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-cn12-001-cluster</span>
-    <span class="cluster-meta">11 projects · 95 labels</span>
+    <span class="cluster-meta">12 projects · 99 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-16">
@@ -151,6 +151,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4-buildkit-cn12-001" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-cpu-4-buildkit-cn12-001" data-npu="cpu"><span class="machine-label">linux-aarch64-cpu-4</span><span class="machine-npu"> · cpu</span></div>
         <div class="project-ns">namespace: <code>triton-ascend</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="vllm-ascend/vllm-ascend-recipes linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-16">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">vllm-ascend/vllm-ascend-recipes</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/vllm-ascend/vllm-ascend-recipes" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>vllm-ascend-vllm-ascend-recipes</code></div>
       </div>
     </div>
     <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-amd64-cpu-4 linux-aarch64-a3-0 a3-560t linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-aarch64-cpu-4 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800t-0 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-8 linux-aarch64-a3-800i-16 linux-aarch64-a3-800t-16">
