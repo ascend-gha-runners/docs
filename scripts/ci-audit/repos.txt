@@ -28,3 +28,5 @@ vllm-ascend/linux-aarch64-cpu-4-gy006|||||
 vllm-ascend/linux-amd64-cpu-4-gy006|||||
 
 sgl-project/sglang-omni|||||
+
+verl-project/uni-agent|||||
