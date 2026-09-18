@@ -14,7 +14,7 @@ permissions:
 jobs:
   label:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.issue.title, '[缺陷]: 业务反馈')
+    if: "startsWith(github.event.issue.title, '[缺陷]: 业务反馈')"
     steps:
       - name: Add problem-tracking label
         run: gh issue edit ${{ github.event.issue.number }} --add-label "problem-tracking"
