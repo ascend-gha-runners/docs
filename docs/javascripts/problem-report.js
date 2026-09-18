@@ -98,16 +98,26 @@
       '<button type="button" class="pr-pill pr-pill-other" data-repo="__OTHER__" data-other="1">Other</button>');
   }
 
+  // 空格/Tab 分隔多关键词：所有关键词都命中（AND）才算匹配
+  function tokenizeSearch(q) {
+    return q ? q.toLowerCase().split(/\s+/).filter(Boolean) : [];
+  }
+  function matchesAllSearch(tokens, text) {
+    if (!tokens.length) return true;
+    var hay = text.toLowerCase();
+    return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
+  }
+
   function filterRepos() {
-    var q = repoInput.value.trim().toLowerCase();
+    var tokens = tokenizeSearch(repoInput.value);
     var shown = 0;
     repoOptions.querySelectorAll('.pr-pill[data-repo]:not([data-other])').forEach(function (b) {
-      var ok = !!q && b.getAttribute('data-repo').toLowerCase().indexOf(q) !== -1;
+      var ok = tokens.length > 0 && matchesAllSearch(tokens, b.getAttribute('data-repo'));
       b.classList.toggle('is-match', ok);
       if (ok) shown++;
     });
     var other = repoOptions.querySelector('.pr-pill[data-other]');
-    if (other) other.classList.toggle('is-match', !!q && shown === 0);
+    if (other) other.classList.toggle('is-match', tokens.length > 0 && shown === 0);
   }
   repoInput.addEventListener('input', filterRepos);
   repoInput.addEventListener('search', filterRepos); // 点击原生 x 清空时同步更新高亮
@@ -155,15 +165,15 @@
   }
 
   function filterLabels() {
-    var q = labelSearch.value.trim().toLowerCase();
+    var tokens = tokenizeSearch(labelSearch.value);
     var shown = 0;
     labelOptions.querySelectorAll('.pr-pill[data-label]:not([data-other])').forEach(function (b) {
-      var ok = !!q && b.getAttribute('data-label').toLowerCase().indexOf(q) !== -1;
+      var ok = tokens.length > 0 && matchesAllSearch(tokens, b.getAttribute('data-label'));
       b.classList.toggle('is-match', ok);
       if (ok) shown++;
     });
     var other = labelOptions.querySelector('.pr-pill[data-other]');
-    if (other) other.classList.toggle('is-match', !!q && shown === 0);
+    if (other) other.classList.toggle('is-match', tokens.length > 0 && shown === 0);
   }
   labelSearch.addEventListener('input', filterLabels);
   labelSearch.addEventListener('search', filterLabels); // 点击原生 x 清空时同步更新高亮

@@ -217,7 +217,7 @@ title: 问题登记
         <h2>2 · 选择项目</h2>
         <p class="pr-hint">输入关键字搜索，或从列表中选择出现问题的仓库。</p>
         <input type="search" id="pr-repo-input" class="cluster-filter pr-repo-search"
-               placeholder="搜索项目，例如 vllm-ascend…" autocomplete="off" aria-label="搜索项目">
+               placeholder="搜索项目，空格分隔多关键词，例如 vllm sglang…" autocomplete="off" aria-label="搜索项目">
         <div id="pr-repo-options" class="pr-pills pr-options"></div>
       </section>
 
@@ -225,7 +225,7 @@ title: 问题登记
         <h2>3 · 确认 runs-on 标签</h2>
         <p class="pr-hint" id="pr-label-hint"></p>
         <input type="search" id="pr-label-search" class="pr-repo-search"
-               placeholder="搜索标签，例如 a2b3…" autocomplete="off" aria-label="搜索 runs-on 标签">
+               placeholder="搜索标签，空格分隔多关键词，例如 a2 b3…" autocomplete="off" aria-label="搜索 runs-on 标签">
         <div id="pr-label-options" class="pr-pills pr-options"></div>
       </section>
 
