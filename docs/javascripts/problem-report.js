@@ -350,8 +350,10 @@
       '### 简单描述你看到的现象', '', descBullets(), '',
       '### 错误信息', '', '```bash\n' + (errInput.value.trim() || '无') + '\n```', ''
     ].join('\n');
-    var task = descTask.value.trim();
-    var title = '[缺陷]: 业务反馈 ' + state.repo + (task ? ' 的 ' + task : '') + ' 出现问题';
+    // 标题关键短语取「出现的问题」字段，超过 24 字截断加省略号；为空时兜底
+    var problem = descProblem.value.trim();
+    if (problem.length > 24) problem = problem.slice(0, 24) + '…';
+    var title = '[缺陷]: 业务反馈 ' + state.repo + '：' + (problem || '出现问题');
     var qs = new URLSearchParams({
       title: title,
       body: body,
