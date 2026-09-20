@@ -523,6 +523,13 @@ def render_cluster_md(clusters):
 def main():
     print("Scanning deployment repo clusters...", flush=True)
     clusters = scan_clusters()
+    if not clusters:
+        print(
+            "ERROR: no cluster data fetched from deployment repo; "
+            "keeping existing docs/Cluster.md unchanged.",
+            flush=True,
+        )
+        sys.exit(1)
     total_runners = sum(
         len(runners)
         for projects in clusters.values()
