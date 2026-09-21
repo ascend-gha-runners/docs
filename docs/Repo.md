@@ -19,9 +19,9 @@
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | 2026-09-21 |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | 2026-09-20 |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ❌ | ❌ | 2026-09-20 |
-| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | 2026-09-21 |
+| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ❌ | ❌ | 2026-09-21 |
 | [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ❌ | ✅ | 2026-09-21 |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | 2026-09-21 |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/35558881228](https://github.com/ascend-gha-runners/docs/actions/runs/35558881228)
+> Cache audit runs daily (incremental). ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown · Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/35560468063](https://github.com/ascend-gha-runners/docs/actions/runs/35560468063)
