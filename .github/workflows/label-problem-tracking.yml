@@ -16,13 +16,15 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
+      # issue 事件触发时 runner 不 checkout 仓库，gh 需用 -R 显式指定目标仓库，
+      # 否则报 "fatal: not a git repository"
       - name: Add problem-tracking label
         if: "startsWith(github.event.issue.title, '[缺陷]: 业务反馈')"
-        run: gh issue edit ${{ github.event.issue.number }} --add-label "problem-tracking"
+        run: gh issue edit ${{ github.event.issue.number }} -R ${{ github.repository }} --add-label "problem-tracking"
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Add self-resolved label
         if: "startsWith(github.event.issue.title, '[自助解决]:')"
-        run: gh issue edit ${{ github.event.issue.number }} --add-label "self-resolved"
+        run: gh issue edit ${{ github.event.issue.number }} -R ${{ github.repository }} --add-label "self-resolved"
         env:
           GH_TOKEN: ${{ github.token }}
