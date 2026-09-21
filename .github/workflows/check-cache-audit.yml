@@ -64,6 +64,13 @@ jobs:
         run: python3 scripts/cluster-map/generate_cluster_map.py
 
       # ================================================================
+      # Phase 2.5: Regenerate problem report label mapping from Cluster.md
+      # ================================================================
+      - name: Update problem report label map
+        continue-on-error: true
+        run: python3 scripts/problem-labels/update_problem_labels.py
+
+      # ================================================================
       # Phase 3: Existing daily cache audit
       # ================================================================
       - name: Generate repos list from Repo.md
@@ -110,7 +117,7 @@ jobs:
           # Push with retry: if another run pushed between our fetch and push,
           # re-fetch latest, re-run update_repo_md.py, re-commit
           for attempt in 1 2 3; do
-            git add docs/Repo.md docs/Cluster.md scripts/ci-audit/repos.txt
+            git add docs/Repo.md docs/Cluster.md docs/assets/problem-labels.json scripts/ci-audit/repos.txt
             if git diff --cached --quiet; then
               echo "No changes to Repo.md"
               break
@@ -140,6 +147,9 @@ jobs:
                 docs/Repo.md \
                 "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
                 "$IS_INCREMENTAL"
+              # Re-generate cluster map and problem labels from restored state
+              python3 scripts/cluster-map/generate_cluster_map.py || true
+              python3 scripts/problem-labels/update_problem_labels.py || true
             else
               echo "::error::All push attempts failed"
               exit 1
