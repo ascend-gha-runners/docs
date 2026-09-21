@@ -295,6 +295,17 @@
   });
 
   // ---------- Step 4: 摘要 + 生成链接 ----------
+  // 决策树路径文本：写入 Issue 正文「自查路径」字段（自助解决登记与转人工提单都带）
+  function treePathText() {
+    if (!treeData || !treeCurrent || !treePath.length) return '未使用决策树';
+    var parts = treePath.map(function (c) { return c.label; });
+    var node = treeData.nodes[treeCurrent];
+    if (node) {
+      parts.push(node.type === 'leaf' ? '命中案例：' + (node.title || '') : '停在问题：' + (node.title || ''));
+    }
+    return parts.join(' → ');
+  }
+
   function descBullets() {
     var parts = [
       ['任务', descTask.value.trim()],
@@ -345,6 +356,7 @@
       ' | ' + runningText + ' | ' + knownText + ' |';
     var body = [
       '### 概览', '', overview, '',
+      '### 自查路径', '', treePathText(), '',
       '### runs-on 标签', '', '```\n' + state.label + '\n```', '',
       '### 问题 URL', '', urlText, '',
       '### 简单描述你看到的现象', '', descBullets(), '',
@@ -462,11 +474,31 @@
           (steps ? '<ol class="pr-leaf-steps">' + steps + '</ol>' : '') +
           (links ? '<div class="pr-leaf-links">' + links + '</div>' : '') +
           '<div class="pr-leaf-actions">' +
-            '<button type="button" class="pr-btn pr-btn-sm pr-leaf-solved">已解决，无需登记</button>' +
+            '<button type="button" class="pr-btn pr-btn-sm pr-leaf-solved">已解决（顺手登记，可选）</button>' +
             '<button type="button" class="pr-btn pr-btn-sm" id="pr-leaf-continue">仍未解决 → 继续登记</button>' +
           '</div>' +
         '</div>';
     }
+  }
+
+  // ---------- 自助解决登记（自愿，仅统计用） ----------
+  function buildSolvedLink() {
+    var node = (treeData && treeCurrent) ? treeData.nodes[treeCurrent] : null;
+    var leafTitle = (node && node.type === 'leaf') ? (node.title || '') : '';
+    var body = [
+      '> 自愿登记：仅用于统计自助解决率与改进决策树，不会有人处理，可不留名，直接 Submit 即可；不想登记关闭本页即可。', '',
+      '### 自查路径', '', treePathText(), '',
+      '### 命中案例', '', leafTitle || '（无）', '',
+      '### 备注（可选）', '', '（哪一步帮你解决了问题，或案例步骤哪里不准确）'
+    ].join('\n');
+    var title = '[自助解决]: ' + (leafTitle || '决策树自助解决');
+    if (title.length > 80) title = title.slice(0, 80) + '…';
+    var qs = new URLSearchParams({
+      title: title,
+      body: body,
+      labels: 'self-resolved'
+    });
+    return 'https://github.com/ascend-gha-runners/docs/issues/new?' + qs.toString();
   }
 
   if (treeNodeEl) {
@@ -483,7 +515,11 @@
         return;
       }
       if (e.target.closest('#pr-leaf-continue')) { setStep(2); return; }
-      if (e.target.closest('.pr-leaf-solved')) { treeReset(); treeRenderNode(); }
+      if (e.target.closest('.pr-leaf-solved')) {
+        window.open(buildSolvedLink(), '_blank');
+        treeReset();
+        treeRenderNode();
+      }
     });
   }
 

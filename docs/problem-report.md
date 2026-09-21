@@ -206,7 +206,7 @@ title: 问题登记
 
       <section class="pr-panel" data-step="1">
         <h2>1 · 自查与自助</h2>
-        <p class="pr-hint">按下面的分叉流程逐步判断，能自助解决的当场处理；确实解决不了再点叶子节点里的「仍未解决 → 继续登记」进入提单。</p>
+        <p class="pr-hint">按下面的分叉流程逐步判断，能自助解决的当场处理；解决后可点叶子节点里的「已解决」自愿登记（仅统计用，可不留名）；确实解决不了再点「仍未解决 → 继续登记」进入提单。</p>
         <div class="pr-tree" id="pr-tree">
           <div class="pr-tree-path" id="pr-tree-path" aria-label="已选择路径"></div>
           <div class="pr-tree-node" id="pr-tree-node"></div>
