@@ -161,7 +161,8 @@
     "leaf_user_script": {
       "type": "leaf",
       "title": "UserScriptError（用户脚本报错）",
-      "summary": "workflow 自身 step 脚本执行失败。",
+      "summary": "workflow 自身 step 脚本执行失败。属用户脚本问题，请自行排查修改，CI 侧不受理。",
+      "selfFix": true,
       "steps": [
         "定位出错的 step 与报错行",
         "检查命令、路径、依赖是否就绪",

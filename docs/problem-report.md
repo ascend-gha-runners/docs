@@ -132,6 +132,13 @@ title: 问题登记
 /* 叶子：案例卡 */
 .pr-leaf { border: 1px solid var(--md-default-fg-color--lightest); border-left: 3px solid var(--md-primary-fg-color); border-radius: 10px; padding: 0.6rem 0.9rem; }
 .pr-leaf-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
+/* 用户脚本类叶子的「请自行修改 workflow」标记（node.selfFix），与 CI 问题分区 */
+.pr-leaf-selffix {
+  display: inline-block; font-size: 0.68rem; font-weight: 600; vertical-align: middle;
+  color: #b26a00; background: rgba(255, 152, 0, 0.15);
+  border: 1px solid rgba(255, 152, 0, 0.45); border-radius: 999px;
+  padding: 0.08rem 0.55rem; margin-left: 0.4rem; white-space: nowrap;
+}
 .pr-leaf-summary { font-size: 0.82rem; color: var(--md-default-fg-color--light); margin: 0 0 0.45rem; }
 .pr-leaf-steps { margin: 0 0 0.5rem; padding-left: 1.2rem; font-size: 0.82rem; }
 .pr-leaf-steps li { margin: 0.2rem 0; }

@@ -469,7 +469,9 @@
       }).join('');
       treeNodeEl.innerHTML =
         '<div class="pr-leaf">' +
-          '<p class="pr-leaf-title">' + escapeHtml(node.title || '') + '</p>' +
+          '<p class="pr-leaf-title">' + escapeHtml(node.title || '') +
+            (node.selfFix ? ' <span class="pr-leaf-selffix">请自行修改 workflow</span>' : '') +
+          '</p>' +
           '<p class="pr-leaf-summary">' + escapeHtml(node.summary || '') + '</p>' +
           (steps ? '<ol class="pr-leaf-steps">' + steps + '</ol>' : '') +
           (links ? '<div class="pr-leaf-links">' + links + '</div>' : '') +
