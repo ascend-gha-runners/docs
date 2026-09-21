@@ -1,8 +1,9 @@
 name: Label Problem Tracking Issues
 
-# 「问题登记」页生成的 issue 标题以「[缺陷]: 业务反馈」开头。
+# 「问题登记」页生成的 issue 标题以「[缺陷]: 业务反馈」开头；
+# 决策树自助解决（自愿登记）的标题以「[自助解决]:」开头。
 # 新建 issue 页的 labels 参数提交时不保证生效，此工作流兜底：
-# 标题匹配即自动补打 problem-tracking 标签，确保导出脚本能收录所有业务反馈。
+# 标题匹配即自动补打对应标签，确保统计能收录所有登记。
 
 on:
   issues:
@@ -14,9 +15,14 @@ permissions:
 jobs:
   label:
     runs-on: ubuntu-latest
-    if: "startsWith(github.event.issue.title, '[缺陷]: 业务反馈')"
     steps:
       - name: Add problem-tracking label
+        if: "startsWith(github.event.issue.title, '[缺陷]: 业务反馈')"
         run: gh issue edit ${{ github.event.issue.number }} --add-label "problem-tracking"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Add self-resolved label
+        if: "startsWith(github.event.issue.title, '[自助解决]:')"
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "self-resolved"
         env:
           GH_TOKEN: ${{ github.token }}
