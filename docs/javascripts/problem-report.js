@@ -442,8 +442,9 @@
 
   // 叶子归属徽标：badge 值 → 文案与颜色类（淡橙=用户可自查修改，淡蓝=CI 侧处理）
   var LEAF_BADGES = {
-    'check-workflow': { text: '自查 · 检查 workflow', cls: 'pr-leaf-badge--user' },
-    'check-resource': { text: '自查 · 检查资源申请', cls: 'pr-leaf-badge--user' },
+    'check-workflow': { text: '检查 workflow', cls: 'pr-leaf-badge--user' },
+    'check-resource': { text: '检查资源申请', cls: 'pr-leaf-badge--user' },
+    'check-github': { text: '检查 GitHub 配置', cls: 'pr-leaf-badge--user' },
     'ci-infra': { text: 'CI 侧 · 基础设施处理', cls: 'pr-leaf-badge--ci' }
   };
 

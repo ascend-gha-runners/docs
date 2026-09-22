@@ -214,7 +214,7 @@
       "type": "leaf",
       "title": "Runner 可能未上线",
       "summary": "Runner 未注册或状态不是 Online。",
-      "badge": "ci-infra",
+      "badge": "check-github",
       "steps": [
         "在仓库 Settings → Actions → Runners 查看 Runner 状态是否 Online",
         "确认仓库 / 组织有权访问该 Runner Group",
