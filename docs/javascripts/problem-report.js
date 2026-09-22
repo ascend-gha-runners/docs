@@ -440,6 +440,18 @@
     }).join('<span class="pr-tree-arrow">→</span>');
   }
 
+  // 叶子归属徽标：badge 值 → 文案与颜色类（淡橙=用户可自查修改，淡蓝=CI 侧处理）
+  var LEAF_BADGES = {
+    'check-workflow': { text: '自查 · 检查 workflow', cls: 'pr-leaf-badge--user' },
+    'check-resource': { text: '自查 · 检查资源申请', cls: 'pr-leaf-badge--user' },
+    'ci-infra': { text: 'CI 侧 · 基础设施处理', cls: 'pr-leaf-badge--ci' }
+  };
+
+  function leafBadgeHtml(node) {
+    var b = node.badge && LEAF_BADGES[node.badge];
+    return b ? ' <span class="pr-leaf-badge ' + b.cls + '">' + b.text + '</span>' : '';
+  }
+
   function treeRenderNode() {
     if (!treeNodeEl || !treeData || !treeCurrent) return;
     var node = treeData.nodes[treeCurrent];
@@ -470,7 +482,7 @@
       treeNodeEl.innerHTML =
         '<div class="pr-leaf">' +
           '<p class="pr-leaf-title">' + escapeHtml(node.title || '') +
-            (node.selfFix ? ' <span class="pr-leaf-selffix">请自行修改 workflow</span>' : '') +
+            leafBadgeHtml(node) +
           '</p>' +
           '<p class="pr-leaf-summary">' + escapeHtml(node.summary || '') + '</p>' +
           (steps ? '<ol class="pr-leaf-steps">' + steps + '</ol>' : '') +

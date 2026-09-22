@@ -62,6 +62,7 @@
       "type": "leaf",
       "title": "ErrImagePull（镜像拉取失败）",
       "summary": "镜像不存在、名称或版本写错，或私有镜像缺拉取凭证。",
+      "badge": "check-workflow",
       "steps": [
         "核对 workflow 中 container.image 的镜像名、tag 是否真实存在",
         "若是私有镜像，确认镜像仓库凭证（imagepullsecret）已配置",
@@ -76,6 +77,7 @@
       "type": "leaf",
       "title": "InvalidImageName（镜像名非法）",
       "summary": "镜像名格式错误。",
+      "badge": "check-workflow",
       "steps": [
         "检查镜像名拼写、大小写、tag 是否规范",
         "确认没有多余空格或非法字符",
@@ -90,6 +92,7 @@
       "type": "leaf",
       "title": "CreateContainerConfigError（容器创建失败）",
       "summary": "引用了不存在的 Secret 或配置项。",
+      "badge": "check-workflow",
       "steps": [
         "确认 workflow 引用的 Secret 已创建且名称一致",
         "检查 Secret 是否在正确的命名空间",
@@ -104,6 +107,7 @@
       "type": "leaf",
       "title": "FailedScheduling（调度失败）",
       "summary": "nodeSelector 无匹配节点，或资源请求超过节点上限。",
+      "badge": "check-resource",
       "steps": [
         "检查 runs-on / nodeSelector 是否有匹配的节点",
         "确认申请的 NPU 卡数 / 资源没有超过该标签的上限",
@@ -120,6 +124,7 @@
       "type": "leaf",
       "title": "FailedBinding（PVC 不存在）",
       "summary": "引用的 PVC 不存在。",
+      "badge": "check-workflow",
       "steps": [
         "确认 workflow 引用的 PVC 已创建",
         "修正后重新触发 workflow"
@@ -133,6 +138,7 @@
       "type": "leaf",
       "title": "Container crash（容器崩溃）",
       "summary": "容器启动后立即退出（exit non-zero）。",
+      "badge": "check-workflow",
       "steps": [
         "查看日志中的 exit code 与报错信息",
         "常见原因：启动命令错误、依赖缺失、环境变量不对",
@@ -147,6 +153,7 @@
       "type": "leaf",
       "title": "OOMKilled（内存不足）",
       "summary": "容器被内核 OOM killer 终止。",
+      "badge": "check-resource",
       "steps": [
         "确认任务内存占用是否超出该标签资源上限",
         "考虑降低 batch size / 并发，或改用内存更大的标签",
@@ -162,7 +169,7 @@
       "type": "leaf",
       "title": "UserScriptError（用户脚本报错）",
       "summary": "workflow 自身 step 脚本执行失败。属用户脚本问题，请自行排查修改，CI 侧不受理。",
-      "selfFix": true,
+      "badge": "check-workflow",
       "steps": [
         "定位出错的 step 与报错行",
         "检查命令、路径、依赖是否就绪",
@@ -177,6 +184,7 @@
       "type": "leaf",
       "title": "等待资源（队列可能已满）",
       "summary": "集群 NPU 资源被占用，Job 排队等待。",
+      "badge": "ci-infra",
       "steps": [
         "在 GitHub Actions 查看该 Job 是否处于 Queued 状态",
         "前往 Cluster 文档确认所用标签对应的机器规格与数量",
@@ -191,6 +199,7 @@
       "type": "leaf",
       "title": "runs-on 标签可能不存在",
       "summary": "workflow 的 runs-on 值在部署仓库没有对应标签。",
+      "badge": "check-workflow",
       "steps": [
         "在 Cluster 文档搜索你的 runs-on 值是否存在",
         "确认标签名与申请时完全一致（大小写 / 连字符）",
@@ -205,6 +214,7 @@
       "type": "leaf",
       "title": "Runner 可能未上线",
       "summary": "Runner 未注册或状态不是 Online。",
+      "badge": "ci-infra",
       "steps": [
         "在仓库 Settings → Actions → Runners 查看 Runner 状态是否 Online",
         "确认仓库 / 组织有权访问该 Runner Group",
@@ -219,6 +229,7 @@
       "type": "leaf",
       "title": "构建 / 打包失败",
       "summary": "编译期错误，多与镜像、依赖、环境有关。",
+      "badge": "check-workflow",
       "steps": [
         "查看 Job 日志定位报错位置",
         "常见原因：依赖未安装、pip 源未走本地缓存、环境变量缺失",
