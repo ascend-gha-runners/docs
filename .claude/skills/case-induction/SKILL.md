@@ -53,8 +53,9 @@ python scripts/case-induction/export_tree_view.py
 1. 只基于 dump 原文归纳，**禁止编造根因 / 结论**；原文无依据的写「待人工确认」
 2. 每条候选必须附来源 issue 编号（#xxx）
 3. review 必须严格使用下方模板结构，字段不得增删
-4. 决策树叶子锚点必须指向 error-types.md 中真实存在的标题
+4. 决策树叶子锚点必须指向 error-types.md 中真实存在的标题（叶子无对应案例时 links 留空，并在 review 中说明）
 5. 新增叶子必须带 badge 归属（check-workflow / check-resource / check-github / ci-infra）
+6. issue 表单字段可能有误（如 runs-on 填成 runner 实例名 / Other）：归纳以正文与评论的事实为准推测真实标签；无法推测的在「高频问题观察」备注「标签存疑」，不要原样采信
 
 ## review 模板（生成 review-<起>-<止>.md 时逐字套用）
 
@@ -67,7 +68,7 @@ python scripts/case-induction/export_tree_view.py
 ## 一、本期概览
 - issue 总数：N（problem-tracking x，self-resolved y）
 - 转人工高频：<runs-on 标签 / 仓库 + 次数>
-- 自查路径命中：<有「### 自查路径」的 issue 数；最常见命中叶子>
+- 自查路径命中：<有「### 自查路径」的 issue 数；最常见命中叶子。注：命中「其它 → 其它问题」不计入有效命中（用户没找到匹配案例才转人工）>
 
 ## 二、决策树变更建议
 - [ ] 【新增叶子】<标题>
@@ -78,7 +79,7 @@ python scripts/case-induction/export_tree_view.py
   - 建议锚点：<error-types.md 已有标题的 #anchor；无对应案例写「需同步新增 error-types 案例」>
   - badge：<check-workflow / check-resource / check-github / ci-infra>
   - 来源：#<issue 号>
-- [ ] 【修改叶子】<节点 id>：<改什么 → 改成什么>（来源：#xxx）
+- [ ] 【修改叶子】<节点 id> · <summary/steps/links/badge/title>：<改什么 → 改成什么>（来源：#xxx；一行一个改动点，多处改动分行写）
 
 （无建议时写「本期无」）
 
