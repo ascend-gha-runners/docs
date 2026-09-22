@@ -1,0 +1,103 @@
+---
+name: case-induction
+description: 每周案例归纳回灌流程。从 problem-tracking / self-resolved 已关闭 issue 归纳候选案例，生成 review 检查单与最新决策路径表，人工检查后回灌 problem-tree.json / error-types.md。当用户说「跑案例归纳」「每周归纳」「归纳回灌」时使用。
+---
+
+# 每周案例归纳（自助解决问题 · P2 回灌流程）
+
+目的：把本周已关闭的问题登记 issue 归纳为可复用案例，经**人工检查**后回灌文档，形成闭环。
+原则：AI 只产出候选，**人工勾选确认后才改动线上文档**；禁止全自动回灌（防幻觉）。
+
+## 固定步骤
+
+### 1. 拉取数据源
+
+```bash
+python scripts/case-induction/fetch_issues.py
+```
+
+- 默认区间：上次 dump 截止日的次日 → 今天（首次默认最近 7 天）
+- 产出：`case-induction/dump-<起>-<止>.md`（issue 正文 + 全部评论）
+
+### 2. AI 归纳，生成 review
+
+阅读三份材料：
+- `case-induction/dump-<起>-<止>.md`（本期数据）
+- `docs/assets/problem-tree.json`（当前决策树）
+- `docs/error-types.md`（当前案例库）
+
+产出 `case-induction/review-<起>-<止>.md`，**必须严格使用本文末的模板**，字段不得增删。
+
+### 3. 按勾选项改决策树，生成最新路径表
+
+只按 review 中**人工已勾选**的项修改 `docs/assets/problem-tree.json` / `docs/error-types.md`，然后：
+
+```bash
+python scripts/case-induction/export_tree_view.py
+```
+
+产出 `case-induction/tree-view.md`：与 git HEAD 已提交版本对比，新增/变化的路径自动标 🆕 并生成可勾选复查清单。
+
+### 4. 人工检查
+
+- review：逐项勾选（`- [x]` 采纳；不采纳的删除或备注原因）
+- tree-view：只复查带 🆕 的新增行（已有路径不用重复检查）
+
+### 5. 提交 PR
+
+一个 PR 一起合入：problem-tree.json + error-types.md + tree-view.md + review + dump。
+**PR 由人工创建、人工安排合入；AI 禁止代建 PR、禁止合并。**
+
+## 硬性规则
+
+1. 只基于 dump 原文归纳，**禁止编造根因 / 结论**；原文无依据的写「待人工确认」
+2. 每条候选必须附来源 issue 编号（#xxx）
+3. review 必须严格使用下方模板结构，字段不得增删
+4. 决策树叶子锚点必须指向 error-types.md 中真实存在的标题
+5. 新增叶子必须带 badge 归属（check-workflow / check-resource / check-github / ci-infra）
+
+## review 模板（生成 review-<起>-<止>.md 时逐字套用）
+
+```markdown
+# 案例归纳 review（<起> ~ <止>）
+
+> 生成：<日期>；数据源：dump-<起>-<止>.md（N 个 issue）
+> 用法：逐项人工勾选（- [x] 采纳 / 删除不采纳项）；勾选后按建议改对应文件，再跑 export_tree_view.py。
+
+## 一、本期概览
+- issue 总数：N（problem-tracking x，self-resolved y）
+- 转人工高频：<runs-on 标签 / 仓库 + 次数>
+- 自查路径命中：<有「### 自查路径」的 issue 数；最常见命中叶子>
+
+## 二、决策树变更建议
+- [ ] 【新增叶子】<标题>
+  - 位置：<父节点路径，如 报错 / Job 失败 → Running（运行中报错）>
+  - 现象：<一句话>
+  - 根因：<一句话；dump 原文无依据写「待人工确认」>
+  - 解决步骤：<1. … 2. … 3. …>
+  - 建议锚点：<error-types.md 已有标题的 #anchor；无对应案例写「需同步新增 error-types 案例」>
+  - badge：<check-workflow / check-resource / check-github / ci-infra>
+  - 来源：#<issue 号>
+- [ ] 【修改叶子】<节点 id>：<改什么 → 改成什么>（来源：#xxx）
+
+（无建议时写「本期无」）
+
+## 三、error-types.md 案例增补建议
+- [ ] 【新增案例】<标题>
+  - 现象：<一句话>
+  - 根因：<一句话；无依据写「待人工确认」>
+  - 解决：<步骤>
+  - 来源：#<issue 号>
+
+（无建议时写「本期无」）
+
+## 四、锚点失效报告
+| 叶子 | 当前锚点 | 失效原因 | 建议 |
+| :--- | :--- | :--- | :--- |
+
+（无失效写「本期无」）
+
+## 五、高频问题观察（仅供人工参考，无需勾选）
+| runs-on 标签 | 仓库 | 次数 | 代表 issue |
+| :--- | :--- | :--- | :--- |
+```
