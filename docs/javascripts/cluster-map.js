@@ -42,6 +42,14 @@
       return tokens.every(function (t) { return hay.indexOf(t) !== -1; });
     }
 
+    // 判断单个标签文本是否命中任意关键词（用于高亮）。一个标签只需命中部分关键词即标注，
+    // 例如「a2b3 hk」里「hk」命中集群名、只有「a2b3」落在标签上，此时仍高亮含 a2b3 的标签。
+    function labelMatches(tokens, label) {
+      if (!tokens.length) return false;
+      var hay = label.toLowerCase();
+      return tokens.some(function (t) { return hay.indexOf(t) !== -1; });
+    }
+
     function apply() {
       var q = input.value.trim().toLowerCase();
       var tokens = tokenize(q);
@@ -62,6 +70,10 @@
             var show = npuOk && searchOk;
             m.hidden = !show;
             if (show) anyMachine = true;
+            // 命中关键词的 runner 标签（如 linux-aarch64-*）：所在灰色圆角框换成蓝色边框
+            var labelEl = m.querySelector(".machine-label");
+            var labelText = labelEl ? labelEl.textContent : "";
+            m.classList.toggle("is-match", labelMatches(tokens, labelText));
           });
           var rowShown = anyMachine;
           row.classList.toggle("is-hidden", !rowShown);

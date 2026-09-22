@@ -235,7 +235,7 @@
   padding: 0.15rem 0 0.4rem 1.3rem;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.3rem;
 }
 .machine-list[hidden] {
   display: none;
@@ -256,6 +256,10 @@
 }
 .machine-label {
   color: var(--md-typeset-color);
+}
+.machine.is-match {
+  border-color: var(--md-primary-fg-color);
+  box-shadow: 0 0 0 1.5px var(--md-primary-fg-color);
 }
 .machine-npu {
   color: var(--md-default-fg-color--light);
