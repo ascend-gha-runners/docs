@@ -445,7 +445,7 @@
     'check-workflow': { text: '检查 workflow', cls: 'pr-leaf-badge--user' },
     'check-resource': { text: '检查资源申请', cls: 'pr-leaf-badge--user' },
     'check-github': { text: '检查 GitHub 配置', cls: 'pr-leaf-badge--user' },
-    'ci-infra': { text: 'CI 侧 · 基础设施处理', cls: 'pr-leaf-badge--ci' }
+    'ci-infra': { text: '基础设施处理', cls: 'pr-leaf-badge--ci' }
   };
 
   function leafBadgeHtml(node) {
