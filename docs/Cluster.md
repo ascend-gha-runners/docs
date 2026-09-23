@@ -23,11 +23,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 161</option>
-  <option value="cpu">CPU (no NPU) · 49</option>
+  <option value="cpu">CPU (no NPU) · 48</option>
   <option value="npu">npu · 20</option>
   <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 8</option>
-  <option value="ascend-310">ascend-310 · 2</option>
+  <option value="ascend-310">ascend-310 · 3</option>
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
@@ -484,7 +484,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--cpu" data-label="linux-aarch64-310p-1" data-npu="cpu"><span class="machine-label">linux-aarch64-310p-1</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-310p-2" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4</span><span class="machine-npu"> · 4 × ascend-310</span></div>
+        <div class="machine" data-label="linux-aarch64-310p-1" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-1</span><span class="machine-npu"> · 1 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-2" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4</span><span class="machine-npu"> · 4 × ascend-310</span></div>
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
