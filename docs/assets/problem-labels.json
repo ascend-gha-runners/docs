@@ -227,6 +227,10 @@
       "linux-aarch64-910b-2",
       "linux-aarch64-910b-4",
       "linux-aarch64-910b-8",
+      "linux-aarch64-a2-1-hk-001",
+      "linux-aarch64-a2-2-hk-001",
+      "linux-aarch64-a2-4-hk-001",
+      "linux-aarch64-a2-8-hk-001",
       "linux-aarch64-a2b1-1",
       "linux-aarch64-a2b1-2",
       "linux-aarch64-a2b1-4",
@@ -238,6 +242,10 @@
       "linux-aarch64-a2b3-8",
       "linux-aarch64-a2b3-v-half",
       "linux-aarch64-a2b3-v-quarter",
+      "linux-aarch64-a2b4-1-hk-001",
+      "linux-aarch64-a2b4-2-hk-001",
+      "linux-aarch64-a2b4-4-hk-001",
+      "linux-aarch64-a2b4-8-hk-001",
       "linux-aarch64-a3-0-sh-001",
       "linux-aarch64-a3-16",
       "linux-aarch64-a3-16-sh-001",
@@ -315,13 +323,25 @@
     "linux-aarch64-a2-1": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2-1-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2-2": [
+      "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2-2-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2-4": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2-4-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2-8": [
+      "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2-8-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b1-1": [
@@ -370,14 +390,26 @@
     "linux-aarch64-a2b4-1": [
       "ascend-infra-guiyang-cluster-001"
     ],
+    "linux-aarch64-a2b4-1-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b4-2": [
       "ascend-infra-guiyang-cluster-001"
+    ],
+    "linux-aarch64-a2b4-2-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b4-4": [
       "ascend-infra-guiyang-cluster-001"
     ],
+    "linux-aarch64-a2b4-4-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b4-8": [
       "ascend-infra-guiyang-cluster-001"
+    ],
+    "linux-aarch64-a2b4-8-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a3": [
       "ascend-cn12-001-cluster"
