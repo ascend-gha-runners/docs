@@ -66,4 +66,6 @@ nav:
   - Integrated Repos: Repo.md
   - Cluster Map: Cluster.md
   - Features: feature.md
-  - Job Failure Reference: error-types.md
+  - Job Failure Reference:
+    - English: error-types.md
+    - 中文: error-types-zh.md

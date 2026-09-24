@@ -24,13 +24,13 @@ python scripts/case-induction/fetch_issues.py
 阅读三份材料：
 - `case-induction/dump-<起>-<止>.md`（本期数据）
 - `docs/assets/problem-tree.json`（当前决策树）
-- `docs/error-types.md`（当前案例库）
+- 案例库：中文 `docs/error-types-zh.md`、英文 `docs/error-types.md`（双语，决策树锚点指向中文页）
 
 产出 `case-induction/review-<起>-<止>.md`，**必须严格使用本文末的模板**，字段不得增删。
 
 ### 3. 按勾选项改决策树，生成最新路径表
 
-只按 review 中**人工已勾选**的项修改 `docs/assets/problem-tree.json` / `docs/error-types.md`，然后：
+只按 review 中**人工已勾选**的项修改 `docs/assets/problem-tree.json` / 案例库（中文 `docs/error-types-zh.md`、英文 `docs/error-types.md`），然后：
 
 ```bash
 python scripts/case-induction/export_tree_view.py
@@ -53,7 +53,7 @@ python scripts/case-induction/export_tree_view.py
 1. 只基于 dump 原文归纳，**禁止编造根因 / 结论**；原文无依据的写「待人工确认」
 2. 每条候选必须附来源 issue 编号（#xxx）
 3. review 必须严格使用下方模板结构，字段不得增删
-4. 决策树叶子锚点必须指向 error-types.md 中真实存在的标题（叶子无对应案例时 links 留空，并在 review 中说明）
+4. 决策树叶子锚点必须指向案例库中真实存在的标题——案例库已**双语化**：中文页 `docs/error-types-zh.md`（决策树默认指向，标题需带 `{ #anchor }` 显式锚点）、英文页 `docs/error-types.md`（叶子无对应案例时 links 留空，并在 review 中说明）
 5. 新增叶子必须带 badge 归属（check-workflow / check-resource / check-github / ci-infra）
 6. issue 表单字段可能有误（如 runs-on 填成 runner 实例名 / Other）：归纳以正文与评论的事实为准推测真实标签；无法推测的在「高频问题观察」备注「标签存疑」，不要原样采信
 
