@@ -4,10 +4,47 @@ on:
     branches:
       - master 
       - main
+  pull_request:
 permissions:
   contents: write
 jobs:
+  sensitive-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 敏感信息门禁（内部标识 / 凭据 / dump 入库）
+        run: |
+          fail=0
+
+          # 1) 案例归纳原始数据（dump）与检查单（review）禁止入库：
+          #    含 issue 正文与评论原文，可能带内网标识，进 git 历史后不可逆。
+          tracked=$(git ls-files | grep -E '^case-induction/(dump|review)-.*\.md$' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::case-induction 下的 dump/review 禁止入库，请放到仓库外本地使用"
+            echo "$tracked"
+            fail=1
+          fi
+
+          # 2) 归纳产物 / 案例库 / 决策树不得含内部标识与凭据。
+          #    替换规则见 .claude/skills/case-induction/SKILL.md 硬性规则 7。
+          #    注：部署与使用手册类页面（有意公开服务名 / 镜像示例）不在扫描范围内。
+          pattern='(10\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\.[0-9]{1,3}\.[0-9]{1,3}'
+          pattern="$pattern|[A-Za-z0-9][A-Za-z0-9.-]*\.internal"
+          pattern="$pattern|base_image/ascend-ci"
+          pattern="$pattern|liqo\.io/managed-by-namespace-map[[:space:]]*[=:][[:space:]]*[^[:space:]<>]+"
+          pattern="$pattern|opensourceways/ascend-ci-deployment/(pull|issues)/[0-9]+"
+          pattern="$pattern|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}"
+          pattern="$pattern|-----BEGIN [A-Z ]*PRIVATE KEY-----"
+          hits=$(grep -rnE "$pattern" docs case-induction .claude/skills || true)
+          if [ -n "$hits" ]; then
+            echo "::error::命中内部标识或凭据，请按 SKILL.md 硬性规则 7 替换为占位符"
+            echo "$hits"
+            fail=1
+          fi
+
+          exit $fail
   deploy:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

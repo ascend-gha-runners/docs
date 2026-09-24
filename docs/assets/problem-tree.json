@@ -9,7 +9,17 @@
         { "label": "报错 / Job 失败", "to": "error_phase" },
         { "label": "一直等待 / 排队", "to": "wait_reason" },
         { "label": "构建 / 打包失败", "to": "leaf_build" },
+        { "label": "集群 / 机器问题", "to": "cat_infra" },
         { "label": "其它", "to": "leaf_other" }
+      ]
+    },
+
+    "cat_infra": {
+      "type": "question",
+      "title": "集群 / 机器问题",
+      "text": "平台侧现象，具体是哪种？",
+      "branches": [
+        { "label": "弹性节点不缩容", "to": "leaf_infra_no_scale_down" }
       ]
     },
 
@@ -43,7 +53,11 @@
       "branches": [
         { "label": "容器退出（崩溃）", "to": "leaf_container_crash" },
         { "label": "OOM 内存不足", "to": "leaf_oom" },
-        { "label": "用户脚本报错", "to": "leaf_user_script" }
+        { "label": "用户脚本报错", "to": "leaf_user_script" },
+        { "label": "HCCL 通信端口被占用", "to": "leaf_hccl_port_bound" },
+        { "label": "模型缓存缺失 / 不完整", "to": "leaf_incomplete_snapshot" },
+        { "label": "任务长时间卡住 / 超时", "to": "leaf_running_hang" },
+        { "label": "上传日志 / 产物失败", "to": "leaf_upload_log_failed" }
       ]
     },
 
@@ -54,7 +68,8 @@
       "branches": [
         { "label": "可能在等资源（队列满）", "to": "leaf_wait_resource" },
         { "label": "runs-on 标签可能不存在", "to": "leaf_wait_label" },
-        { "label": "Runner 可能未上线", "to": "leaf_runner_offline" }
+        { "label": "Runner 可能未上线", "to": "leaf_runner_offline" },
+        { "label": "任务卡在虚拟节点（接管异常）", "to": "leaf_wait_liqo_offload" }
       ]
     },
 
@@ -62,13 +77,16 @@
       "type": "leaf",
       "title": "ErrImagePull（镜像拉取失败）",
       "summary": "镜像不存在、名称或版本写错，或私有镜像缺拉取凭证。",
+      "badge": "check-workflow",
       "steps": [
         "核对 workflow 中 container.image 的镜像名、tag 是否真实存在",
         "若是私有镜像，确认镜像仓库凭证（imagepullsecret）已配置",
+        "若报 401 Unauthorized：确认是否近期更换过镜像仓库地址，runner 配置的 secret 是否有新仓库的拉取权限；无权限则联系基础设施方确认或将镜像设为公开",
+        "若报 not found / failed to resolve source metadata：确认镜像是否已同步到目标 SWR 仓库；镜像源变更后需同步更新 SWR 重定向地址",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#errimagepull" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#errimagepull" }
       ]
     },
 
@@ -76,13 +94,14 @@
       "type": "leaf",
       "title": "InvalidImageName（镜像名非法）",
       "summary": "镜像名格式错误。",
+      "badge": "check-workflow",
       "steps": [
         "检查镜像名拼写、大小写、tag 是否规范",
         "确认没有多余空格或非法字符",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#invalidimagename" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#invalidimagename" }
       ]
     },
 
@@ -90,13 +109,14 @@
       "type": "leaf",
       "title": "CreateContainerConfigError（容器创建失败）",
       "summary": "引用了不存在的 Secret 或配置项。",
+      "badge": "check-workflow",
       "steps": [
         "确认 workflow 引用的 Secret 已创建且名称一致",
         "检查 Secret 是否在正确的命名空间",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#createcontainerconfigerror" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#createcontainerconfigerror" }
       ]
     },
 
@@ -104,14 +124,16 @@
       "type": "leaf",
       "title": "FailedScheduling（调度失败）",
       "summary": "nodeSelector 无匹配节点，或资源请求超过节点上限。",
+      "badge": "check-resource",
       "steps": [
         "检查 runs-on / nodeSelector 是否有匹配的节点",
         "确认申请的 NPU 卡数 / 资源没有超过该标签的上限",
+        "检查配置中的 tolerations，删除不属于目标节点的容忍（如虚拟节点特有的容忍），避免任务被调度到虚拟 / 错误节点",
         "前往 Cluster 文档核对标签与机器规格"
       ],
       "links": [
-        { "text": "案例：nodeSelector", "href": "/docs/error-types/#failedscheduling-nodeselector" },
-        { "text": "案例：资源上限", "href": "/docs/error-types/#failedscheduling-resource-limit" },
+        { "text": "案例：nodeSelector", "href": "/docs/error-types-zh/#failedscheduling-nodeselector" },
+        { "text": "案例：资源上限", "href": "/docs/error-types-zh/#failedscheduling-resource-limit" },
         { "text": "核对 Cluster 映射", "href": "/docs/Cluster/" }
       ]
     },
@@ -120,12 +142,13 @@
       "type": "leaf",
       "title": "FailedBinding（PVC 不存在）",
       "summary": "引用的 PVC 不存在。",
+      "badge": "check-workflow",
       "steps": [
         "确认 workflow 引用的 PVC 已创建",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#failedbinding" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#failedbinding" }
       ]
     },
 
@@ -133,13 +156,14 @@
       "type": "leaf",
       "title": "Container crash（容器崩溃）",
       "summary": "容器启动后立即退出（exit non-zero）。",
+      "badge": "check-workflow",
       "steps": [
         "查看日志中的 exit code 与报错信息",
         "常见原因：启动命令错误、依赖缺失、环境变量不对",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#container-crash" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#container-crash" }
       ]
     },
 
@@ -147,13 +171,14 @@
       "type": "leaf",
       "title": "OOMKilled（内存不足）",
       "summary": "容器被内核 OOM killer 终止。",
+      "badge": "check-resource",
       "steps": [
         "确认任务内存占用是否超出该标签资源上限",
         "考虑降低 batch size / 并发，或改用内存更大的标签",
         "前往 Cluster 文档查看各标签规格"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#oomkilled" },
+        { "text": "查看案例", "href": "/docs/error-types-zh/#oomkilled" },
         { "text": "核对 Cluster 映射", "href": "/docs/Cluster/" }
       ]
     },
@@ -161,14 +186,15 @@
     "leaf_user_script": {
       "type": "leaf",
       "title": "UserScriptError（用户脚本报错）",
-      "summary": "workflow 自身 step 脚本执行失败。",
+      "summary": "workflow 自身 step 脚本执行失败。属用户脚本问题，请自行排查修改，CI 侧不受理。",
+      "badge": "check-workflow",
       "steps": [
         "定位出错的 step 与报错行",
         "检查命令、路径、依赖是否就绪",
         "修正后重新触发 workflow"
       ],
       "links": [
-        { "text": "查看案例", "href": "/docs/error-types/#userscripterror" }
+        { "text": "查看案例", "href": "/docs/error-types-zh/#userscripterror" }
       ]
     },
 
@@ -176,6 +202,7 @@
       "type": "leaf",
       "title": "等待资源（队列可能已满）",
       "summary": "集群 NPU 资源被占用，Job 排队等待。",
+      "badge": "ci-infra",
       "steps": [
         "在 GitHub Actions 查看该 Job 是否处于 Queued 状态",
         "前往 Cluster 文档确认所用标签对应的机器规格与数量",
@@ -190,6 +217,7 @@
       "type": "leaf",
       "title": "runs-on 标签可能不存在",
       "summary": "workflow 的 runs-on 值在部署仓库没有对应标签。",
+      "badge": "check-workflow",
       "steps": [
         "在 Cluster 文档搜索你的 runs-on 值是否存在",
         "确认标签名与申请时完全一致（大小写 / 连字符）",
@@ -204,6 +232,7 @@
       "type": "leaf",
       "title": "Runner 可能未上线",
       "summary": "Runner 未注册或状态不是 Online。",
+      "badge": "check-github",
       "steps": [
         "在仓库 Settings → Actions → Runners 查看 Runner 状态是否 Online",
         "确认仓库 / 组织有权访问该 Runner Group",
@@ -214,17 +243,34 @@
       ]
     },
 
+    "leaf_wait_liqo_offload": {
+      "type": "leaf",
+      "title": "任务卡在虚拟节点（Liqo 接管异常）",
+      "summary": "任务长时间 Waiting，runner pod 处于 OffloadingBackOff，无法在目标远端集群启动。",
+      "badge": "ci-infra",
+      "steps": [
+        "确认任务卡在哪个远端集群及对应 namespace",
+        "检查该 namespace 是否带 Liqo 接管标记（label liqo.io/remote-cluster-id、annotation liqo.io/managed-by-namespace-map / liqo.io/original-name）",
+        "补上与其它集群一致的 label/annotation（非破坏，不动 PVC/SA/namespace 内容），观察 pod 恢复",
+        "建议把标记固化进部署仓 kustomization，避免漂移再触发"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#liqo-offloading-backoff" }
+      ]
+    },
+
     "leaf_build": {
       "type": "leaf",
       "title": "构建 / 打包失败",
       "summary": "编译期错误，多与镜像、依赖、环境有关。",
+      "badge": "check-workflow",
       "steps": [
         "查看 Job 日志定位报错位置",
         "常见原因：依赖未安装、pip 源未走本地缓存、环境变量缺失",
         "可先查看 Running 阶段的工作流错误案例"
       ],
       "links": [
-        { "text": "Job Failure Reference", "href": "/docs/error-types/" }
+        { "text": "Job Failure Reference", "href": "/docs/error-types-zh/" }
       ]
     },
 
@@ -232,7 +278,85 @@
       "type": "leaf",
       "title": "其它问题",
       "summary": "不属于上面几类，直接登记即可。",
-      "steps": [],
+      "steps": [
+        "若 Job 运行时间过长需要结束：先在 GitHub Actions 页面自行 Cancel",
+        "业务用例耗时过长属用例问题，请自行调整",
+        "确需人工终止或排查再登记"
+      ],
+      "links": []
+    },
+
+    "leaf_hccl_port_bound": {
+      "type": "leaf",
+      "title": "HCCL 通信端口被占用",
+      "summary": "多机任务 Running 阶段报 Communication_Error_Bind_IP_Port：IP 地址和端口（如 60000）已被绑定。",
+      "badge": "check-workflow",
+      "steps": [
+        "检查该端口是否被其他进程占用",
+        "按报错提示用环境变量 HCCL_IF_BASE_PORT 调整端口，或用 sysctl -w net.ipv4.ip_local_reserved_ports 调整保留端口范围",
+        "检查用例是否在同一设备上重复启动服务进程，修正后重跑"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#hccl-port-already-bound" }
+      ]
+    },
+
+    "leaf_incomplete_snapshot": {
+      "type": "leaf",
+      "title": "模型缓存缺失 / 不完整",
+      "summary": "Running 阶段报 IncompleteSnapshotError 或 LocalEntryNotFoundError：集群侧无该模型缓存或缓存缺文件（local_files_only=True 时无法在线补）。",
+      "badge": "ci-infra",
+      "steps": [
+        "从报错信息确认缺失的模型与文件清单",
+        "确认任务实际调度到的集群上是否有该模型缓存（缺失与残缺都可能）",
+        "联系基础设施方核对对应集群的模型缓存并补齐 / 重新下载",
+        "补齐后重新触发 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#incomplete-model-snapshot" }
+      ]
+    },
+
+    "leaf_running_hang": {
+      "type": "leaf",
+      "title": "任务长时间卡住 / 超时（引擎进程挂起）",
+      "summary": "任务运行数小时无输出、超时被取消；pod 显示 Running 但日志不再更新（引擎核心进程挂起，属业务代码 / 用例问题）。",
+      "badge": "check-workflow",
+      "steps": [
+        "查看日志末尾堆栈：若停在 async_llm.py 的 q.get() 或 output_processor.py 的 raise output，判断为引擎核心挂起",
+        "结合启动参数（DP×TP、专家并行、投机解码等）复现，属业务代码 / 用例问题请自行排查",
+        "无需继续等待可先在 GitHub Actions 页面自行 Cancel，修正后重跑"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#vllm-v1-streaming-hang" }
+      ]
+    },
+
+    "leaf_upload_log_failed": {
+      "type": "leaf",
+      "title": "上传日志 / 产物失败（需加网络白名单）",
+      "summary": "上传 artifact / 日志时报 Upload progress stalled，随后容器 hook 执行失败（exit code 1）。",
+      "badge": "ci-infra",
+      "steps": [
+        "从报错确认失败在上传 artifact / 日志步骤",
+        "联系基础设施方把上传目标域名加入网络白名单（一次性操作，加过后长期有效）",
+        "重跑 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#upload-artifact-whitelist" }
+      ]
+    },
+
+    "leaf_infra_no_scale_down": {
+      "type": "leaf",
+      "title": "弹性节点不缩容",
+      "summary": "动态扩缩容（Karpenter）扩出的机器长期不缩容。",
+      "badge": "ci-infra",
+      "steps": [
+        "检查不缩容节点上是否有 ARC listener 等常驻 pod",
+        "为 listenerTemplate 添加反亲和，避免调度到扩容的动态节点",
+        "修改后验证能正常扩缩容"
+      ],
       "links": []
     }
   }

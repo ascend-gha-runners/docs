@@ -51,6 +51,10 @@ MAIN_CLUSTERS = {
     "ascend-cn12-001-cluster",
 }
 
+# projects hidden from the public cluster map (matched by dir name or real
+# GitHub org/repo from githubConfigUrl)
+HIDDEN_PROJECTS = {"alibaba/ROLL"}
+
 
 # ---------------------------------------------------------------------------
 # GitHub API
@@ -258,6 +262,10 @@ def scan_clusters():
                     )
                     if m:
                         repo_full = f"{m.group(1)}/{m.group(2).rstrip('/')}"
+
+                # projects hidden from the public cluster map
+                if project in HIDDEN_PROJECTS or repo_full in HIDDEN_PROJECTS:
+                    continue
 
                 # capability labels = scaleSetLabels minus cluster short-names
                 # (sub-model labels like a3-560t are kept)
