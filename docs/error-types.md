@@ -63,7 +63,7 @@ Image does not exist.
 
 #### ErrImagePull: 401 Unauthorized After Registry Change
 
-Image pulls fail with `401 Unauthorized` after the registry address was changed (e.g., swr.cn-sourthwest → swr.cn-north-12) — the runner's existing secret has no pull permission for the new registry. Before switching registries, confirm with the infrastructure team whether the new registry is public or credentials exist, or make the image public.
+Image pulls fail with `401 Unauthorized` after the registry address was changed (e.g., `swr.<region-a>` → `swr.<region-b>`) — the runner's existing secret has no pull permission for the new registry. Before switching registries, confirm with the infrastructure team whether the new registry is public or credentials exist, or make the image public.
 
 > **Ref:**
 > [#250](https://github.com/ascend-gha-runners/docs/issues/250)

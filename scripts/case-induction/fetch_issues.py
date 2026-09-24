@@ -10,7 +10,7 @@
     --labels    逗号分隔的 issue 标签，默认 problem-tracking,self-resolved
     --since     起始日期 YYYY-MM-DD（按关闭时间过滤，含当天）
     --until     截止日期 YYYY-MM-DD（含当天，默认今天）
-    --out-dir   输出目录，默认 <仓库根>/case-induction
+    --out-dir   输出目录，默认 <仓库根上级>/case-induction-data（仓库外，不入库）
     --token     GitHub Token（也可通过环境变量 GITHUB_TOKEN / GH_TOKEN 提供）
 
 说明:
@@ -18,7 +18,9 @@
     - 时间段默认规则：扫描输出目录中最新的 dump-<起>-<止>.md，取其「止」的次日作为本次
       起始日期；目录无 dump 时默认最近 7 天。--since/--until 可显式覆盖。
     - 输出 dump-<起>-<止>.md：每个 issue 一节（编号 / 标题 / 标签 / 时间 / 正文 / 逐条评论）。
-    - dump 目录位于仓库根 case-induction/，不进入 mkdocs 站点构建。
+    - **dump 不入库**：它是 issue 正文+评论的原文聚合，可能含内网 IP / 内部域名 / 内部镜像
+      仓库路径 / 私有仓库链接，且一旦进 git 历史即不可逆。默认输出到仓库外，仅在本地给 AI
+      归纳用；仓库根的 case-induction/dump-*.md 已由 .gitignore 兜底忽略。
     - 公仓库可省略 Token（受匿名限流 60 次/小时影响）；评论逐 issue 拉取，issue 较多时建议提供 Token。
 """
 
@@ -36,7 +38,8 @@ DEFAULT_LABELS = "problem-tracking,self-resolved"
 
 # 仓库根目录（本脚本位于 scripts/case-induction/ 下）
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_OUT_DIR = os.path.join(REPO_ROOT, "case-induction")
+# dump 不入库：默认写到仓库外（仓库根的同级目录），仅本地 AI 归纳使用
+DEFAULT_OUT_DIR = os.path.join(os.path.dirname(REPO_ROOT), "case-induction-data")
 
 DUMP_NAME_RE = re.compile(r"^dump-(\d{8})-(\d{8})\.md$")
 

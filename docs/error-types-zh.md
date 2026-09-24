@@ -73,9 +73,9 @@
 
 **现象**：拉取镜像失败，报 **`401 Unauthorized`**。报错示例（issue #250）：
 
-> `failed to pull and unpack image "swr.cn-north-12.myhuaweicloud.com/base_image/ascend-ci/vllm-ascend:nightly-ci-main-a5": ... failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized`
+> `failed to pull and unpack image "swr.<region>.myhuaweicloud.com/<internal-registry>/vllm-ascend:nightly-ci-main-a5": ... failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized`
 
-**根因**（按 issue #250 定位结论）：业务方把镜像仓库地址从 `swr.cn-sourthwest.myhuaweicloud.com` 修改为 `swr.cn-north-12.myhuaweicloud.com`，但 **runner 原本配置的 secret 没有新仓库的拉取权限**，导致 401。
+**根因**（按 issue #250 定位结论）：业务方把镜像仓库地址从一个 SWR 区域（`swr.<region-a>.myhuaweicloud.com`）改到另一个 SWR 区域（`swr.<region-b>.myhuaweicloud.com`），但 **runner 原本配置的 secret 没有新仓库的拉取权限**，导致 401。
 
 **解决**（按 issue #250 处理过程与建议）：
 
@@ -89,7 +89,7 @@
 
 **现象**：构建 / 拉取镜像时报 **`failed to resolve source metadata ... not found`**（issue #223）。
 
-> `error: failed to solve: swr.cn-southwest-2.myhuaweicloud.com/base_image/ascend-ci/vllm-ascend/vllm-ascend:v0.28.0-fd81546-a3: not found`
+> `error: failed to solve: swr.<region>.myhuaweicloud.com/<internal-registry>/vllm-ascend/vllm-ascend:v0.28.0-fd81546-a3: not found`
 
 **根因**（按 issue #223 定位结论）：镜像源变更（如 `quay.io/ascend` → `quay.io/atlas-ci`）后，**SWR 重定向仓库地址未同步更新**，按旧地址拉取时找不到镜像。
 
@@ -171,7 +171,7 @@
 1. 定位任务卡住的集群与 namespace；
 2. 给该 namespace 补上与其它集群一致的 Liqo 接管标记：
    - label `liqo.io/remote-cluster-id=cn12-001`
-   - annotation `liqo.io/managed-by-namespace-map=liqo-tenant-cn12-001/gy004`
+   - annotation `liqo.io/managed-by-namespace-map=<tenant-namespace>/<cluster>`
    - annotation `liqo.io/original-name=<namespace>`
 3. 补完即恢复（**不动任何 PVC / SA / namespace 内容**）；
 4. 建议把这段标记**固化进部署仓 kustomization**（新增带 label/annotation 的 namespace.yaml 并加入 resources），避免 namespace 被误删 / 漂移再触发。
