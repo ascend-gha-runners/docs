@@ -1,0 +1,2211 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/error-types-zh/">
+      
+      
+        <link rel="prev" href="../error-types/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>中文 - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              中文
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required="">
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-gha-en/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-buildkite-en/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Repo/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Integrated Repos
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Cluster/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Cluster Map
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../feature/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Features
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../error-types/" class="md-tabs__link">
+          
+  
+  
+  Job Failure Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1">
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated Repos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked="">
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Job Failure Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#normal-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        正常流程
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pending 阶段（排队）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pending 阶段（排队）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="镜像错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalidimagename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像名非法（InvalidImageName）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errimagepull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像拉取失败（ErrImagePull）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errimagepull-401-unauthorized-after-registry-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        更换仓库后镜像拉取报 401
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-not-synced-to-swr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像未同步到 SWR（not found）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器创建错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="容器创建错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#createcontainerconfigerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret 配置错误（CreateContainerConfigError）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failedscheduling-nodeselector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：nodeSelector 不匹配
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failedscheduling-resource-limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：资源超限
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failedbinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：PVC 不存在（FailedBinding）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        虚拟节点接管错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="虚拟节点接管错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liqo-offloading-backoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liqo namespace 未接管导致任务卡死（OffloadingBackOff）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running 阶段（运行）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running 阶段（运行）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器运行时错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="容器运行时错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#container-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器崩溃
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oomkilled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内存不足（OOMKilled）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow 错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#userscripterror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        用户脚本报错（UserScriptError）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-artifact-whitelist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        上传日志 / 产物失败（需加网络白名单）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        任务卡死 / 超时
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="任务卡死 / 超时">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vllm-v1-streaming-hang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        任务长时间卡住 / 超时（引擎进程挂起）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通信错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="通信错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hccl-port-already-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCCL 通信端口被占用
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        环境错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="环境错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#incomplete-model-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        模型缓存缺失 / 不完整
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        支持
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#normal-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        正常流程
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pending 阶段（排队）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pending 阶段（排队）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="镜像错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invalidimagename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像名非法（InvalidImageName）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errimagepull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像拉取失败（ErrImagePull）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errimagepull-401-unauthorized-after-registry-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        更换仓库后镜像拉取报 401
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-not-synced-to-swr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        镜像未同步到 SWR（not found）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器创建错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="容器创建错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#createcontainerconfigerror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secret 配置错误（CreateContainerConfigError）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failedscheduling-nodeselector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：nodeSelector 不匹配
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failedscheduling-resource-limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：资源超限
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failedbinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        调度失败：PVC 不存在（FailedBinding）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        虚拟节点接管错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="虚拟节点接管错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#liqo-offloading-backoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Liqo namespace 未接管导致任务卡死（OffloadingBackOff）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running 阶段（运行）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running 阶段（运行）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器运行时错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="容器运行时错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#container-crash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        容器崩溃
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oomkilled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        内存不足（OOMKilled）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow 错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#userscripterror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        用户脚本报错（UserScriptError）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-artifact-whitelist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        上传日志 / 产物失败（需加网络白名单）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        任务卡死 / 超时
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="任务卡死 / 超时">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vllm-v1-streaming-hang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        任务长时间卡住 / 超时（引擎进程挂起）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        通信错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="通信错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hccl-port-already-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCCL 通信端口被占用
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        环境错误
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="环境错误">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#incomplete-model-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        模型缓存缺失 / 不完整
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        支持
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/error-types-zh.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/error-types-zh.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+    </a>
+  
+
+
+<h1 id="_1">任务失败案例参考<a class="headerlink" href="#_1" title="Permanent link">¶</a></h1>
+<p>本页收录 runner pod 生命周期中已知的任务失败场景，每个案例附已核实的 GitHub Actions 运行示例，供排障定位参考。</p>
+<p>成功运行的 pod 状态流转：<strong>Pending → Running → Succeeded</strong>（终态，pod 随后被移除）</p>
+<!-- ERROR_SUMMARY_TABLE_START -->
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">错误</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;"><a href="#normal-flow">正常流程</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">镜像</td>
+<td style="text-align: left;"><a href="#invalidimagename">镜像名非法</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">镜像</td>
+<td style="text-align: left;"><a href="#errimagepull">镜像拉取失败</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">镜像</td>
+<td style="text-align: left;"><a href="#errimagepull-401-unauthorized-after-registry-change">更换仓库后镜像拉取报 401</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">镜像</td>
+<td style="text-align: left;"><a href="#image-not-synced-to-swr">镜像未同步到 SWR（not found）</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">容器创建</td>
+<td style="text-align: left;"><a href="#createcontainerconfigerror">Secret 配置错误</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">调度</td>
+<td style="text-align: left;"><a href="#failedscheduling-nodeselector">调度失败：nodeSelector 不匹配</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">调度</td>
+<td style="text-align: left;"><a href="#failedscheduling-resource-limit">调度失败：资源超限</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">调度</td>
+<td style="text-align: left;"><a href="#failedbinding">调度失败：PVC 不存在</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Pending</td>
+<td style="text-align: left;">虚拟节点接管</td>
+<td style="text-align: left;"><a href="#liqo-offloading-backoff">Liqo namespace 未接管导致任务卡死</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">容器运行时</td>
+<td style="text-align: left;"><a href="#container-crash">容器崩溃</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">容器运行时</td>
+<td style="text-align: left;"><a href="#oomkilled">内存不足（OOMKilled）</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">Workflow</td>
+<td style="text-align: left;"><a href="#userscripterror">用户脚本报错</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">Workflow</td>
+<td style="text-align: left;"><a href="#upload-artifact-whitelist">上传日志 / 产物失败（需加网络白名单）</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">任务卡死</td>
+<td style="text-align: left;"><a href="#vllm-v1-streaming-hang">任务长时间卡住 / 超时（引擎进程挂起）</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">通信</td>
+<td style="text-align: left;"><a href="#hccl-port-already-bound">HCCL 通信端口被占用</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">Running</td>
+<td style="text-align: left;">环境</td>
+<td style="text-align: left;"><a href="#incomplete-model-snapshot">模型缓存缺失 / 不完整</a></td>
+</tr>
+</tbody>
+</table>
+<!-- ERROR_SUMMARY_TABLE_END -->
+
+<hr>
+<h2 id="normal-flow">正常流程<a class="headerlink" href="#normal-flow" title="Permanent link">¶</a></h2>
+<p>手动触发正确的 workflow、镜像可拉取时，Pod 状态依次经历 Pending → Running → Succeeded（终态，pod 随后被移除）。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/normal-flow.png" data-desc-position="bottom"><img alt="成功运行：pod 从 Pending 到 Running 再到 Succeeded" src="../assets/error-types/normal-flow.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346510462">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c</a></p>
+</blockquote>
+<hr>
+<h2 id="pending">Pending 阶段（排队）<a class="headerlink" href="#pending" title="Permanent link">¶</a></h2>
+<h3 id="_2">镜像错误<a class="headerlink" href="#_2" title="Permanent link">¶</a></h3>
+<h4 id="invalidimagename">镜像名非法（InvalidImageName）<a class="headerlink" href="#invalidimagename" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，K8s reason 为 <strong><code>InvalidImageName</code></strong>，容器无法创建。</p>
+<p><strong>根因</strong>：workflow 中填写的镜像名格式错误（含非法字符或格式不完整）。</p>
+<p><strong>解决</strong>：[AI] 核对 <code>container.image</code> 的镜像名拼写与格式（仓库地址 / 名称 / tag 完整、无非法字符），修正后重新触发 workflow。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/invalid-image-name.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，原因 InvalidImageName" src="../assets/error-types/invalid-image-name.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319721644">linux-aarch64-test-hook_invalid-image-name · ascend-gha-runners/add-node-check@22e524c</a></p>
+</blockquote>
+<h4 id="errimagepull">镜像拉取失败（ErrImagePull）<a class="headerlink" href="#errimagepull" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，报 <strong><code>ErrImagePull</code> / <code>ImagePullBackOff</code></strong>，镜像始终拉取不到。</p>
+<p><strong>根因</strong>：镜像不存在、名称或版本写错，或私有镜像缺拉取凭证。</p>
+<p><strong>解决</strong>：[AI] 核对镜像名与 tag 真实存在；若是私有镜像，确认镜像仓库凭证（imagepullsecret）已配置；修正后重新触发。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/err-image-pull.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，报 ErrImagePull / ImagePullBackOff" src="../assets/error-types/err-image-pull.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319718531">linux-aarch64-test-hook_err-image-pull · ascend-gha-runners/add-node-check@22e524c</a></p>
+</blockquote>
+<h4 id="errimagepull-401-unauthorized-after-registry-change">更换仓库后镜像拉取报 401<a class="headerlink" href="#errimagepull-401-unauthorized-after-registry-change" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：拉取镜像失败，报 <strong><code>401 Unauthorized</code></strong>。报错示例（issue #250）：</p>
+<blockquote>
+<p><code>failed to pull and unpack image "swr.&lt;region&gt;.myhuaweicloud.com/&lt;internal-registry&gt;/vllm-ascend:nightly-ci-main-a5": ... failed to authorize: failed to fetch anonymous token: unexpected status: 401 Unauthorized</code></p>
+</blockquote>
+<p><strong>根因</strong>（按 issue #250 定位结论）：业务方把镜像仓库地址从一个 SWR 区域（<code>swr.&lt;region-a&gt;.myhuaweicloud.com</code>）改到另一个 SWR 区域（<code>swr.&lt;region-b&gt;.myhuaweicloud.com</code>），但 <strong>runner 原本配置的 secret 没有新仓库的拉取权限</strong>，导致 401。</p>
+<p><strong>解决</strong>（按 issue #250 处理过程与建议）：</p>
+<ol>
+<li>本次处理：与业务方沟通，<strong>把对应地址的镜像公开</strong>；</li>
+<li>长期建议：业务方修改仓库地址前，<strong>先与基础设施方确认对应地址是公开还是私有、当前有没有权限拉取</strong>。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/250">#250</a></p>
+</blockquote>
+<h4 id="image-not-synced-to-swr">镜像未同步到 SWR（not found）<a class="headerlink" href="#image-not-synced-to-swr" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：构建 / 拉取镜像时报 <strong><code>failed to resolve source metadata ... not found</code></strong>（issue #223）。</p>
+<blockquote>
+<p><code>error: failed to solve: swr.&lt;region&gt;.myhuaweicloud.com/&lt;internal-registry&gt;/vllm-ascend/vllm-ascend:v0.28.0-fd81546-a3: not found</code></p>
+</blockquote>
+<p><strong>根因</strong>（按 issue #223 定位结论）：镜像源变更（如 <code>quay.io/ascend</code> → <code>quay.io/atlas-ci</code>）后，<strong>SWR 重定向仓库地址未同步更新</strong>，按旧地址拉取时找不到镜像。</p>
+<p><strong>解决</strong>：</p>
+<ol>
+<li>对照 sync-tools 的 <code>image-sync.json</code> 确认镜像源与 SWR 地址映射；</li>
+<li><strong>同步更新 SWR 重定向地址</strong>（如 <code>.../vllm-ascend</code> → <code>.../vllm-ascend-ci</code>）；</li>
+<li>重跑 workflow。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/223">#223</a></p>
+</blockquote>
+<h3 id="_3">容器创建错误<a class="headerlink" href="#_3" title="Permanent link">¶</a></h3>
+<h4 id="createcontainerconfigerror">Secret 配置错误（CreateContainerConfigError）<a class="headerlink" href="#createcontainerconfigerror" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，报 <strong><code>CreateContainerConfigError</code></strong>。</p>
+<p><strong>根因</strong>：workflow 引用了不存在的 Secret。</p>
+<p><strong>解决</strong>：[AI] 核对引用的 Secret 名称拼写，确认该 Secret 已在对应命名空间创建；补建或修正后重新触发。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/create-container-config-error.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，报 CreateContainerConfigError（Secret 缺失）" src="../assets/error-types/create-container-config-error.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346768522">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c</a></p>
+</blockquote>
+<h3 id="_4">调度错误<a class="headerlink" href="#_4" title="Permanent link">¶</a></h3>
+<h4 id="failedscheduling-nodeselector">调度失败：nodeSelector 不匹配<a class="headerlink" href="#failedscheduling-nodeselector" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，报 <strong><code>FailedScheduling</code></strong>。</p>
+<p><strong>根因</strong>：没有满足 <code>nodeSelector</code> 标签约束的节点。</p>
+<p><strong>解决</strong>：[AI] 检查 <code>runs-on</code> / <code>nodeSelector</code> 是否有匹配的节点；前往 <a href="/docs/Cluster/">Cluster 文档</a> 核对标签与机器规格。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/failed-scheduling-node-selector.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，FailedScheduling（nodeSelector 不匹配）" src="../assets/error-types/failed-scheduling-node-selector.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317874137">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d</a></p>
+</blockquote>
+<h4 id="failedscheduling-resource-limit">调度失败：资源超限<a class="headerlink" href="#failedscheduling-resource-limit" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，报 <strong><code>FailedScheduling</code></strong>（422 场景）。</p>
+<p><strong>根因</strong>：申请的 NPU 卡数 / 资源超过该标签节点的上限。</p>
+<p><strong>解决</strong>：[AI] 降低申请的卡数 / 资源，或更换更大规格的标签；前往 <a href="/docs/Cluster/">Cluster 文档</a> 核对标签与机器规格。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/failed-scheduling-resource.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，FailedScheduling（资源超限）" src="../assets/error-types/failed-scheduling-resource.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317502668">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d</a></p>
+</blockquote>
+<h4 id="failedbinding">调度失败：PVC 不存在（FailedBinding）<a class="headerlink" href="#failedbinding" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：Pod 卡在 <strong>Pending</strong>，报 <strong><code>FailedBinding</code></strong>。</p>
+<p><strong>根因</strong>：workflow 引用的 PVC 不存在。</p>
+<p><strong>解决</strong>：[AI] 核对 PVC 名称、确认 PVC 已在对应命名空间创建；修正后重新触发。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/failed-binding-pvc.png" data-desc-position="bottom"><img alt="Pod 卡在 Pending，FailedBinding（PVC 缺失）" src="../assets/error-types/failed-binding-pvc.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29318217127">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d</a></p>
+</blockquote>
+<h3 id="_5">虚拟节点接管错误<a class="headerlink" href="#_5" title="Permanent link">¶</a></h3>
+<h4 id="liqo-offloading-backoff">Liqo namespace 未接管导致任务卡死（OffloadingBackOff）<a class="headerlink" href="#liqo-offloading-backoff" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：任务长时间 <strong>Waiting</strong>，runner pod 处于 <strong><code>OffloadingBackOff</code></strong>，无法在目标远端集群（如 gy004）启动；NamespaceOffloading 一直 <strong><code>CreationLoopBackOff</code></strong>（issue #205）。</p>
+<p><strong>根因</strong>（按 issue #205 定位结论）：远端集群上<strong>预先存在的 namespace 缺少 Liqo 接管标记</strong>，导致 Liqo 拒绝把 pod 反射到该集群（<code>ReflectionDisabled</code>），runner 被卡死。</p>
+<p><strong>解决</strong>（按 issue #205 处理过程，<strong>非破坏性</strong>）：</p>
+<ol>
+<li>定位任务卡住的集群与 namespace；</li>
+<li>给该 namespace 补上与其它集群一致的 Liqo 接管标记：</li>
+<li>label <code>liqo.io/remote-cluster-id=cn12-001</code></li>
+<li>annotation <code>liqo.io/managed-by-namespace-map=&lt;tenant-namespace&gt;/&lt;cluster&gt;</code></li>
+<li>annotation <code>liqo.io/original-name=&lt;namespace&gt;</code></li>
+<li>补完即恢复（<strong>不动任何 PVC / SA / namespace 内容</strong>）；</li>
+<li>建议把这段标记<strong>固化进部署仓 kustomization</strong>（新增带 label/annotation 的 namespace.yaml 并加入 resources），避免 namespace 被误删 / 漂移再触发。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/205">#205</a></p>
+</blockquote>
+<hr>
+<h2 id="running">Running 阶段（运行）<a class="headerlink" href="#running" title="Permanent link">¶</a></h2>
+<h3 id="_6">容器运行时错误<a class="headerlink" href="#_6" title="Permanent link">¶</a></h3>
+<h4 id="container-crash">容器崩溃<a class="headerlink" href="#container-crash" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：<strong>Running</strong> 阶段，容器启动后<strong>立即退出（exit non-zero）</strong>。</p>
+<p><strong>根因</strong>：启动命令错误或依赖（挂载卷 / Secret 等）未就绪。</p>
+<p><strong>解决</strong>：[AI] 核对启动命令与依赖配置，修正后重跑；仍失败带日志登记。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/container-crash-exit.png" data-desc-position="bottom"><img alt="容器启动后立即以非零码退出" src="../assets/error-types/container-crash-exit.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/28562662088">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d</a></p>
+</blockquote>
+<h4 id="oomkilled">内存不足（OOMKilled）<a class="headerlink" href="#oomkilled" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：容器被<strong>内核 OOM killer 终止</strong>，状态 <strong><code>OOMKilled</code></strong>。</p>
+<p><strong>根因</strong>：任务实际内存占用超出申请的 limit。</p>
+<p><strong>解决</strong>：[AI] 在 workflow 中提高内存 limit 后重新触发。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/oomkilled.png" data-desc-position="bottom"><img alt="容器以 OOMKilled 状态终止" src="../assets/error-types/oomkilled.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/28570845291">linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d</a></p>
+</blockquote>
+<h3 id="workflow">Workflow 错误<a class="headerlink" href="#workflow" title="Permanent link">¶</a></h3>
+<h4 id="userscripterror">用户脚本报错（UserScriptError）<a class="headerlink" href="#userscripterror" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：<strong>Running</strong> 阶段，用户脚本 step 以<strong>非零码退出</strong>，K8s pod reason 为 <strong><code>Error</code></strong>。</p>
+<p><strong>根因</strong>：runner 容器已成功启动、workflow 步骤已执行——失败在脚本逻辑本身。</p>
+<p><strong>解决</strong>：[AI] 属用户脚本问题，按 step 日志定位自行修改，CI 侧不受理。</p>
+<p><a class="glightbox" data-type="image" data-width="auto" data-height="auto" href="../assets/error-types/user-script-error.png" data-desc-position="bottom"><img alt="用户脚本失败，非零退出码" src="../assets/error-types/user-script-error.png"></a></p>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319724802">linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8</a></p>
+</blockquote>
+<h4 id="upload-artifact-whitelist">上传日志 / 产物失败（需加网络白名单）<a class="headerlink" href="#upload-artifact-whitelist" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：上传 artifact / 日志时报 <strong><code>Upload progress stalled</code></strong>，随后容器 hook 执行失败（<code>Executing the custom container implementation failed</code>，exit code 1）（issue #197）。</p>
+<p><strong>根因</strong>（按 issue #197 处理结论）：<strong>上传目标网址未加入网络白名单</strong>，上传被阻断。</p>
+<p><strong>解决</strong>：</p>
+<ol>
+<li>确认失败发生在上传 artifact / 日志步骤；</li>
+<li>联系基础设施方把上传目标域名<strong>加入网络白名单</strong>（一次性操作，添加后长期有效；多个网址需一并添加）；</li>
+<li>重跑 workflow。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/197">#197</a></p>
+</blockquote>
+<h3 id="_7">任务卡死 / 超时<a class="headerlink" href="#_7" title="Permanent link">¶</a></h3>
+<h4 id="vllm-v1-streaming-hang">任务长时间卡住 / 超时（引擎进程挂起）<a class="headerlink" href="#vllm-v1-streaming-hang" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：任务运行数小时无输出、超时被取消（issue #216：超时 4h5m 后被取消）；pod 显示 <strong>Running</strong> 但日志不再更新。</p>
+<p><strong>根因</strong>（按 issue #216 定位结论）：<strong>vLLM v1 引擎核心进程在流式推理中崩溃 / 死锁</strong>——16 卡 worker 在「投机解码 + DP×TP + 专家并行」推理中挂起，输出队列既无 token 也无收尾，流式客户端永久 <code>await q.get()</code>。pod 显示 Running 只是 runner 容器存活，引擎核心已丢失，<strong>属业务代码 / 用例问题</strong>。</p>
+<p><strong>解决</strong>：</p>
+<ol>
+<li>查看日志末尾堆栈，若停在 <code>async_llm.py</code> 的 <code>out = q.get_nowait() or await q.get()</code> 或 <code>output_processor.py</code> 的 <code>raise output</code>，即可判断为引擎核心挂起（issue #216 结论：之后通过 <code>await q.get()</code> 可以快速判断）；</li>
+<li>结合启动参数（<code>--data-parallel-size</code> / <code>--tensor-parallel-size</code>、<code>--enable-expert-parallel</code>、<code>--speculative-config</code> 等）复现，<strong>属业务代码问题请自行排查</strong>；</li>
+<li>无需继续等待可先在 GitHub Actions 页面自行 Cancel，修正后重跑。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/216">#216</a></p>
+</blockquote>
+<h3 id="_8">通信错误<a class="headerlink" href="#_8" title="Permanent link">¶</a></h3>
+<h4 id="hccl-port-already-bound">HCCL 通信端口被占用<a class="headerlink" href="#hccl-port-already-bound" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：多机任务（如 <code>DeepSeek-V3_1.yaml</code> 用例）<strong>Running</strong> 阶段失败，日志报 <strong><code>Communication_Error_Bind_IP_Port(EI0019)</code></strong>（issue #219）：</p>
+<blockquote>
+<p><code>Cannot bind IF. ip is ***, port is 60000, bind fail. Reason: The IP and port have been bound already.</code>
+提示：<code>maybe the port is occupied by other processes, or there are duplicate startup service processes on the same device</code>，且 vLLM 实例随之 abort。</p>
+</blockquote>
+<p><strong>根因</strong>：HCCL 通信端口（如 <strong>60000</strong>）已被其他进程占用，或同一设备上重复启动了服务进程。issue #219 定位为<strong>用户侧用例问题</strong>（业务方用例修改后已无反馈），非 CI 平台问题。</p>
+<p><strong>解决</strong>（按 issue #219 报错中的建议与处理结果）：</p>
+<ol>
+<li>检查端口占用情况；</li>
+<li>按报错提示，用环境变量 <strong><code>HCCL_IF_BASE_PORT</code></strong> 调整端口，或用 <strong><code>sysctl -w net.ipv4.ip_local_reserved_ports=****-****</code></strong> 调整保留端口范围；</li>
+<li>检查用例是否在同一设备上<strong>重复启动服务进程</strong>，修正用例后重跑（issue #219 即通过修改业务方用例解决）。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/219">#219</a></p>
+</blockquote>
+<h3 id="_9">环境错误<a class="headerlink" href="#_9" title="Permanent link">¶</a></h3>
+<h4 id="incomplete-model-snapshot">模型缓存缺失 / 不完整<a class="headerlink" href="#incomplete-model-snapshot" title="Permanent link">¶</a></h4>
+<p><strong>现象</strong>：<strong>Running</strong> 阶段报模型缓存相关错误，两种形态：</p>
+<ul>
+<li>缓存<strong>残缺</strong>：<code>huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing</code>（issue #242）；</li>
+<li>缓存<strong>缺失</strong>：<code>huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled</code>（issue #220）；或缓存缺 shard（issue #200：<code>1 valid / 1 missing</code>）。</li>
+</ul>
+<p><strong>根因</strong>：任务实际调度到的集群上<strong>没有该模型缓存</strong>或<strong>缓存缺文件</strong>，离线模式（<code>local_files_only=True</code>）下无法在线补齐。</p>
+<p><strong>解决</strong>（按 issue #242 / #220 / #200 处理过程）：</p>
+<ol>
+<li>从报错确认缺失的模型与文件清单（issue #242 给出的排查地址：https://fayespica.github.io/ascend-image-ci/ ）；</li>
+<li>确认任务实际调度到的集群上是否有该模型缓存（缺失与残缺都可能，issue #220 确认 gy005 已有对应模型）；</li>
+<li>联系基础设施方<strong>补齐 / 重新下载</strong>缺失的模型缓存（issue #242 i2v 已存在、t2v 缺失，重新下载后解决；issue #200 下载缺少的相关模型）；</li>
+<li>补齐后重新触发 workflow。</li>
+</ol>
+<blockquote>
+<p><strong>Ref:</strong>
+<a href="https://github.com/ascend-gha-runners/docs/issues/242">#242</a>
+<a href="https://github.com/ascend-gha-runners/docs/issues/220">#220</a>
+<a href="https://github.com/ascend-gha-runners/docs/issues/200">#200</a></p>
+</blockquote>
+<hr>
+<h2 id="_10">支持<a class="headerlink" href="#_10" title="Permanent link">¶</a></h2>
+<p>遇到本页未收录的问题，请<a href="https://github.com/ascend-gha-runners/docs/discussions">发起 discussion</a> 或联系基础设施团队。</p>
+<hr>
+<p><strong>Document version:</strong> v2.2
+<strong>Last updated:</strong> 2026-09-24</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/tablesort.js"></script>
+      
+        <script src="../javascripts/cluster-map.js"></script>
+      
+        <script src="../javascripts/problem-report.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>
