@@ -4,10 +4,12 @@
 用法:
     python fetch_issues.py                                  # 从上次 dump 结尾的次日拉到今天（首次默认最近 7 天）
     python fetch_issues.py --since 2026-09-15 --until 2026-09-22
+    python fetch_issues.py --issues 11,53,257               # 按编号补拉（忽略标签与区间，用于补漏）
 
 参数:
     --repo      仓库，默认 ascend-gha-runners/docs
     --labels    逗号分隔的 issue 标签，默认 problem-tracking,self-resolved
+    --issues    按编号显式补拉（逗号 / 空格分隔），忽略 --labels 与时间区间
     --since     起始日期 YYYY-MM-DD（按关闭时间过滤，含当天）
     --until     截止日期 YYYY-MM-DD（含当天，默认今天）
     --out-dir   输出目录，默认 <仓库根上级>/case-induction-data（仓库外，不入库）
@@ -98,6 +100,11 @@ def fetch_comments(repo, number, token):
     return comments
 
 
+def fetch_issue_by_number(repo, number, token):
+    """按编号拉取单个 issue（忽略标签与时间区间，用于补漏）。"""
+    return gh_get(f"https://api.github.com/repos/{repo}/issues/{number}", token)
+
+
 def parse_date(s):
     """YYYY-MM-DD -> date；失败退出。"""
     try:
@@ -158,7 +165,7 @@ def fenced(text):
     return f"{fence}text\n{body}\n{fence}"
 
 
-def write_dump(path, issues, comments_map, since, until, repo, labels):
+def write_dump(path, issues, comments_map, since, until, repo, labels, scope=None):
     """写出 dump md：每个 issue 一节（元信息 / 正文 / 逐条评论）。"""
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     lines = [
@@ -166,7 +173,7 @@ def write_dump(path, issues, comments_map, since, until, repo, labels):
         "",
         f"> 拉取时间：{now}（本地）",
         f"> 仓库：{repo}；标签：{labels}",
-        f"> 范围：关闭时间在区间内（含首尾）的 issue，共 {len(issues)} 个",
+        f"> 范围：{scope or '关闭时间在区间内（含首尾）'}，共 {len(issues)} 个",
         "> 用途：仅供本地 AI 每周案例归纳使用，不进入文档站构建。",
         "> 格式：正文 / 评论原文统一包在 ~~~~text 围栏内（原文自带 markdown，围栏仅作边界）。",
         "",
@@ -207,16 +214,51 @@ def write_dump(path, issues, comments_map, since, until, repo, labels):
     print(f"[完成] 已生成 {path}（{len(issues)} 个 issue）")
 
 
+def fetch_by_numbers(args):
+    """按编号补拉：补齐「没打标签、因此被标签过滤漏掉」的已关闭 issue。
+
+    输出 dump-issues-<最小号>-<最大号>.md，文件名不匹配 DUMP_NAME_RE，
+    不影响 infer_since 的区间衔接。
+    """
+    numbers = [int(x) for x in re.split(r"[,\s]+", args.issues.strip()) if x]
+    print(f"[信息] 按编号补拉 {len(numbers)} 个 issue（忽略标签与时间区间）")
+    issues = []
+    for n in numbers:
+        issue = fetch_issue_by_number(args.repo, n, args.token)
+        if "pull_request" in issue:
+            sys.stderr.write(f"[警告] #{n} 是 PR，已跳过\n")
+            continue
+        issues.append(issue)
+    if not issues:
+        print("[提示] 没有可写的 issue。")
+        return
+    issues.sort(key=lambda i: i["number"])
+    comments_map = {i["number"]: fetch_comments(args.repo, i["number"], args.token)
+                    for i in issues}
+    dates = [d for d in (closed_date(i) for i in issues) if d]
+    since, until = min(dates), max(dates)
+    os.makedirs(args.out_dir, exist_ok=True)
+    out_path = os.path.join(
+        args.out_dir, f"dump-issues-{issues[0]['number']}-{issues[-1]['number']}.md")
+    write_dump(out_path, issues, comments_map, since, until, args.repo,
+               "（未按标签过滤）", scope="按编号显式补拉（忽略标签与时间区间）")
+
+
 def main():
     parser = argparse.ArgumentParser(description="拉取案例归纳数据源 dump")
     parser.add_argument("--repo", default=DEFAULT_REPO)
     parser.add_argument("--labels", default=DEFAULT_LABELS,
                         help="逗号分隔的 issue 标签（默认 problem-tracking,self-resolved）")
+    parser.add_argument("--issues", help="按编号显式补拉（逗号 / 空格分隔），忽略标签与时间区间")
     parser.add_argument("--since", help="起始日期 YYYY-MM-DD（含当天）")
     parser.add_argument("--until", help="截止日期 YYYY-MM-DD（含当天，默认今天）")
     parser.add_argument("--out-dir", default=DEFAULT_OUT_DIR)
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"))
     args = parser.parse_args()
+
+    if args.issues:
+        fetch_by_numbers(args)
+        return
 
     today = datetime.date.today()
     until = parse_date(args.until) if args.until else today
