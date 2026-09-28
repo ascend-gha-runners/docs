@@ -180,6 +180,7 @@
       "linux-aarch64-a3-2",
       "linux-aarch64-a3-4",
       "linux-aarch64-a3-8",
+      "linux-aarch64-a3-800i-0-cn12-001",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -459,6 +460,9 @@
     ],
     "linux-aarch64-a3-8-sh-001": [
       "openmerlin-sh-001-cluster"
+    ],
+    "linux-aarch64-a3-800i-0-cn12-001": [
+      "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800i-16": [
       "ascend-cn12-001-cluster"
