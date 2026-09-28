@@ -19,7 +19,12 @@
       "title": "集群 / 机器问题",
       "text": "平台侧现象，具体是哪种？",
       "branches": [
-        { "label": "弹性节点不缩容", "to": "leaf_infra_no_scale_down" }
+        { "label": "弹性节点不缩容", "to": "leaf_infra_no_scale_down" },
+        { "label": "弹性扩容失败 / 弹性节点不健康", "to": "leaf_infra_scale_out_failed" },
+        { "label": "节点 NPU 被外部进程 / 带外容器占用", "to": "leaf_npu_external_occupied" },
+        { "label": "共享盘空间不足 / 锁文件残留", "to": "leaf_shared_storage" },
+        { "label": "节点异常（DNS 解析 / 时钟偏移）", "to": "leaf_node_infra_abnormal" },
+        { "label": "节点硬件故障（NPU 挂死 / NotReady）", "to": "leaf_node_hardware" }
       ]
     },
 
@@ -40,8 +45,12 @@
       "branches": [
         { "label": "镜像拉取失败", "to": "leaf_err_image_pull" },
         { "label": "镜像名非法", "to": "leaf_invalid_image_name" },
+        { "label": "镜像拉取慢（Initialize containers 卡住）", "to": "leaf_image_pull_slow" },
         { "label": "容器创建失败（Secret）", "to": "leaf_create_container" },
+        { "label": "容器启动即死（postStart 钩子）", "to": "leaf_poststart_exit_137" },
+        { "label": "novolume 模式失败 / 额外耗时", "to": "leaf_novolume_hook" },
         { "label": "调度失败（资源 / 节点）", "to": "leaf_scheduling" },
+        { "label": "调度到架构不匹配的节点", "to": "leaf_arch_mismatch" },
         { "label": "PVC 不存在", "to": "leaf_binding" }
       ]
     },
@@ -53,10 +62,14 @@
       "branches": [
         { "label": "容器退出（崩溃）", "to": "leaf_container_crash" },
         { "label": "OOM 内存不足", "to": "leaf_oom" },
+        { "label": "/dev/shm 不足", "to": "leaf_dev_shm_oom" },
         { "label": "用户脚本报错", "to": "leaf_user_script" },
+        { "label": "安装 / 编译阶段 OOM（并行度过高）", "to": "leaf_compile_oom" },
+        { "label": "依赖缓存异常（pypi / rust）", "to": "leaf_dep_cache" },
         { "label": "HCCL 通信端口被占用", "to": "leaf_hccl_port_bound" },
         { "label": "模型缓存缺失 / 不完整", "to": "leaf_incomplete_snapshot" },
         { "label": "任务长时间卡住 / 超时", "to": "leaf_running_hang" },
+        { "label": "任务耗时异常（模型加载 / checkout）", "to": "leaf_ci_slow" },
         { "label": "上传日志 / 产物失败", "to": "leaf_upload_log_failed" }
       ]
     },
@@ -69,6 +82,8 @@
         { "label": "可能在等资源（队列满）", "to": "leaf_wait_resource" },
         { "label": "runs-on 标签可能不存在", "to": "leaf_wait_label" },
         { "label": "Runner 可能未上线", "to": "leaf_runner_offline" },
+        { "label": "Runner 名额被残留 EphemeralRunner 占用", "to": "leaf_ephemeralrunner_stuck" },
+        { "label": "Runner 版本过旧（GitHub 提升最低版本）", "to": "leaf_runner_version_eol" },
         { "label": "任务卡在虚拟节点（接管异常）", "to": "leaf_wait_liqo_offload" }
       ]
     },
@@ -128,6 +143,7 @@
       "steps": [
         "检查 runs-on / nodeSelector 是否有匹配的节点",
         "确认申请的 NPU 卡数 / 资源没有超过该标签的上限",
+        "若 pod 没有 Scheduled / FailedScheduling 事件却直接 phase: Failed，检查 runner / job 模板是否写死 nodeName（会绕过调度器与弹性扩容）",
         "检查配置中的 tolerations，删除不属于目标节点的容忍（如虚拟节点特有的容忍），避免任务被调度到虚拟 / 错误节点",
         "前往 Cluster 文档核对标签与机器规格"
       ],
@@ -206,6 +222,7 @@
       "steps": [
         "在 GitHub Actions 查看该 Job 是否处于 Queued 状态",
         "前往 Cluster 文档确认所用标签对应的机器规格与数量",
+        "排队过久可能被 GitHub 超时取消；多机任务申请资源名须用目标机型的正确名称（如 a5 为 huawei.com/npu，非 huawei.com/ascend-1980），名称写错会找不到资源",
         "若高峰忙，可稍后重试，或改用空闲的其它标签"
       ],
       "links": [
@@ -279,6 +296,7 @@
       "title": "其它问题",
       "summary": "不属于上面几类，直接登记即可。",
       "steps": [
+        "看 GitHub Actions 左侧任务图标：感叹号通常是 GitHub 侧取消 / 任务超时；若 workflow 配了 concurrency（新 commit 自动取消旧任务），属业务 workflow 逻辑，自行调整",
         "若 Job 运行时间过长需要结束：先在 GitHub Actions 页面自行 Cancel",
         "业务用例耗时过长属用例问题，请自行调整",
         "确需人工终止或排查再登记"
@@ -358,6 +376,242 @@
         "修改后验证能正常扩缩容"
       ],
       "links": []
+    },
+
+    "leaf_image_pull_slow": {
+      "type": "leaf",
+      "title": "镜像拉取慢（Initialize containers 卡住）",
+      "summary": "Pod 停在 Initialize containers 很久不前进，镜像在目标架构节点上没有缓存、拉取很慢。",
+      "badge": "check-workflow",
+      "steps": [
+        "改用国内加速镜像源（如 ghcr 南京源）",
+        "若镜像变动不多，可请 CI 侧用 sync-tools 同步到 SWR 镜像站后改用该镜像",
+        "重跑 workflow"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#image-pull-slow" }
+      ]
+    },
+
+    "leaf_poststart_exit_137": {
+      "type": "leaf",
+      "title": "容器启动即死（postStart 钩子 exit 137）",
+      "summary": "pod 启动即死，报 exit code 137（非 OOM）；kubelet 报 Failed to execute PostStartHook: failed to drain exec process io in 2s。",
+      "badge": "ci-infra",
+      "steps": [
+        "把 postStart 钩子里的 bash 写法 &> /dev/null 改为 POSIX 的 > /dev/null 2>&1",
+        "不要在 postStart 里留后台 / 长驻进程（会继承 exec 的 stdout/stderr 管道，导致 drain 超时）",
+        "长期把 NPU 就绪等待从 postStart 挪到测试 setup 脚本"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#poststart-exit-137" }
+      ]
+    },
+
+    "leaf_novolume_hook": {
+      "type": "leaf",
+      "title": "novolume 模式失败 / 额外耗时",
+      "summary": "novolume（runner-container-hooks）实现缺陷：checkout 反复重试、uses: action 找不到脚本、Initialize containers 失败、每个 step 额外多约 30s。",
+      "badge": "ci-infra",
+      "steps": [
+        "把 uses: 步骤改写为 run:（或内联脚本），绕过路径映射解析",
+        "移除多余 setup 步骤，减少 _temp 同步量",
+        "升级 ARC / runner-container-hooks 到含修复的版本",
+        "关注上游 runner-container-hooks#337 / #274"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#novolume-hook-failures" }
+      ]
+    },
+
+    "leaf_arch_mismatch": {
+      "type": "leaf",
+      "title": "调度到架构不匹配的节点",
+      "summary": "CPU / lint 任务被调度到 NPU（aarch64）节点，或 arm 镜像跑在 amd64 CPU runner 上，导致依赖 / 镜像不匹配而失败。",
+      "badge": "check-workflow",
+      "steps": [
+        "确认任务实际调度到的节点架构",
+        "为 CPU / lint 任务指定匹配的 amd64 标签与 nodeSelector",
+        "使用与节点架构一致的镜像"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#arch-mismatch" }
+      ]
+    },
+
+    "leaf_dev_shm_oom": {
+      "type": "leaf",
+      "title": "/dev/shm 不足",
+      "summary": "多模态等用例在小卡数 runner 上 /dev/shm OOM，需要更大规格才能跑过。",
+      "badge": "ci-infra",
+      "steps": [
+        "确认报错指向 /dev/shm 空间不足",
+        "改用 /dev/shm 更大的标签（平台侧已调大 runner 的 /dev/shm）",
+        "用例侧降低并发 / 显存占用"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#dev-shm-oom" }
+      ]
+    },
+
+    "leaf_compile_oom": {
+      "type": "leaf",
+      "title": "安装 / 编译阶段 OOM（并行度过高）",
+      "summary": "源码编译 / 安装在 Running 阶段大面积进程被 killed，通常是并行度按错误的核心数推算导致。",
+      "badge": "check-workflow",
+      "steps": [
+        "在 CI 环境变量显式指定编译线程数，不要依赖脚本自动推算",
+        "修正从标签解析卡数的正则（如 a3-800i 被贪心解析出 800）",
+        "按节点实际 CPU 设置并行度"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#compile-oom-threads" }
+      ]
+    },
+
+    "leaf_dep_cache": {
+      "type": "leaf",
+      "title": "依赖缓存异常（pypi / rust）",
+      "summary": "安装依赖报 read timeout / 503 / 下载字节不足，或依赖下载耗时极长。",
+      "badge": "ci-infra",
+      "steps": [
+        "确认报错来自缓存服务还是外溢到官方源",
+        "调整缓存服务配置（关闭 keepalive、增大 proxy_read_timeout、缩短锁寿命）",
+        "转发镜像站改用 CDN 加速域名",
+        "社区依赖（如 rust）改用国内镜像站"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#dependency-cache-error" }
+      ]
+    },
+
+    "leaf_ci_slow": {
+      "type": "leaf",
+      "title": "任务耗时异常（模型加载 / checkout）",
+      "summary": "模型加载、checkout 等步骤耗时异常长，通常与存储带宽或网络路径有关。",
+      "badge": "ci-infra",
+      "steps": [
+        "核对模型加载 / checkout 耗时是否明显异常",
+        "存储侧升级 / 网络侧分流（避免 checkout 与模型下载抢占同一出口）",
+        "属基础设施问题的联系基础设施方"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#ci-slow" }
+      ]
+    },
+
+    "leaf_npu_external_occupied": {
+      "type": "leaf",
+      "title": "节点 NPU 被外部进程 / 带外容器占用",
+      "summary": "任务报 dcmi ... ret is -8020 / davinci0 already in use，或随机 NPU OOM；device-plugin 看不到带外占用。",
+      "badge": "ci-infra",
+      "steps": [
+        "pod 内 npu-smi 看不到占用进程时，到宿主机（hostPID + nsenter）查 /dev/davinci* 的真实持有者",
+        "清理带外容器 / 进程",
+        "规范机器回收流程（确认无容器残留再交回）",
+        "集群统一使用 volcano 调度器",
+        "测试侧 fail-fast：跑用例前查可用 HBM，低于阈值按环境问题报错"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#npu-occupied-by-external" }
+      ]
+    },
+
+    "leaf_shared_storage": {
+      "type": "leaf",
+      "title": "共享盘空间不足 / 锁文件残留",
+      "summary": "报 Errno 122 Disk quota exceeded / no space left on device，或 Errno 116 Stale file handle、任务卡在引擎初始化（残留 lock）。",
+      "badge": "ci-infra",
+      "steps": [
+        "区分配额（Errno 122 / EDQUOT）与磁盘满（Errno 28 / ENOSPC）",
+        "清理缓存 / 扩容共享盘，新集群提前预留模型缓存空间",
+        "调整 buildkit 保留空间阈值并加磁盘告警",
+        "任务卡死时用 py-spy 确认是否停在 torch 的 FileBaton wait()，删除残留 lock",
+        "CI 启动步骤加 stale 锁清理；长期把相关 C++ 扩展预编译进镜像"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#shared-storage-lock-and-space" }
+      ]
+    },
+
+    "leaf_node_infra_abnormal": {
+      "type": "leaf",
+      "title": "节点异常（DNS 解析 / 时钟偏移）",
+      "summary": "runner 无法连接 GitHub 中央服务 / 无法下载依赖，或无法注册、鉴权失败；多为节点 DNS 解析异常或未配 NTP 时钟偏移。",
+      "badge": "ci-infra",
+      "steps": [
+        "在 runner pod 内 curl -v / nslookup 验证解析，并检查节点时间是否偏移",
+        "确认为节点级故障",
+        "置换该节点",
+        "排查修复 DNS 插件 / 配置 NTP"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#node-infra-abnormal" }
+      ]
+    },
+
+    "leaf_node_hardware": {
+      "type": "leaf",
+      "title": "节点硬件故障（NPU 挂死 / NotReady）",
+      "summary": "节点整机硬挂死、被云平台带外复位、Pod 驱逐、CI 失败；reboot 后 NPU PCIe I/O error 仍在。",
+      "badge": "ci-infra",
+      "steps": [
+        "从节点日志确认是否为整机硬挂死 + 带外复位",
+        "该节点需硬件级 NPU 重置，reboot 通常无效",
+        "检查同集群同类机型是否同样异常",
+        "CI 加前置 NPU 健康检查，异常节点跳过或调度到其他节点重跑",
+        "报华为侧排查固件 / 硬件"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#node-hardware-failure" }
+      ]
+    },
+
+    "leaf_infra_scale_out_failed": {
+      "type": "leaf",
+      "title": "弹性扩容失败 / 弹性节点不健康",
+      "summary": "Pod 长时间 Pending 但 Karpenter 不扩容；NodePool 被置 NodeRegistrationHealthy=False 后不再重试，或报无库存。",
+      "badge": "ci-infra",
+      "steps": [
+        "清除 NodePool 的 NodeRegistrationHealthy=False",
+        "机型列表至少 2 种同级规格，NodeClass 多挂可用区子网",
+        "解除 nodeName 硬绑定，改 nodeSelector: kubernetes.io/arch",
+        "对 NodeRegistrationHealthy=False 及 Pending 超时加告警"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#elastic-scale-out-failed" }
+      ]
+    },
+
+    "leaf_ephemeralrunner_stuck": {
+      "type": "leaf",
+      "title": "Runner 名额被残留 EphemeralRunner 占用",
+      "summary": "任务长时间 Waiting for a runner to pick up this job，但 runner set 无空闲 slot；已结束 job 的 EphemeralRunner 仍卡在 Running。",
+      "badge": "ci-infra",
+      "steps": [
+        "查 EphemeralRunner 是否有残留 Running，手动删除僵尸 ER 恢复",
+        "升级 ARC 至 0.13.1 及以上",
+        "加 EphemeralRunner 超时 12h 告警",
+        "用定时脚本清理未正常退出的 runner"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#ephemeralrunner-stuck" }
+      ]
+    },
+
+    "leaf_runner_version_eol": {
+      "type": "leaf",
+      "title": "Runner 版本过旧（GitHub 提升最低版本）",
+      "summary": "GitHub 公告提升 self-hosted runner 最低版本后，runner 无法注册 / workflow 不启动。",
+      "badge": "ci-infra",
+      "steps": [
+        "跟踪 GitHub changelog 的最低 runner 版本要求",
+        "在 GitHub 更新前替换 / 升级所有 runner 版本",
+        "建立定期升级机制"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#runner-version-eol" }
+      ]
     }
   }
 }
