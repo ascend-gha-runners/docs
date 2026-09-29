@@ -129,6 +129,21 @@ title: 问题登记
 }
 .pr-tree-branch:hover { border-color: var(--md-primary-fg-color); color: var(--md-primary-fg-color); }
 
+/* 决策树：报错关键词搜索 */
+.pr-tree-search { width: 100%; max-width: none; margin-bottom: 0.5rem; }
+.pr-tree-results { display: flex; flex-direction: column; gap: 0.35rem; margin: 0 0 0.6rem; max-height: 320px; overflow: auto; }
+.pr-tree-results[hidden] { display: none; }  /* 确保 hidden 属性生效（覆盖上面的 display） */
+.pr-tree-result {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  padding: 0.45rem 0.7rem; font-size: 0.82rem; color: var(--md-typeset-color);
+  background: var(--md-default-bg-color); border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px; transition: border-color 0.2s, color 0.2s;
+}
+.pr-tree-result:hover { border-color: var(--md-primary-fg-color); }
+.pr-tree-result-title { display: block; font-weight: 600; }
+.pr-tree-result-path { display: block; margin-top: 0.15rem; font-size: 0.74rem; color: var(--md-default-fg-color--light); }
+.pr-tree-noresult { font-size: 0.78rem; color: var(--md-default-fg-color--light); margin: 0; }
+
 /* 叶子：案例卡 */
 .pr-leaf { border: 1px solid var(--md-default-fg-color--lightest); border-left: 3px solid var(--md-primary-fg-color); border-radius: 10px; padding: 0.6rem 0.9rem; }
 .pr-leaf-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
@@ -219,7 +234,10 @@ title: 问题登记
 
       <section class="pr-panel" data-step="1">
         <h2>1 · 自查与自助</h2>
-        <p class="pr-hint">按下面的分叉流程逐步判断，能自助解决的当场处理；解决后可点叶子节点里的「已解决」自愿登记（仅统计用，可不留名）；确实解决不了再点「仍未解决 → 继续登记」进入提单。</p>
+        <p class="pr-hint">按下面的分叉流程逐步判断，或直接输入报错关键词搜索案例（命中后一次展开整条链路）；能自助解决的当场处理，解决后可点叶子节点里的「已解决」自愿登记（仅统计用，可不留名）；确实解决不了再点「仍未解决 → 继续登记」进入提单。</p>
+        <input type="search" id="pr-tree-search" class="pr-tree-search"
+               placeholder="输入报错关键词搜索案例，如 ErrImagePull / exit 137 / Disk quota…" autocomplete="off" aria-label="搜索错误信息">
+        <div id="pr-tree-results" class="pr-tree-results" hidden></div>
         <div class="pr-tree" id="pr-tree">
           <div class="pr-tree-path" id="pr-tree-path" aria-label="已选择路径"></div>
           <div class="pr-tree-node" id="pr-tree-node"></div>
