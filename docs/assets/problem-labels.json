@@ -222,9 +222,13 @@
       "linux-aarch64-a2-4-hk-001",
       "linux-aarch64-a2-8-hk-001",
       "linux-aarch64-a2b1-1",
+      "linux-aarch64-a2b1-1-hk-001",
       "linux-aarch64-a2b1-2",
+      "linux-aarch64-a2b1-2-hk-001",
       "linux-aarch64-a2b1-4",
+      "linux-aarch64-a2b1-4-hk-001",
       "linux-aarch64-a2b1-8",
+      "linux-aarch64-a2b1-8-hk-001",
       "linux-aarch64-a2b3-0",
       "linux-aarch64-a2b3-1",
       "linux-aarch64-a2b3-2",
@@ -337,14 +341,26 @@
     "linux-aarch64-a2b1-1": [
       "ascend-infra-guiyang-cluster-001"
     ],
+    "linux-aarch64-a2b1-1-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b1-2": [
       "ascend-infra-guiyang-cluster-001"
+    ],
+    "linux-aarch64-a2b1-2-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b1-4": [
       "ascend-infra-guiyang-cluster-001"
     ],
+    "linux-aarch64-a2b1-4-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b1-8": [
       "ascend-infra-guiyang-cluster-001"
+    ],
+    "linux-aarch64-a2b1-8-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b3": [
       "ascend-hk-001-cluster"
