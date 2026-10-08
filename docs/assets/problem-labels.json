@@ -132,6 +132,12 @@
       "linux-aarch64-a2-4",
       "linux-aarch64-a2-8"
     ],
+    "tile-ai/tilelang": [
+      "linux-amd64-a5-1-sh-002",
+      "linux-amd64-a5-2-sh-002",
+      "linux-amd64-a5-4-sh-002",
+      "linux-amd64-a5-8-sh-002"
+    ],
     "tile-ai/tilelang-mlir-ascend": [
       "linux-aarch64-a3-16",
       "linux-aarch64-a3-2",
