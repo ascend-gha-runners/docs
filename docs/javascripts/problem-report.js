@@ -46,11 +46,15 @@
   var treeContainer = $('pr-tree');
   var treePathEl = $('pr-tree-path');
   var treeNodeEl = $('pr-tree-node');
+  var treeSearchEl = $('pr-tree-search');
+  var treeResultsEl = $('pr-tree-results');
   var TREE_URL = '../assets/problem-tree.json';
   var treeData = null;
   var treeStart = null;
   var treePath = [];   // [{ from, label, to }]，记录每步选择以支持面包屑回退
   var treeCurrent = null;
+  var treeIndex = [];       // 搜索索引：每条 根→叶子 路径的叶子与可检索文本
+  var treeSearchTerm = '';  // 本次命中来自搜索时记录关键词，仅用于「已解决」登记打标
 
   function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -430,6 +434,7 @@
   function treeReset() {
     treePath = [];
     treeCurrent = treeData && treeStart ? treeStart : null;
+    treeClearSearch();
   }
 
   function treeRenderPath() {
@@ -496,13 +501,123 @@
     }
   }
 
+  // ---------- 决策树：报错关键词搜索 ----------
+  // 索引纯前端由决策树派生（不改 problem-tree.json）：对每条 根→叶子 路径，
+  // 拼出叶子 title + summary + steps + 各级分叉标签 + 沿途问题节点标题作为可检索文本。
+  function buildTreeIndex() {
+    treeIndex = [];
+    if (!treeData || !treeStart) return;
+    (function walk(nodeId, path, trailTitles) {
+      var node = treeData.nodes[nodeId];
+      if (!node) return;
+      if (node.type === 'leaf') {
+        var parts = [node.title || '', node.summary || '']
+          .concat(node.steps || [])
+          .concat(path.map(function (c) { return c.label; }))
+          .concat(trailTitles);
+        treeIndex.push({
+          path: path.slice(),
+          leafId: nodeId,
+          leaf: node,
+          text: parts.join('\n').toLowerCase()
+        });
+        return;
+      }
+      (node.branches || []).forEach(function (b) {
+        walk(b.to, path.concat([{ from: nodeId, label: b.label, to: b.to }]),
+          trailTitles.concat([node.title || '']));
+      });
+    })(treeStart, [], []);
+  }
+
+  // 手动逐级导航时放弃搜索态，避免「搜索命中」指标串味
+  function treeClearSearch() {
+    treeSearchTerm = '';
+    if (treeSearchEl) treeSearchEl.value = '';
+    hideTreeResults();
+  }
+
+  function hideTreeResults() {
+    if (!treeResultsEl) return;
+    treeResultsEl.hidden = true;
+    treeResultsEl.innerHTML = '';
+  }
+
+  // 候选里展示完整链路，让用户未点选也能先看清走到哪
+  function treeHitPathText(hit) {
+    return hit.path.map(function (c) { return c.label; })
+      .concat(['命中案例：' + (hit.leaf.title || '')]).join(' → ');
+  }
+
+  // 直达：面包屑填满整条路径并渲染叶子案例卡；记录关键词供「已解决」登记打标
+  function treeGotoHit(hit, term) {
+    treePath = hit.path.slice();
+    treeCurrent = hit.leafId;
+    treeSearchTerm = term;
+    hideTreeResults();
+    treeRenderNode();
+  }
+
+  function runTreeSearch() {
+    if (!treeSearchEl || !treeResultsEl || !treeData) return;
+    var q = treeSearchEl.value.trim();
+    if (!q) {  // 清空搜索：回到正常逐级导航
+      treeSearchTerm = '';
+      hideTreeResults();
+      treeRenderNode();
+      return;
+    }
+    var tokens = tokenizeSearch(q);
+    var hits = treeIndex.filter(function (h) { return matchesAllSearch(tokens, h.text); });
+    if (hits.length === 1) {  // 单命中：直接出整条链路
+      treeGotoHit(hits[0], q);
+      return;
+    }
+    treeSearchTerm = '';  // 还没选定目标，不算搜索命中
+    if (!hits.length) {
+      treeResultsEl.innerHTML =
+        '<p class="pr-tree-noresult">无匹配案例，可继续逐级点选，或直接点「下一步」登记。</p>';
+      treeResultsEl.hidden = false;
+      return;
+    }
+    treeResultsEl.innerHTML = hits.map(function (h) {
+      return '<button type="button" class="pr-tree-result" data-leaf="' + escapeHtml(h.leafId) + '">' +
+        '<span class="pr-tree-result-title">' + escapeHtml(h.leaf.title || '') + '</span>' +
+        '<span class="pr-tree-result-path">' + escapeHtml(treeHitPathText(h)) + '</span>' +
+      '</button>';
+    }).join('');
+    treeResultsEl.hidden = false;
+  }
+
+  if (treeSearchEl) {
+    treeSearchEl.addEventListener('input', runTreeSearch);
+    treeSearchEl.addEventListener('search', runTreeSearch);  // 点击原生 x 清空时同步更新
+  }
+
+  if (treeResultsEl) {
+    treeResultsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.pr-tree-result');
+      if (!btn) return;
+      var leafId = btn.getAttribute('data-leaf');
+      var hit = null;
+      treeIndex.forEach(function (h) { if (!hit && h.leafId === leafId) hit = h; });
+      if (hit) treeGotoHit(hit, treeSearchEl.value.trim());
+    });
+  }
+
   // ---------- 自助解决登记（自愿，仅统计用） ----------
+  // 自查路径：来自搜索命中时前缀标注关键词，便于周统计区分「逐级点选」与「搜索命中」来源
+  function solvedPathText() {
+    var t = treePathText();
+    return treeSearchTerm ? '搜索命中：' + treeSearchTerm + ' → ' + t : t;
+  }
+
   function buildSolvedLink() {
     var node = (treeData && treeCurrent) ? treeData.nodes[treeCurrent] : null;
     var leafTitle = (node && node.type === 'leaf') ? (node.title || '') : '';
     var body = [
       '> 自愿登记：仅用于统计自助解决率与改进决策树，不会有人处理，可不留名，直接 Submit 即可；不想登记关闭本页即可。', '',
-      '### 自查路径', '', treePathText(), '',
+      '### 自查路径', '', solvedPathText(), '',
       '### 命中案例', '', leafTitle || '（无）', '',
       '### 备注（可选）', '', '（哪一步帮你解决了问题，或案例步骤哪里不准确）'
     ].join('\n');
@@ -520,6 +635,7 @@
     treeNodeEl.addEventListener('click', function (e) {
       var branch = e.target.closest('.pr-tree-branch');
       if (branch) {
+        treeClearSearch();
         treePath.push({
           from: treeCurrent,
           label: branch.getAttribute('data-label'),
@@ -544,6 +660,7 @@
       if (!crumb) return;
       var idx = parseInt(crumb.getAttribute('data-index'), 10);
       if (isNaN(idx) || !treePath[idx]) return;
+      treeClearSearch();
       treeCurrent = treePath[idx].from;
       treePath = treePath.slice(0, idx);
       treeRenderNode();
@@ -567,6 +684,7 @@
       .then(function (data) {
         treeData = data || null;
         treeStart = treeData && treeData.start ? treeData.start : null;
+        buildTreeIndex();
         treeReset();
         treeRenderNode();
       })
