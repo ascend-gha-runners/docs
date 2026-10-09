@@ -31,6 +31,11 @@ OUT_FILE = "docs/Cluster.md"
 
 TOKEN = os.environ.get("GH_TOKEN", "")
 
+# Guard: a partial scan (API rate limit / throttling) silently drops projects.
+# Refuse to overwrite Cluster.md when the project count drops by more than this,
+# so a flaky run cannot wipe the map. Increases are allowed (self-healing).
+MAX_PROJECT_DROP = 3
+
 # scaleSetLabels cluster labels (short names), excluded from runner capability labels
 CLUSTER_SHORTNAMES = {
     "gy-001", "gy-002", "gy-003", "gy-004", "gy-005", "gy-006", "gy-007",
@@ -520,6 +525,21 @@ def render_cluster_md(clusters):
 
 # ---------------------------------------------------------------------------
 
+def _previous_project_count():
+    """Projects count recorded in the existing Cluster.md (None if unavailable)."""
+    try:
+        with open(OUT_FILE, encoding="utf-8") as fh:
+            text = fh.read()
+    except OSError:
+        return None
+    m = re.search(
+        r'<span class="stat-num">(\d+)</span>\s*'
+        r'<span class="stat-label">Projects</span>',
+        text,
+    )
+    return int(m.group(1)) if m else None
+
+
 def main():
     print("Scanning deployment repo clusters...", flush=True)
     clusters = scan_clusters()
@@ -535,6 +555,18 @@ def main():
         for projects in clusters.values()
         for runners in projects.values()
     )
+    n_projects = len({p for projects in clusters.values() for p in projects})
+
+    prev_projects = _previous_project_count()
+    if prev_projects is not None and prev_projects - n_projects > MAX_PROJECT_DROP:
+        print(
+            f"ERROR: project count dropped abnormally ({prev_projects} -> {n_projects}, "
+            f"allowed drop <= {MAX_PROJECT_DROP}); "
+            f"keeping existing {OUT_FILE} unchanged.",
+            flush=True,
+        )
+        sys.exit(1)
+
     print(f"Found {len(clusters)} clusters, {total_runners} runner entries", flush=True)
 
     md = render_cluster_md(clusters)

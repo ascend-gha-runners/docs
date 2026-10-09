@@ -19,7 +19,7 @@
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | ✅ | - | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ❌ | ❌ | - | - | - |
-| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | - | - |
+| [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ❌ | ❌ | - | - | - |
 | [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | ✅ | ✅ | - |
 <!-- CACHE_AUDIT_TABLE_END -->
