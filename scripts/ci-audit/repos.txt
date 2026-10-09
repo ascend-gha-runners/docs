@@ -1,34 +1,34 @@
-# org/repo|workflow-file.yml|pypi_default|apt_default|ccache_default|uv_default
+# org/repo|workflow-file.yml|pypi_default|apt_default|ccache_default|uv_default|buildkit_default|squid_default|runson_default
 # 默认值仅在审计无法确认时使用（⚙️/🔍/⚠️）
 # 审计确认的 ✅ 或 ❌ 优先级高于默认值
-sgl-project/sglang|pr-test-npu.yml||||
-vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅||
-vllm-project/vllm-omni||||||
-sgl-project/sgl-kernel-npu||✅|✅||
-verl-project/verl|e2e_ascend.yml|✅|✅||
-hiyouga/LlamaFactory|tests_npu.yml||||
-modelscope/ms-swift|citest_npu.yaml||||
-triton-lang/triton-ascend|||✅||
-vllm-ascend/vllm-ascend-recipes|||||
-verl-project/verl-omni|||||
-Ascend/pytorch|||||
-Ascend/sglang|||||
-alibaba/ROLL|||||
-areal-project/AReaL|||||
-fla-org/flash-linear-attention|||||
-tile-ai/tilelang-mlir-ascend|||||
-verl-project/verl-SpeCo|||||
+sgl-project/sglang|pr-test-npu.yml|||||||
+vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅|||||
+vllm-project/vllm-omni||||||||
+sgl-project/sgl-kernel-npu||✅|✅|||||
+verl-project/verl|e2e_ascend.yml|✅|✅|||||
+hiyouga/LlamaFactory|tests_npu.yml|||||||
+modelscope/ms-swift|citest_npu.yaml|||||||
+triton-lang/triton-ascend|||✅|||||
+vllm-ascend/vllm-ascend-recipes||||||||
+verl-project/verl-omni||||||||
+Ascend/pytorch||||||||
+Ascend/sglang||||||||
+alibaba/ROLL||||||||
+areal-project/AReaL||||||||
+fla-org/flash-linear-attention||||||||
+tile-ai/tilelang-mlir-ascend||||||||
+verl-project/verl-SpeCo||||||||
 
-vllm-ascend/config-cn12-001|||||
-vllm-ascend/linux-aarch64-cpu-4-cn12-001|||||
-vllm-ascend/linux-amd64-cpu-4-cn12-001|||||
+vllm-ascend/config-cn12-001||||||||
+vllm-ascend/linux-aarch64-cpu-4-cn12-001||||||||
+vllm-ascend/linux-amd64-cpu-4-cn12-001||||||||
 
-vllm-ascend/config-for-guiyang-006|||||
-vllm-ascend/linux-aarch64-cpu-4-gy006|||||
-vllm-ascend/linux-amd64-cpu-4-gy006|||||
+vllm-ascend/config-for-guiyang-006||||||||
+vllm-ascend/linux-aarch64-cpu-4-gy006||||||||
+vllm-ascend/linux-amd64-cpu-4-gy006||||||||
 
-sgl-project/sglang-omni|||||
+sgl-project/sglang-omni||||||||
 
-verl-project/uni-agent|||||
+verl-project/uni-agent||||||||
 
-tile-ai/tilelang|||||
+tile-ai/tilelang||||||||

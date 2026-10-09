@@ -78,6 +78,8 @@
         var el = comment.nextSibling;
         while (el && el.nodeType !== Node.ELEMENT_NODE) el = el.nextSibling;
         if (!el || el.tagName !== "TABLE") continue;
+        // data-* 而非 class：保留 Material 的 table:not([class]) 默认样式（边框等）
+        el.dataset.cacheAudit = "";
         initTable(el);
         var s = state.get(el);
         if (s && s.col !== -1) continue; // already sorted by user

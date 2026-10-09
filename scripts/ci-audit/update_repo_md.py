@@ -8,7 +8,7 @@
 模式：
   全量（默认）与增量（incremental=true）行为一致：脚本找到 ✅/❌ 就更新该格子；
   脚本未找到证据（-）时优先保留 Repo.md 旧值，旧值也是 - 时才回落到 repos.txt 默认值。
-  两者区别仅在于「Last Checked」日期：全量总是刷新为当天，增量仅在找到证据时刷新。
+  表格不再包含「Last Checked」列：审计时间统一写入表格下方的 footer 说明。
 """
 
 import re
@@ -30,9 +30,21 @@ TABLE_END   = "<!-- CACHE_AUDIT_TABLE_END -->"
 CHECK_MARK = "\u2705"  # ✅
 CROSS_MARK = "\u274c"  # ❌
 
+# 缓存维度顺序（必须与 check_cache_from_logs.sh 输出列顺序一致）
+DIMS = ("pypi", "apt", "ccache", "uv", "buildkit", "squid", "runson")
+TABLE_HEADER = ("| Repo | PyPI | APT | CCache | uv "
+                "| BuildKit | Squid | runs-on |")
+TABLE_ALIGN  = "| :--- | " + " | ".join([":---:"] * len(DIMS)) + " |"
+
+
+def empty_marks():
+    return tuple("-" for _ in DIMS)
+
+
 # ---------- 读取 repos.txt 默认值 ----------
-# 格式: org/repo|workflow.yml|pypi_default|apt_default|ccache_default|uv_default
-defaults = {}  # repo -> (pypi_default, apt_default, ccache_default, uv_default)
+# 格式: org/repo|workflow.yml|pypi|apt|ccache|uv|buildkit|squid|runson
+# 默认值从 parts[2] 开始，依次对应 DIMS
+defaults = {}  # repo -> tuple(str|None, ...)
 
 with open(REPOS_FILE) as f:
     for line in f:
@@ -40,21 +52,23 @@ with open(REPOS_FILE) as f:
         if not line or line.startswith("#"):
             continue
         parts = line.split("|")
-        repo    = parts[0].strip()
-        pypi    = parts[2].strip() if len(parts) > 2 else ""
-        apt     = parts[3].strip() if len(parts) > 3 else ""
-        ccache  = parts[4].strip() if len(parts) > 4 else ""
-        uv      = parts[5].strip() if len(parts) > 5 else ""
-        defaults[repo] = (pypi or None, apt or None, ccache or None, uv or None)
+        repo = parts[0].strip()
+        vals = []
+        for i in range(len(DIMS)):
+            idx = 2 + i
+            v = parts[idx].strip() if len(parts) > idx else ""
+            vals.append(v or None)
+        defaults[repo] = tuple(vals)
 
 # ---------- 读取 Repo.md ----------
 with open(REPO_MD) as f:
     content = f.read()
 
-# ---------- 解析现有表格值（增量模式用） ----------
-# Repo.md 表格格式: | Repository | PyPI | APT | CCache | uv | Last Checked |
-# split("|") 后: cols[0]="" cols[1]=repo cols[2]=PyPI cols[3]=APT cols[4]=CCache cols[5]=uv cols[6]=Date cols[7]=""
-# repo -> (pypi, apt, ccache, uv, date)  全是字符串
+# ---------- 解析现有表格值（保留旧值用） ----------
+# 新格式: | Repository | PyPI | APT | CCache | uv | BuildKit | Squid | runs-on/cache |
+#          split("|") 后: cols[0]="" cols[1]=repo cols[2..2+len(DIMS)]=缓存格
+# 旧格式: | Repository | PyPI | APT | CCache | uv | Last Checked |
+#          （兼容迁移：只取前 4 维，其余维视为无旧值）
 existing = {}
 if TABLE_START in content and TABLE_END in content:
     m = re.search(re.escape(TABLE_START) + r"(.*?)" + re.escape(TABLE_END), content, re.DOTALL)
@@ -63,33 +77,38 @@ if TABLE_START in content and TABLE_END in content:
             if not line.startswith("| "):
                 continue
             cols = [c.strip() for c in line.split("|")]
-            # Repo.md 行只有 8 个元素（6 列 + 首尾空串），不需要 9
-            if len(cols) < 8:
+            if len(cols) < 3:
                 continue
             if "Repository" in cols[1] or "---" in cols[1]:
                 continue
             rm = re.search(r'([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)', cols[1])
-            if rm:
-                repo = rm.group(1)
-                # Repo.md 列索引: cols[2]=PyPI cols[3]=APT cols[4]=CCache cols[5]=uv cols[6]=Date
-                existing[repo] = (cols[2], cols[3], cols[4], cols[5],
-                                   cols[6] if len(cols) > 6 else TODAY)
+            if not rm:
+                continue
+            repo = rm.group(1)
+            if len(cols) >= len(DIMS) + 2:
+                # 新格式（len(DIMS) 个缓存列）
+                existing[repo] = tuple(cols[2:2 + len(DIMS)])
+            elif len(cols) >= 8:
+                # 旧格式（4 个缓存列 + Last Checked），迁移时补足为 len(DIMS) 维
+                existing[repo] = tuple(cols[2:6]) + tuple("-" for _ in range(len(DIMS) - 4))
 
 # ---------- 解析审计结果（原始脚本输出） ----------
-raw_results = {}  # repo -> (pypi, apt, ccache, uv)
+# 审计行: | repo | run | runner | pypi | apt | ccache | uv | buildkit | squid | runson | evidence |
+raw_results = {}
 
-with open(AUDIT_FILE) as f:
+# newline='\n'：不把行内残留的 \r（来自日志/run 名）当作换行，避免整行被截断
+with open(AUDIT_FILE, newline='\n') as f:
     for line in f:
         if not line.startswith("| "):
             continue
         cols = [c.strip() for c in line.split("|")]
-        if len(cols) < 9:
+        # 元素数 = 3(前缀: 空串+repo+run+runner) ... 需覆盖到最后一个缓存格
+        if len(cols) < 4 + len(DIMS):
             continue
         rm = re.search(r'([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)', cols[1])
         if not rm:
             continue
-        repo = rm.group(1)
-        raw_results[repo] = (cols[4], cols[5], cols[6], cols[7])
+        raw_results[rm.group(1)] = tuple(cols[4:4 + len(DIMS)])
 
 # ---------- 提取仓库顺序（从 Repo.md 链接） ----------
 repos_in_md = re.findall(r'\[([a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+)\]\(https://github\.com/', content)
@@ -102,9 +121,7 @@ for r in repos_in_md:
 
 # ---------- 工具函数 ----------
 def fmt(val):
-    if val is None:
-        return "-"
-    return val
+    return "-" if val is None else val
 
 def resolve_cell(raw_val, old_val, default_val):
     """解析单个缓存格子的值。
@@ -123,50 +140,34 @@ def resolve_cell(raw_val, old_val, default_val):
     return default_val, False
 
 # ---------- 生成新表格 ----------
-rows = []
-rows.append("| Repository | PyPI Cache | APT Cache | CCache | uv | Last Checked |")
-rows.append("| :--- | :---: | :---: | :---: | :---: | :--- |")
+rows = [TABLE_HEADER, TABLE_ALIGN]
 
 for repo in repos_ordered:
-    raw = raw_results.get(repo, ("-", "-", "-", "-"))
-    old = existing.get(repo, ("-", "-", "-", "-", TODAY))
-    defs = defaults.get(repo, (None, None, None, None))
+    raw = raw_results.get(repo, empty_marks())
+    old = existing.get(repo, empty_marks())
+    defs = defaults.get(repo, tuple(None for _ in DIMS))
 
-    pypi,   p_upd = resolve_cell(raw[0], old[0], defs[0])
-    apt,    a_upd = resolve_cell(raw[1], old[1], defs[1])
-    ccache, c_upd = resolve_cell(raw[2], old[2], defs[2])
-    uv,     u_upd = resolve_cell(raw[3], old[3], defs[3])
+    cells = []
+    for i in range(len(DIMS)):
+        val, _updated = resolve_cell(raw[i], old[i], defs[i])
+        cells.append(fmt(val))
 
-    any_updated = p_upd or a_upd or c_upd or u_upd
-
-    if INCREMENTAL and not any_updated and repo in existing:
-        # 增量模式且无新证据 → 保留旧日期
-        date = old[4]
-    else:
-        date = TODAY
-
-    rows.append(
-        f"| [{repo}](https://github.com/{repo}) "
-        f"| {fmt(pypi)} | {fmt(apt)} | {fmt(ccache)} | {fmt(uv)} | {date} |"
-    )
+    rows.append(f"| [{repo}](https://github.com/{repo}) | " + " | ".join(cells) + " |")
 
 new_table = "\n".join([TABLE_START] + rows + [TABLE_END])
 
-# ---------- 构建注释行 ----------
+# ---------- 构建注释 footer（图例 / 时间 / 来源各自独立成行） ----------
 mode_label = "incremental" if INCREMENTAL else "full scan"
+footer_lines = [
+    f"> Cache audit runs daily ({mode_label}).",
+    ">",
+    f"> {CHECK_MARK} = confirmed in use \u00b7 {CROSS_MARK} = confirmed NOT in use \u00b7 - = unknown",
+    ">",
+    f"> Last checked: {TODAY}",
+]
 if RUN_URL:
-    footer = (f"> Cache audit runs daily ({mode_label}). "
-              f"{CHECK_MARK} = confirmed in use "
-              f"\u00b7 {CROSS_MARK} = confirmed NOT in use "
-              f"\u00b7 - = unknown "
-              f"\u00b7 Results sourced from [{RUN_URL}]({RUN_URL})")
-else:
-    footer = (f"> Cache audit runs daily ({mode_label}). "
-              f"{CHECK_MARK} = confirmed in use "
-              f"\u00b7 {CROSS_MARK} = confirmed NOT in use "
-              f"\u00b7 - = unknown")
-
-FOOTER_RE = re.compile(r'^> (Cache audit runs daily|缓存状态每日自动审计更新).*$', re.MULTILINE)
+    footer_lines += [">", f"> Results sourced from [{RUN_URL}]({RUN_URL})"]
+footer = "\n".join(footer_lines)
 
 # ---------- 替换 Repo.md 中的表格区域 ----------
 if TABLE_START in content and TABLE_END in content:
@@ -177,17 +178,16 @@ if TABLE_START in content and TABLE_END in content:
         flags=re.DOTALL
     )
 else:
-    new_content = content.rstrip() + "\n\n" + new_table + "\n"
+    new_content = content.rstrip() + "\n\n" + new_table
 
-# 移除所有旧 footer 行（可能有多个），然后只添加一个
-new_content = FOOTER_RE.sub("", new_content)
-# 清除删除 footer 后可能残留的连续空行
-new_content = re.sub(r'\n{3,}', '\n\n', new_content)
+# footer 始终紧跟在表格之后：截断 TABLE_END 之后的所有旧内容，再追加新 footer
+idx = new_content.find(TABLE_END)
+if idx != -1:
+    new_content = new_content[:idx + len(TABLE_END)]
 new_content = new_content.rstrip() + "\n\n" + footer + "\n"
 
 with open(REPO_MD, "w") as f:
     f.write(new_content)
 
-mode_str = "incremental" if INCREMENTAL else "full scan"
-print(f"Updated {REPO_MD} with {len(repos_ordered)} repos ({TODAY}, {mode_str})")
+print(f"Updated {REPO_MD} with {len(repos_ordered)} repos ({TODAY}, {mode_label})")
 print(f"  Parsed {len(existing)} existing table rows, {len(raw_results)} audit results")

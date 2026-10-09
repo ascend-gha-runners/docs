@@ -17,7 +17,7 @@ Rendered site: **https://ascend-gha-runners.github.io/docs/**
 
 ### Reference
 
-- [Platform features](docs/feature.md) — PyPI/Apt cache, Git smart proxy, S3 cache, sccache
+- [Platform features](docs/feature.md) — PyPI/Apt cache, Git smart proxy, S3 cache, sccache, Squid proxy, BuildKit cache, runs-on cache
 - [Runner advanced features](docs/runner-features-en.md) · [中文](docs/runner-features-zh.md)
 - [Integrated repositories](docs/Repo.md)
 - [CI infrastructure deployment (contributor)](docs/ci-infrastructure-deployment-zh.md)
