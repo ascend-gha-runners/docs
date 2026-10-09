@@ -13,13 +13,21 @@ set -euo pipefail
 #      + unlimited log aggregation），避免 API rate limit (5000/hr) 耗尽导致静默失败
 #
 # 标记图例：
-#   ✅ = confirmed in use（任一日志中找到缓存使用证据）
-#   ❌ = confirmed NOT in use（所有日志均有反面证据，无正面证据）
+#   ✅ = confirmed in use（日志或 workflow 中找到缓存使用证据）
+#   ❌ = confirmed NOT in use（有反面证据且无正面证据）
 #   -  = unknown（无证据或无法确定）
+#
+# 检测维度（7 列）：
+#   PyPI / APT / CCache / uv —— 基于 job 日志
+#   BuildKit —— workflow 静态扫（cache-from/cache-to/--import-cache/--export-cache/buildcache）
+#               + 日志（=> CACHED / importing cache manifest / exporting cache）
+#   Squid    —— 通用 HTTP 正向代理缓存（squid-cache / :3128），workflow 静态扫 + 日志
+#   runs-on/cache —— runs-on 的 S3 后端 Actions 缓存（runs-on/cache@v5），workflow 静态扫 + 日志
 #
 # repos.txt 格式：
 #   org/repo                           — 自动模式，GraphQL 查询
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
+#   可选默认值列（第 3 列起）：pypi|apt|ccache|uv|buildkit|squid|runson
 #
 # 环境变量（设 0 = 全量模式，内部使用 cap 防止 rate limit）：
 #   RUNNER_FILTER     — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
@@ -53,6 +61,9 @@ PYPI_CACHE_HOST="${PYPI_CACHE_HOST:-cache-service.nginx-pypi-cache.svc.cluster.l
 APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
 CCACHE_KEYWORD="${CCACHE_KEYWORD:-ccache}"
+# Squid 检测：squid 缓存，或真实代理端点 :3128（后面必须不是数字/冒号，
+# 以排除 "block_sparse_attention_tiling.cpp:3128:22" 这类编译器 行:列 告警）
+SQUID_PATTERN='squid-cache|:3128([^0-9:]|$)|HTTP_PROXY|HTTPS_PROXY|http_proxy|https_proxy'
 RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-50}"
 MAX_CANDIDATES="${MAX_CANDIDATES:-15}"
@@ -210,19 +221,75 @@ get_npu_jobs() {
 }
 
 # ==============================================================================
+# Static scan: read a repo's workflow YAML files for config-visible cache usage
+# Sets globals: static_buildkit static_squid static_runson
+#               static_ev_buildkit static_ev_squid static_ev_runson
+# ==============================================================================
+scan_workflows_static() {
+    local REPO="$1"
+    static_buildkit=false
+    static_squid=false
+    static_runson=false
+    static_ev_buildkit=""
+    static_ev_squid=""
+    static_ev_runson=""
+
+    local files
+    files=$(gh api "repos/$REPO/contents/.github/workflows" --jq '.[].name' 2>/dev/null) || true
+    if [ -z "$files" ]; then
+        return 0
+    fi
+
+    local f content line
+    while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        case "$f" in *.yml|*.yaml) ;; *) continue ;; esac
+        content=$(gh api "repos/$REPO/contents/.github/workflows/$f" --jq '.content' 2>/dev/null \
+            | tr -d '\n' | base64 -d 2>/dev/null) || true
+        if [ -z "$content" ]; then
+            continue
+        fi
+
+        if [ "$static_runson" = false ]; then
+            line=$(printf '%s' "$content" | grep -m1 -E "runs-on/cache" 2>/dev/null) || true
+            if [ -n "$line" ]; then
+                static_runson=true
+                static_ev_runson="workflow静态: ${line:0:200}"
+            fi
+        fi
+        if [ "$static_buildkit" = false ]; then
+            line=$(printf '%s' "$content" | grep -m1 -iE "cache-from|cache-to|--import-cache|--export-cache|buildcache|buildkit-cache" 2>/dev/null) || true
+            if [ -n "$line" ]; then
+                static_buildkit=true
+                static_ev_buildkit="workflow静态: ${line:0:200}"
+            fi
+        fi
+        if [ "$static_squid" = false ]; then
+            line=$(printf '%s' "$content" | grep -m1 -iE "$SQUID_PATTERN" 2>/dev/null) || true
+            if [ -n "$line" ]; then
+                static_squid=true
+                static_ev_squid="workflow静态: ${line:0:200}"
+            fi
+        fi
+    done <<< "$files"
+    return 0
+}
+
+# ==============================================================================
 # Phase 2: search ONE log for cache evidence
-# Sets globals: repo_pypi repo_apt repo_ccache repo_uv
-#               ev_pypi ev_apt ev_ccache ev_uv
+# Sets globals: repo_pypi repo_apt repo_ccache repo_uv repo_buildkit repo_squid repo_runson
+#               ev_pypi ev_apt ev_ccache ev_uv ev_buildkit ev_squid ev_runson
 #               counter_evidence_pypi counter_evidence_apt
 #               counter_evidence_ccache counter_evidence_uv
+#               counter_evidence_buildkit counter_evidence_squid counter_evidence_runson
 # Returns: 0 = log has package activity (evidence searched)
 #          1 = log has no package activity (skip)
 # ==============================================================================
 search_log_evidence() {
     local log_file="$1"
 
-    # Pre-check: skip jobs with no package installation activity
-    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja" "$log_file" 2>/dev/null; then
+    # Pre-check: skip jobs with no package installation / cache activity
+    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja|buildctl|build-push|cache-from|cache-to|import-cache|export-cache|buildcache|buildkit|docker build|$SQUID_PATTERN|runs-on/cache|Cache restored|Cache saved" "$log_file" 2>/dev/null; then
         return 1
     fi
 
@@ -391,6 +458,53 @@ search_log_evidence() {
         fi
     fi
 
+    # ---------- BuildKit cache evidence ----------
+    ev_buildkit=""
+    counter_evidence_buildkit=""
+    repo_buildkit=false
+
+    grep_line=$(grep -m1 -iE "cache-from|cache-to|--import-cache|--export-cache|importing cache manifest|exporting cache|=> CACHED|CACHED \[|buildcache|buildkit-cache" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_buildkit=true
+        ev_buildkit="buildkit-cache(运行时/配置): ${grep_line:0:200}"
+    fi
+    # Counter-evidence: uses buildkit but no cache instruction
+    if [ "$repo_buildkit" = false ]; then
+        grep_line=$(grep -m1 -iE "BUILDKITD_ADDR|buildctl|buildkitd" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_buildkit="用buildkit但无缓存指令: ${grep_line:0:200}"
+        fi
+    fi
+
+    # ---------- Squid proxy evidence ----------
+    ev_squid=""
+    counter_evidence_squid=""
+    repo_squid=false
+
+    grep_line=$(grep -m1 -iE "$SQUID_PATTERN" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_squid=true
+        ev_squid="squid代理: ${grep_line:0:200}"
+    fi
+
+    # ---------- runs-on/cache evidence ----------
+    ev_runson=""
+    counter_evidence_runson=""
+    repo_runson=false
+
+    grep_line=$(grep -m1 -iE "runs-on/cache|Cache restored from key|Cache saved with key|Cache not found for input keys" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_runson=true
+        ev_runson="runs-on/cache(运行时): ${grep_line:0:200}"
+    fi
+    # Counter-evidence: uses actions/cache instead of runs-on/cache
+    if [ "$repo_runson" = false ]; then
+        grep_line=$(grep -m1 -E "actions/cache@|actions/cache/" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_runson="用 actions/cache 而非 runs-on/cache: ${grep_line:0:200}"
+        fi
+    fi
+
     return 0
 }
 
@@ -417,7 +531,11 @@ process_repo() {
     mkdir -p "$log_dir"
 
     # Stats for this repo
-    local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_no_cache=0 s_no_npu=0 s_error=0
+    local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_buildkit=0 s_squid=0 s_runson=0
+    local s_no_cache=0 s_no_npu=0 s_error=0
+
+    # Static scan of workflow files (config-visible evidence for BuildKit / Squid / runs-on cache)
+    scan_workflows_static "$REPO" || true
 
     # ===== Phase 1: Collect candidates (up to MAX_CANDIDATES) =====
     local candidates=""
@@ -461,14 +579,14 @@ process_repo() {
     if [ "$candidate_count" -eq 0 ]; then
         local row=""
         if [ "$runs_scanned" -gt 0 ]; then
-            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
+            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
             s_no_npu=1
         else
-            row="| $REPO | - | - | - | - | - | - | No completed runs / no access |"
+            row="| $REPO | - | - | - | - | - | - | - | - | - | No completed runs / no access |"
             s_error=1
         fi
         echo "$row" > "$row_file"
-        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
         rm -rf "$log_dir"
         return 0
     fi
@@ -479,8 +597,11 @@ process_repo() {
     #   ❌ = NO log has positive evidence AND ANY log has counter-evidence
     #   -  = otherwise (no evidence in any direction)
     local agg_pypi=false agg_apt=false agg_ccache=false agg_uv=false
+    local agg_buildkit=false agg_squid=false agg_runson=false
     local agg_ev_pypi="" agg_ev_apt="" agg_ev_ccache="" agg_ev_uv=""
+    local agg_ev_buildkit="" agg_ev_squid="" agg_ev_runson=""
     local agg_counter_pypi="" agg_counter_apt="" agg_counter_ccache="" agg_counter_uv=""
+    local agg_counter_buildkit="" agg_counter_squid="" agg_counter_runson=""
     local logs_checked=0
     local log_no_pkg_activity=0
     local repo_run="" repo_runner="" repo_job_url=""
@@ -560,6 +681,18 @@ process_repo() {
             agg_uv=true
             agg_ev_uv="$ev_uv"
         fi
+        if [ "$repo_buildkit" = true ] && [ "$agg_buildkit" = false ]; then
+            agg_buildkit=true
+            agg_ev_buildkit="$ev_buildkit"
+        fi
+        if [ "$repo_squid" = true ] && [ "$agg_squid" = false ]; then
+            agg_squid=true
+            agg_ev_squid="$ev_squid"
+        fi
+        if [ "$repo_runson" = true ] && [ "$agg_runson" = false ]; then
+            agg_runson=true
+            agg_ev_runson="$ev_runson"
+        fi
 
         # Aggregate counter-evidence (take first found, only if no positive yet)
         if [ "$repo_pypi" = false ] && [ -n "$counter_evidence_pypi" ] && [ -z "$agg_counter_pypi" ]; then
@@ -574,9 +707,19 @@ process_repo() {
         if [ "$repo_uv" = false ] && [ -n "$counter_evidence_uv" ] && [ -z "$agg_counter_uv" ]; then
             agg_counter_uv="$counter_evidence_uv"
         fi
+        if [ "$repo_buildkit" = false ] && [ -n "$counter_evidence_buildkit" ] && [ -z "$agg_counter_buildkit" ]; then
+            agg_counter_buildkit="$counter_evidence_buildkit"
+        fi
+        if [ "$repo_squid" = false ] && [ -n "$counter_evidence_squid" ] && [ -z "$agg_counter_squid" ]; then
+            agg_counter_squid="$counter_evidence_squid"
+        fi
+        if [ "$repo_runson" = false ] && [ -n "$counter_evidence_runson" ] && [ -z "$agg_counter_runson" ]; then
+            agg_counter_runson="$counter_evidence_runson"
+        fi
 
-        # Early exit: all 4 cache types have positive evidence, no need to check more logs
-        if [ "$agg_pypi" = true ] && [ "$agg_apt" = true ] && [ "$agg_ccache" = true ] && [ "$agg_uv" = true ]; then
+        # Early exit: all 7 cache types have positive evidence, no need to check more logs
+        if [ "$agg_pypi" = true ] && [ "$agg_apt" = true ] && [ "$agg_ccache" = true ] && [ "$agg_uv" = true ] \
+           && [ "$agg_buildkit" = true ] && [ "$agg_squid" = true ] && [ "$agg_runson" = true ]; then
             break
         fi
 
@@ -592,14 +735,20 @@ process_repo() {
         first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
         first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
+        # Apply static (workflow) evidence for the 3 config-visible dims even without pkg activity
+        local nb_mark ns_mark nr_mark
+        nb_mark="-"; ns_mark="-"; nr_mark="-"
+        if [ "$static_buildkit" = true ]; then nb_mark="✅"; s_buildkit=1; fi
+        if [ "$static_squid" = true ]; then ns_mark="✅"; s_squid=1; fi
+        if [ "$static_runson" = true ]; then nr_mark="✅"; s_runson=1; fi
         if [ "$log_no_pkg_activity" = 1 ]; then
-            row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | NPU runner jobs found but no package installation in recent logs — [查看]($first_url) |"
+            row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $nr_mark | NPU runner jobs found but no package installation in recent logs — [查看]($first_url) |"
         else
-            row="| $REPO | (NPU jobs found, log download failed) | $first_runner | - | - | - | - | NPU runner jobs found but logs could not be downloaded (expired or fetch failed) — [查看]($first_url) |"
+            row="| $REPO | (NPU jobs found, log download failed) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $nr_mark | NPU runner jobs found but logs could not be downloaded (expired or fetch failed) — [查看]($first_url) |"
         fi
         s_error=1
         echo "$row" > "$row_file"
-        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
         rm -rf "$log_dir"
         return 0
     fi
@@ -608,6 +757,7 @@ process_repo() {
 
     # Determine marks based on aggregated evidence
     local pypi_mark pypi_detail apt_mark apt_detail ccache_mark ccache_detail uv_mark uv_detail
+    local buildkit_mark buildkit_detail squid_mark squid_detail runson_mark runson_detail
 
     if [ "$agg_pypi" = true ]; then
         pypi_mark="✅"; pypi_detail="$agg_ev_pypi"; s_pypi=1
@@ -641,15 +791,48 @@ process_repo() {
         uv_mark="-"; uv_detail="无证据(日志中未出现 uv 相关输出)"
     fi
 
-    local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}"
+    # BuildKit: workflow 静态证据优先，其次日志
+    if [ "$static_buildkit" = true ]; then
+        buildkit_mark="✅"; buildkit_detail="$static_ev_buildkit"; s_buildkit=1
+    elif [ "$agg_buildkit" = true ]; then
+        buildkit_mark="✅"; buildkit_detail="$agg_ev_buildkit"; s_buildkit=1
+    elif [ -n "$agg_counter_buildkit" ]; then
+        buildkit_mark="❌"; buildkit_detail="反面证据: ${agg_counter_buildkit}"; s_no_cache=1
+    else
+        buildkit_mark="-"; buildkit_detail="无证据(日志/workflow 中未出现 buildkit 缓存指令)"
+    fi
+
+    # Squid: workflow 静态证据优先，其次日志
+    if [ "$static_squid" = true ]; then
+        squid_mark="✅"; squid_detail="$static_ev_squid"; s_squid=1
+    elif [ "$agg_squid" = true ]; then
+        squid_mark="✅"; squid_detail="$agg_ev_squid"; s_squid=1
+    elif [ -n "$agg_counter_squid" ]; then
+        squid_mark="❌"; squid_detail="反面证据: ${agg_counter_squid}"; s_no_cache=1
+    else
+        squid_mark="-"; squid_detail="无证据(日志/workflow 中未出现 squid 代理地址)"
+    fi
+
+    # runs-on/cache: workflow 静态证据优先，其次日志
+    if [ "$static_runson" = true ]; then
+        runson_mark="✅"; runson_detail="$static_ev_runson"; s_runson=1
+    elif [ "$agg_runson" = true ]; then
+        runson_mark="✅"; runson_detail="$agg_ev_runson"; s_runson=1
+    elif [ -n "$agg_counter_runson" ]; then
+        runson_mark="❌"; runson_detail="反面证据: ${agg_counter_runson}"; s_no_cache=1
+    else
+        runson_mark="-"; runson_detail="无证据(日志/workflow 中未出现 runs-on/cache)"
+    fi
+
+    local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}; ${buildkit_detail}; ${squid_detail}; ${runson_detail}"
     evidence="${evidence# ; }"
     evidence="${evidence% ; }"
     # Sanitize: replace pipe chars to prevent markdown table column corruption
     evidence="${evidence//|/¦}"
 
-    row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | ${evidence:0:400} $job_link |"
+    row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | $buildkit_mark | $squid_mark | $runson_mark | ${evidence:0:400} $job_link |"
     echo "$row" > "$row_file"
-    echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+    echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
 
     rm -rf "$log_dir"
 }
@@ -675,8 +858,8 @@ echo "Processing $TOTAL repos with $PARALLEL parallel workers..."
 echo ""
 
 # Output table header
-echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | 证据 (Evidence) |"
-echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |"
+echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | BuildKit | Squid | runs-on/cache | 证据 (Evidence) |"
+echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |"
 
 # Process repos in parallel
 # Use background processes with a concurrency limit
@@ -702,6 +885,9 @@ STAT_PYPI=0
 STAT_APT=0
 STAT_CCACHE=0
 STAT_UV=0
+STAT_BUILDKIT=0
+STAT_SQUID=0
+STAT_RUNSON=0
 STAT_NO_CACHE=0
 STAT_NO_NPU=0
 STAT_ERROR=0
@@ -715,16 +901,19 @@ for line in "${REPO_LINES[@]}"; do
     if [ -f "$row_file" ]; then
         cat "$row_file"
     else
-        echo "| $REPO | - | - | - | - | - | - | Processing error — no output |"
-        echo "0|0|0|0|0|0|1" > "$stat_file"
+        echo "| $REPO | - | - | - | - | - | - | - | - | - | Processing error — no output |"
+        echo "0|0|0|0|0|0|0|0|0|1" > "$stat_file"
     fi
 
     if [ -f "$stat_file" ]; then
-        IFS='|' read -r sp sa sc su sn snn se < "$stat_file"
+        IFS='|' read -r sp sa sc su sbk ssq srs sn snn se < "$stat_file"
         STAT_PYPI=$((STAT_PYPI + sp))
         STAT_APT=$((STAT_APT + sa))
         STAT_CCACHE=$((STAT_CCACHE + sc))
         STAT_UV=$((STAT_UV + su))
+        STAT_BUILDKIT=$((STAT_BUILDKIT + sbk))
+        STAT_SQUID=$((STAT_SQUID + ssq))
+        STAT_RUNSON=$((STAT_RUNSON + srs))
         STAT_NO_CACHE=$((STAT_NO_CACHE + sn))
         STAT_NO_NPU=$((STAT_NO_NPU + snn))
         STAT_ERROR=$((STAT_ERROR + se))
@@ -740,6 +929,9 @@ echo "- PyPI cache confirmed (✅): **$STAT_PYPI** / $TOTAL"
 echo "- APT cache confirmed (✅): **$STAT_APT** / $TOTAL"
 echo "- CCache confirmed (✅): **$STAT_CCACHE** / $TOTAL"
 echo "- uv confirmed (✅): **$STAT_UV** / $TOTAL"
+echo "- BuildKit cache confirmed (✅): **$STAT_BUILDKIT** / $TOTAL"
+echo "- Squid proxy confirmed (✅): **$STAT_SQUID** / $TOTAL"
+echo "- runs-on/cache confirmed (✅): **$STAT_RUNSON** / $TOTAL"
 echo "- Confirmed NOT in use (❌): **$STAT_NO_CACHE** — need cache config"
 echo "- No NPU runner jobs found: **$STAT_NO_NPU** — repos don't use our NPU runners"
 echo "- Unknown / logs unavailable (-): **$STAT_ERROR**"

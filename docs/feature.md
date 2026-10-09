@@ -107,6 +107,28 @@ Proxies the crates.io sparse index for Rust crate dependencies.
 
 ---
 
+### Squid Proxy (Port 3128)
+
+A general-purpose outbound HTTP(S) forward proxy and cache (`squid-cache.squid.svc.cluster.local:3128`).
+Unlike the registry-specific caches above, it caches arbitrary external HTTP responses.
+
+---
+
+### BuildKit Cache
+
+In-cluster BuildKit (`buildkitd-{arch}:1234`) caches image build layers. Because the local cache is
+ephemeral, the durable cache is kept in the registry via `cache-from`/`cache-to` (or
+`--import-cache`/`--export-cache`), stored as a `buildcache`/`buildkit-cache` tag.
+
+---
+
+### runs-on/cache (S3-backed)
+
+Self-hosted runners cannot use the GitHub-hosted Actions cache. Use the runs-on cache actions instead
+(`runs-on/cache@v5`, `runs-on/cache/restore@v5`, `runs-on/cache/save@v5`), backed by S3 object storage.
+
+---
+
 ### Summary
 
 | Cache Type | Port | Upstream | Client |
@@ -116,3 +138,6 @@ Proxies the crates.io sparse index for Rust crate dependencies.
 | Rust | 8082 | mirrors.huaweicloud.com/rustup | rustup |
 | YUM | 8083 | repo.huaweicloud.com/openeuler | dnf / yum |
 | crates.io | 8085 | crates.io sparse index | cargo |
+| Squid proxy | 3128 | general outbound HTTP(S) | http_proxy / HTTPS_PROXY |
+| BuildKit | — | image registry (`buildcache` / `buildkit-cache` tag) | buildctl / buildx |
+| runs-on cache | — | S3 object storage | runs-on/cache@v5 |
