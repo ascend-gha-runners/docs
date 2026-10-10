@@ -1,5 +1,9 @@
 {
   "repos": {
+    "Ascend/cann-container-image": [
+      "linux-aarch64-cpu-4-cn12-001",
+      "linux-amd64-cpu-4-cn12-001"
+    ],
     "Ascend/pytorch": [
       "linux-aarch64-a3-16",
       "linux-aarch64-a3-2",

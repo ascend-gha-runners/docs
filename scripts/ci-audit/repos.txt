@@ -32,3 +32,5 @@ sgl-project/sglang-omni||||||||
 verl-project/uni-agent||||||||
 
 tile-ai/tilelang||||||||
+
+Ascend/cann-container-image|||||
