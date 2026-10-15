@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">268</span>
+    <span class="stat-num">269</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -27,11 +27,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="npu">npu · 24</option>
   <option value="on-demand">on-demand · 12</option>
   <option value="Ascend910">Ascend910 · 8</option>
-  <option value="ascend-310">ascend-310 · 3</option>
+  <option value="ascend-310">ascend-310 · 4</option>
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 268 labels</span>
+<span class="cluster-hint">11 clusters · 269 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -485,20 +485,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-003-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-003-cluster</span>
-    <span class="cluster-meta">2 projects · 4 labels</span>
+    <span class="cluster-meta">2 projects · 5 labels</span>
   </div>
   <div class="cluster-body">
-    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-310p-1 linux-aarch64-310p-2 linux-aarch64-310p-4">
+    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-310p-1 linux-aarch64-310p-2 linux-aarch64-310p-4 linux-aarch64-310p-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">3 labels</span>
+          <span class="project-count">4 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-310p-1" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-1</span><span class="machine-npu"> · 1 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-2" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4</span><span class="machine-npu"> · 4 × ascend-310</span></div>
+        <div class="machine" data-label="linux-aarch64-310p-1" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-1</span><span class="machine-npu"> · 1 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-2" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-2</span><span class="machine-npu"> · 2 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-4" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-4</span><span class="machine-npu"> · 4 × ascend-310</span></div>        <div class="machine" data-label="linux-aarch64-310p-8" data-npu="ascend-310"><span class="machine-label">linux-aarch64-310p-8</span><span class="machine-npu"> · 8 × ascend-310</span></div>
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
