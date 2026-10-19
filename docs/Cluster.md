@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">269</span>
+    <span class="stat-num">271</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,7 +22,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords (space-separated)" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 169</option>
+  <option value="ascend-1980">ascend-1980 · 171</option>
   <option value="cpu">CPU (no NPU) · 50</option>
   <option value="npu">npu · 24</option>
   <option value="on-demand">on-demand · 12</option>
@@ -31,14 +31,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 269 labels</span>
+<span class="cluster-hint">11 clusters · 271 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
 <div class="cluster-card" data-name="ascend-cn12-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-cn12-001-cluster</span>
-    <span class="cluster-meta">13 projects · 102 labels</span>
+    <span class="cluster-meta">13 projects · 103 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/cann-container-image linux-amd64-cpu-4 linux-aarch64-cpu-4">
@@ -209,17 +209,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-project-vllm-omni</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-800i-0 mind-third-ci linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-16">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-800i-0 mind-third-ci linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-16 linux-aarch64-a3-800i-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">5 labels</span>
+          <span class="project-count">6 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-800i-0-cn12-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-800i-0 + mind-third-ci</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-800i-0-cn12-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-800i-0 + mind-third-ci</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-test-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>volcengine</code></div>
       </div>
     </div>
@@ -229,7 +229,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="ascend-hk-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-hk-001-cluster</span>
-    <span class="cluster-meta">13 projects · 78 labels</span>
+    <span class="cluster-meta">13 projects · 79 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-aarch64-a2b3-1 linux-aarch64-a2b3-2 linux-aarch64-a2b3-4 linux-aarch64-a2b3-8">
@@ -386,17 +386,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>verl-project-uni-agent</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="verl-project/verl linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a2-1 linux-aarch64-a2-2 linux-aarch64-a2-4 linux-aarch64-a2-8 linux-aarch64-a2-test-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--cpu" data-label="linux-aarch64-a2-1" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-2" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-4" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
+        <div class="machine machine--cpu" data-label="linux-aarch64-a2-1" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-1</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-2" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-a2-4" data-npu="cpu"><span class="machine-label">linux-aarch64-a2-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a2-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-test-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-test-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>volcengine</code></div>
       </div>
     </div>
