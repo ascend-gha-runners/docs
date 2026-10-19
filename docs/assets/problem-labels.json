@@ -241,8 +241,11 @@
       "linux-aarch64-910b-2",
       "linux-aarch64-910b-4",
       "linux-aarch64-910b-8",
+      "linux-aarch64-a2-1-binding-hk-001",
       "linux-aarch64-a2-1-hk-001",
+      "linux-aarch64-a2-2-binding-hk-001",
       "linux-aarch64-a2-2-hk-001",
+      "linux-aarch64-a2-4-binding-hk-001",
       "linux-aarch64-a2-4-hk-001",
       "linux-aarch64-a2-8-hk-001",
       "linux-aarch64-a2b1-1",
@@ -290,6 +293,9 @@
       "linux-aarch64-a5-2",
       "linux-aarch64-a5-4",
       "linux-aarch64-a5-8",
+      "linux-aarch64-binding-a3-2",
+      "linux-aarch64-binding-a3-4",
+      "linux-aarch64-binding-a3-8",
       "linux-aarch64-cpu-4-cn12-001",
       "linux-aarch64-nightly-a3-16",
       "linux-aarch64-nightly-a3-2",
@@ -348,16 +354,25 @@
     "linux-aarch64-a2-1": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2-1-binding-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2-1-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2-2": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2-2-binding-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2-2-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2-4": [
+      "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2-4-binding-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2-4-hk-001": [
@@ -588,6 +603,15 @@
     ],
     "linux-aarch64-a5-8": [
       "openmerlin-sh-001-cluster"
+    ],
+    "linux-aarch64-binding-a3-2": [
+      "openmerlin-guiyang-005-cluster"
+    ],
+    "linux-aarch64-binding-a3-4": [
+      "openmerlin-guiyang-005-cluster"
+    ],
+    "linux-aarch64-binding-a3-8": [
+      "openmerlin-guiyang-005-cluster"
     ],
     "linux-aarch64-cpu-1": [
       "openmerlin-guiyang-005-cluster"
