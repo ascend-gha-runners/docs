@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">277</span>
+    <span class="stat-num">278</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -23,7 +23,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 177</option>
-  <option value="cpu">CPU (no NPU) · 50</option>
+  <option value="cpu">CPU (no NPU) · 51</option>
   <option value="npu">npu · 24</option>
   <option value="on-demand">on-demand · 12</option>
   <option value="Ascend910">Ascend910 · 8</option>
@@ -31,7 +31,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">11 clusters · 277 labels</span>
+<span class="cluster-hint">11 clusters · 278 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -522,7 +522,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-004-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-004-cluster</span>
-    <span class="cluster-meta">2 projects · 12 labels</span>
+    <span class="cluster-meta">2 projects · 13 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-amd64-cpu-4 linux-amd64-cpu-8 linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
@@ -539,17 +539,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="sgl-project/sglang linux-amd64-cpu-4 linux-aarch64-a3-0 a3-752t linux-aarch64-a3-2 a3-752t linux-aarch64-a3-4 a3-752t linux-aarch64-a3-8 a3-752t linux-aarch64-a3-16 a3-752t">
+    <div class="project-row" data-search="sgl-project/sglang linux-amd64-cpu-2 linux-amd64-cpu-4 linux-aarch64-a3-0 a3-752t linux-aarch64-a3-2 a3-752t linux-aarch64-a3-4 a3-752t linux-aarch64-a3-8 a3-752t linux-aarch64-a3-16 a3-752t">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sglang</span>
-          <span class="project-count">6 labels</span>
+          <span class="project-count">7 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-8" data-npu="cpu"><span class="machine-label">linux-aarch64-a3-0 + a3-752t</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2 + a3-752t</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4 + a3-752t</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8 + a3-752t</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16 + a3-752t</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine machine--cpu" data-label="linux-amd64-cpu-2" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-8" data-npu="cpu"><span class="machine-label">linux-aarch64-a3-0 + a3-752t</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2 + a3-752t</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4 + a3-752t</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8 + a3-752t</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16 + a3-752t</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>sgl-project</code></div>
       </div>
     </div>

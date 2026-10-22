@@ -127,6 +127,7 @@
       "linux-amd64-a5-2-sh-002",
       "linux-amd64-a5-4-sh-002",
       "linux-amd64-a5-8-sh-002",
+      "linux-amd64-cpu-2",
       "linux-amd64-cpu-4",
       "linux-amd64-cpu-8"
     ],
@@ -663,6 +664,9 @@
     ],
     "linux-amd64-cpu-16-hk": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-amd64-cpu-2": [
+      "openmerlin-guiyang-004-cluster"
     ],
     "linux-amd64-cpu-2-hk": [
       "ascend-hk-001-cluster"
