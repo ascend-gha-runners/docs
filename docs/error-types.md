@@ -23,17 +23,22 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Virtual Node Offloading | [Liqo namespace not offloaded (task stuck)](#liqo-offloading-backoff) |
 | Running | Container Runtime | [Container crash](#container-crash) |
 | Running | Container Runtime | [OOMKilled](#oomkilled) |
+| Running | Container Runtime | [Host memory exhausted (207001)](#host-memory-oom) |
 | Running | Container Runtime | [/dev/shm exhausted](#dev-shm-oom) |
 | Running | Workflow | [UserScriptError](#userscripterror) |
+| Running | Workflow | [kubeconfig / secret points to the wrong cluster](#kubeconfig-wrong-cluster) |
 | Running | Workflow | [Artifact / log upload failed (whitelist)](#upload-artifact-whitelist) |
 | Running | Workflow | [Install / build OOM (parallelism too high)](#compile-oom-threads) |
 | Running | Workflow | [Dependency cache errors (pypi / rust)](#dependency-cache-error) |
 | Running | Workflow | [Abnormally slow steps (model load / checkout)](#ci-slow) |
 | Running | Task Hang | [Task hang / timeout (engine process stuck)](#vllm-v1-streaming-hang) |
+| Running | Build | [BuildKit cache corrupt (parent snapshot not found)](#buildkit-cache-corrupt) |
 | Running | Communication | [HCCL Port Already Bound](#hccl-port-already-bound) |
 | Running | Environment | [Model Cache Missing / Incomplete](#incomplete-model-snapshot) |
 | Platform | Node Resource | [Node NPU occupied by an out-of-band process / container](#npu-occupied-by-external) |
 | Platform | Storage | [Shared disk full / stale lock file](#shared-storage-lock-and-space) |
+| Platform | Node | [Node abnormal after maintenance (shared disk not mounted / whitelist missing)](#node-after-maintenance) |
+| Platform | Control Plane | [Control plane API transient outage (ECONNREFUSED / 403 during cleanup)](#apiserver-transient-window) |
 | Platform | Node | [Node DNS failure / clock skew](#node-infra-abnormal) |
 | Platform | Node | [Node hardware failure (NPU hang / NotReady)](#node-hardware-failure) |
 | Platform | Autoscaling | [Scale-out failure / unhealthy elastic node](#elastic-scale-out-failed) |
@@ -137,14 +142,15 @@ Several symptoms appear under novolume mode: the copy + hash check after each ch
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317874137)
 
-#### FailedScheduling (resource limit)
+#### FailedScheduling (resource limit) { #failedscheduling-resource-limit }
 
-Resource request exceeds node limit (422 scenario).
+Resource request exceeds node limit (422 scenario); or the pod is rejected outright by the node (`OutOfcpu`): `Pod was rejected: Node didn't have enough resource: cpu, requested: 8000, used: 29895, capacity: 31850` (issue #248). The requested NPU cards / resources exceed the node limit for that label, or the node's CPU is already saturated by other workloads so the new pod's CPU request can't be met (issue #248). Lower the requested cards / resources or switch to a larger label; for `OutOfcpu`, wait for the node to free up or use another label; check labels and machine specs in [Cluster](/docs/Cluster/).
 
 ![Pod stuck in Pending with FailedScheduling due to resource request exceeding node limit](assets/error-types/failed-scheduling-resource.png)
 
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317502668)
+> [#248](https://github.com/ascend-gha-runners/docs/issues/248)
 
 #### FailedBinding
 
@@ -197,6 +203,14 @@ Out of memory — container killed by the kernel OOM killer.
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28570845291)
 
+#### Host memory exhausted (aclrtMallocHostWithCfg 207001) { #host-memory-oom }
+
+The process exits in the Running phase with `torch.OutOfMemoryError: allocate_host_memory_slowpath`, backed by `aclrtMallocHostWithCfg ... error code is 207001` and `Memory_Allocation_Failure(EL0004)` (issues #264 / #272). This is **not** Kubernetes `OOMKilled` (the container limit was not exceeded) — the **node's host memory** is insufficient. The test case's host-side allocation (pinned memory, KV cache, etc.) exceeds available node memory: #272 had high concurrency and an oversized hicache size; #264 was an under-resourced a2b3-8 node. First tell host memory (207001) apart from container `OOMKilled`; reduce the test case's concurrency / hicache size (#272 was fixed this way); if resources are still short, use a larger label (#264 switched to a3-800i-8 and raised the memory limit); then re-run.
+
+> **Ref:**
+> [#264](https://github.com/ascend-gha-runners/docs/issues/264)
+> [#272](https://github.com/ascend-gha-runners/docs/issues/272)
+
 #### /dev/shm exhausted { #dev-shm-oom }
 
 Multimodal test cases (e.g., qwen2.5-VL) hit `/dev/shm` OOM on small-card runners (e.g., 2 cards) and only pass on a larger flavor (issue #27). The runner pod's `/dev/shm` is too small by default. The platform has raised it to 1Gi; if still insufficient, use a label with a larger `/dev/shm` or reduce the test case's concurrency / memory usage.
@@ -215,6 +229,13 @@ User script step exited with non-zero code. K8s pod reason: `Error`. Unlike cont
 > **Ref:**
 > [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319724802)
 
+#### kubeconfig / secret points to the wrong cluster { #kubeconfig-wrong-cluster }
+
+kubectl / the client inside the task can't reach the API: `dial tcp <internal-ip>:5443: i/o timeout`, `Unable to connect to the server` (issue #293). The **kubeconfig in the repository secret points to a non-target cluster** (in this case the Hong Kong cluster) — a user-side configuration error. Check whether the kubeconfig's `server` address in the secret is the target cluster; obtain the correct kubeconfig for the target cluster from the infrastructure team (prefer the **internal server address**); update the secret and re-run (#293 passed after the update).
+
+> **Ref:**
+> [#293](https://github.com/ascend-gha-runners/docs/issues/293)
+
 #### Artifact / log upload failed (whitelist) { #upload-artifact-whitelist }
 
 Artifact / log upload reports `Upload progress stalled`, then the container hook fails (`Executing the custom container implementation failed`, exit code 1) (issue #197). The upload target URL was not added to the network whitelist. Ask the infrastructure team to whitelist the target domain (one-off, persists afterwards), then re-run.
@@ -232,7 +253,7 @@ During source compile / install, processes are killed en masse and installation 
 
 #### Dependency cache errors (pypi / rust) { #dependency-cache-error }
 
-Installing dependencies reports **`read timeout`**, **`Download failed because not enough bytes were received`**, or **`HTTP status server error (503)`** (issues #32 / #98 / #113 / #117); or dependency download takes over 2h (rust dependencies going to the official source, issue #89). The pypi cache service (nginx) upstreams to Huawei Cloud — when sync is delayed or rate-limited the cache itself can't get packages; cache misses **spill over to the official source**; keepalive and `proxy_read_timeout` are misconfigured; and rust-like dependencies bypass the cache and the domestic network can't reach the official source. Determine whether the error comes from the cache service or has already spilled to the official source; tune the cache service (disable keepalive, raise `proxy_read_timeout`, shorten lock lifetime); switch the forwarding mirror to a CDN-accelerated domain; and point community dependencies (e.g. rust) at a domestic mirror.
+Installing dependencies reports **`read timeout`**, **`Download failed because not enough bytes were received`**, or **`HTTP status server error (503)`** (issues #32 / #98 / #113 / #117); or dependency download takes over 2h (rust dependencies going to the official source, issue #89); or a package **hash mismatch**: `THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE` (issue #208); or cargo fails pulling crates.io through the proxy with a timeout (issue #274). The pypi cache service (nginx) upstreams to Huawei Cloud — when sync is delayed or rate-limited the cache itself can't get packages; cache misses **spill over to the official source**; keepalive and `proxy_read_timeout` are misconfigured; and rust-like dependencies bypass the cache and the domestic network can't reach the official source. A hash mismatch usually means the **mirror site hasn't synced** or the **cache service version is old** (issue #208 traced it to the download-r2 mirror not being synced and an outdated nginx); crates.io proxy timeouts are a **proxy stability** issue (issue #274). Determine whether the error comes from the cache service or has already spilled to the official source; for a **hash mismatch** ask the CI side to refresh the mirror / update the cache service and **don't keep retrying** (issue #208); for **cargo / crates.io timeouts** re-run failed jobs first and report repeated timeouts to the CI side (issue #274); tune the cache service (disable keepalive, raise `proxy_read_timeout`, shorten lock lifetime); switch the forwarding mirror to a CDN-accelerated domain; and point community dependencies (e.g. rust) at a domestic mirror.
 
 > **Ref:**
 > [#32](https://github.com/ascend-gha-runners/docs/issues/32)
@@ -240,6 +261,8 @@ Installing dependencies reports **`read timeout`**, **`Download failed because n
 > [#98](https://github.com/ascend-gha-runners/docs/issues/98)
 > [#113](https://github.com/ascend-gha-runners/docs/issues/113)
 > [#117](https://github.com/ascend-gha-runners/docs/issues/117)
+> [#208](https://github.com/ascend-gha-runners/docs/issues/208)
+> [#274](https://github.com/ascend-gha-runners/docs/issues/274)
 
 #### Abnormally slow steps (model load / checkout) { #ci-slow }
 
@@ -248,6 +271,15 @@ Loading a 70G model takes about **1100s** (issue #13); checkout is occasionally 
 > **Ref:**
 > [#13](https://github.com/ascend-gha-runners/docs/issues/13)
 > [#202](https://github.com/ascend-gha-runners/docs/issues/202)
+
+### Build Errors
+
+#### BuildKit cache corrupt (parent snapshot not found) { #buildkit-cache-corrupt }
+
+Image build reports **`ERROR: failed to solve: failed to compute cache key: parent snapshot sha256:... does not exist: not found`**, and the same script fails on only **some agents / machines** (issue #291). The agent's **local buildx cache layer chain is corrupted** (an interrupted historical build or a full disk truncated the cache export), so every build fails once the parent snapshot is gone; after clearing the cache, the cold build also exposed hidden issues such as an invalid cache-service address and security groups not allowing traffic. Re-run to confirm the failure is **pinned to certain agents / machines**; ask the CI side to **clear and rebuild that agent's buildx cache**; if the cold build exposes an invalid cache-service address / blocked network, fix that too; then re-run.
+
+> **Ref:**
+> [#291](https://github.com/ascend-gha-runners/docs/issues/291)
 
 ### Task Hang / Timeout
 
@@ -271,12 +303,13 @@ Multi-node job fails in Running phase with `Communication_Error_Bind_IP_Port(EI0
 
 #### Model Cache Missing / Incomplete { #incomplete-model-snapshot }
 
-Running phase fails with model-cache errors in two forms: **incomplete** — `huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing` (issue #242); or **missing** — `huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled` (issue #220), or a missing shard (issue #200). The cluster the task actually landed on has no such model cache or an incomplete one, and `local_files_only=True` prevents online completion. Identify the missing model/files, verify the cache on that cluster, ask the infrastructure team to complete / re-download it, then re-trigger the workflow.
+Running phase fails with model-cache errors in three forms: **incomplete** — `huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing` (issue #242); **missing** — `huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled` (issue #220), or a missing shard (issue #200); or **version-incompatible** — loading weights raises `KeyError: 'wkv.weight_offset'` and similar missing keys (issue #268), usually because a **stale older cache** doesn't match the current code's index structure. The cluster the task actually landed on has no such model cache, an incomplete one, or an old-version one, and `local_files_only=True` prevents online completion. Identify the missing model/files from the error, verify the cache on that cluster, for **KeyError**-style version mismatches check that the cache version matches the current code and **clear the old cache then re-download** (issue #268 recovered this way), ask the infrastructure team to complete / re-download missing caches, then re-trigger the workflow.
 
 > **Ref:**
 > [#242](https://github.com/ascend-gha-runners/docs/issues/242)
 > [#220](https://github.com/ascend-gha-runners/docs/issues/220)
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
+> [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 
 ---
 
@@ -307,17 +340,34 @@ Reports **`OSError: [Errno 122] Disk quota exceeded`** (issues #191 / #221) or *
 > [#221](https://github.com/ascend-gha-runners/docs/issues/221)
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
 
+### Control Plane
+
+#### Control plane API transient outage (ECONNREFUSED / 403 during cleanup) { #apiserver-transient-window }
+
+The job fails suddenly during cleanup with **`FetchError: request to https://<internal-ip>/apis/authorization.k8s.io/v1/selfsubjectaccessreviews failed, reason: connect ECONNREFUSED`**, or the same request returns **`403 forbidden`**; **multiple PRs / repositories go red in the same time window** and a re-run passes (issue #274). During the managed apiserver backend rotation window the **forwarding rules weren't switched atomically** and the new instance's **RBAC cache hadn't finished syncing**; the container hook's pre-flight request is **single-shot with no retry**, amplifying a sub-second blip into a job failure. Confirm whether **several CI runs failed in the same window** and whether a re-run passes; just **re-run failed jobs**; do **not** change RBAC / ServiceAccount permissions because of this; report repeated occurrences to the CI side (hook pre-flight retries are in progress).
+
+> **Ref:**
+> [#274](https://github.com/ascend-gha-runners/docs/issues/274)
+
 ### Node Abnormalities
+
+#### Node abnormal after maintenance (shared disk not mounted / whitelist missing) { #node-after-maintenance }
+
+After a node is powered down and back up / maintained, two problems appear: CI **can't find the model**, and after the mount is restored the node **can't reach `api.github.com`** so it receives no jobs (issue #284). The **shared disk wasn't remounted** after maintenance, and the lab firewall **whitelist doesn't allow the domains CI needs**. Check whether the node's **shared disk is mounted** (CI can't find the model); confirm the node's **outbound whitelist** to GitHub / dependency sources is complete; restore the mount and complete the whitelist, then re-run.
+
+> **Ref:**
+> [#284](https://github.com/ascend-gha-runners/docs/issues/284)
 
 #### Node DNS resolution failure / clock skew { #node-infra-abnormal }
 
-Runner logs report **`Could not resolve host: pipelinesghubeus11.actions.githubusercontent.com`** / **`Socket Error: TryAgain`** (issues #48 / #88), and the task queues forever without executing; or the install phase reports `No module named 'deep_ep'` (torch_npu download failed, issue #49); or the runner can't register and ARC fails to authenticate to GitHub (issue #99). The node's **DNS resolver plugin is faulty**, so the runner pod can't reach GitHub central services / download dependencies; or the node **has no NTP configured** and clock skew causes authentication failures. Verify resolution with `curl -v` / `nslookup` inside the runner pod and check whether the node clock is skewed; confirm it is a node-level fault; replace the node; and investigate / fix the DNS plugin or configure NTP.
+Runner logs report **`Could not resolve host: pipelinesghubeus11.actions.githubusercontent.com`** / **`Socket Error: TryAgain`** (issues #48 / #88), and the task queues forever without executing; or the install phase reports `No module named 'deep_ep'` (torch_npu download failed, issue #49); or the runner can't register and ARC fails to authenticate to GitHub (issue #99); or the task can't resolve a cluster service: `Could not resolve host: rayjob-submitter.ci-system.svc.cluster.local` (issue #270). The node's **DNS resolver plugin is faulty**, so the runner pod can't reach GitHub central services / download dependencies; or the node **has no NTP configured** and clock skew causes authentication failures; or the **target cluster doesn't deploy the required service / the service config doesn't match the cluster** (issue #270: the cluster lacked the ray service, and after the disk path changed the ray service still pointed at the old path, reporting `FailedMount ... hostPath type check failed`). Verify resolution with `curl -v` / `nslookup` inside the runner pod and check whether the node clock is skewed; if a **service domain fails to resolve**, confirm the target cluster actually deploys that service and that the node paths in its config match the cluster (issue #270 recovered after fixing the ray config); confirm it is a node-level fault; replace the node; and investigate / fix the DNS plugin or configure NTP.
 
 > **Ref:**
 > [#48](https://github.com/ascend-gha-runners/docs/issues/48)
 > [#49](https://github.com/ascend-gha-runners/docs/issues/49)
 > [#88](https://github.com/ascend-gha-runners/docs/issues/88)
 > [#99](https://github.com/ascend-gha-runners/docs/issues/99)
+> [#270](https://github.com/ascend-gha-runners/docs/issues/270)
 
 #### Node hardware failure (NPU hang / NotReady) { #node-hardware-failure }
 
@@ -362,5 +412,5 @@ If you encounter an issue not listed on this page, please [create a discussion](
 
 ---
 
-**Document version:** v2.3
-**Last updated:** 2026-09-28
+**Document version:** v2.4
+**Last updated:** 2026-10-22

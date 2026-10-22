@@ -23,17 +23,22 @@
 | Pending | 虚拟节点接管 | [Liqo namespace 未接管导致任务卡死](#liqo-offloading-backoff) |
 | Running | 容器运行时 | [容器崩溃](#container-crash) |
 | Running | 容器运行时 | [内存不足（OOMKilled）](#oomkilled) |
+| Running | 容器运行时 | [host 内存不足（207001）](#host-memory-oom) |
 | Running | 容器运行时 | [/dev/shm 不足](#dev-shm-oom) |
 | Running | Workflow | [用户脚本报错](#userscripterror) |
+| Running | Workflow | [kubeconfig / secret 指向错误集群](#kubeconfig-wrong-cluster) |
 | Running | Workflow | [上传日志 / 产物失败（需加网络白名单）](#upload-artifact-whitelist) |
 | Running | Workflow | [安装 / 编译阶段 OOM（并行度过高）](#compile-oom-threads) |
 | Running | Workflow | [依赖缓存异常（pypi / rust）](#dependency-cache-error) |
 | Running | Workflow | [任务耗时异常（模型加载 / checkout）](#ci-slow) |
 | Running | 任务卡死 | [任务长时间卡住 / 超时（引擎进程挂起）](#vllm-v1-streaming-hang) |
+| Running | 构建 | [构建缓存损坏（BuildKit parent snapshot）](#buildkit-cache-corrupt) |
 | Running | 通信 | [HCCL 通信端口被占用](#hccl-port-already-bound) |
 | Running | 环境 | [模型缓存缺失 / 不完整](#incomplete-model-snapshot) |
 | 平台 | 节点资源 | [节点 NPU 被外部进程 / 带外容器占用](#npu-occupied-by-external) |
 | 平台 | 存储 | [共享盘空间不足 / 锁文件残留](#shared-storage-lock-and-space) |
+| 平台 | 节点异常 | [节点维护后异常（共享盘未挂载 / 白名单缺失）](#node-after-maintenance) |
+| 平台 | 控制面 | [控制面 API 瞬断（ECONNREFUSED / 403）](#apiserver-transient-window) |
 | 平台 | 节点异常 | [节点 DNS 解析异常 / 时钟偏移](#node-infra-abnormal) |
 | 平台 | 节点异常 | [节点硬件故障（NPU 挂死 / NotReady）](#node-hardware-failure) |
 | 平台 | 弹性伸缩 | [弹性扩容失败 / 弹性节点不健康](#elastic-scale-out-failed) |
@@ -205,16 +210,17 @@
 
 #### 调度失败：资源超限 { #failedscheduling-resource-limit }
 
-**现象**：Pod 卡在 **Pending**，报 **`FailedScheduling`**（422 场景）。
+**现象**：Pod 卡在 **Pending**，报 **`FailedScheduling`**（422 场景）；或 Pod 被节点直接拒绝（**`OutOfcpu`**）：`Pod was rejected: Node didn't have enough resource: cpu, requested: 8000, used: 29895, capacity: 31850`（issue #248）。
 
-**根因**：申请的 NPU 卡数 / 资源超过该标签节点的上限。
+**根因**：申请的 NPU 卡数 / 资源超过该标签节点的上限；或节点 **CPU 已被其他负载占满**，新 Pod 的 CPU 请求无法满足（issue #248）。
 
-**解决**：[AI] 降低申请的卡数 / 资源，或更换更大规格的标签；前往 [Cluster 文档](/docs/Cluster/) 核对标签与机器规格。
+**解决**：[AI] 降低申请的卡数 / 资源，或更换更大规格的标签；若报 **OutOfcpu**，等待节点资源释放后重跑，或改用其它标签；前往 [Cluster 文档](/docs/Cluster/) 核对标签与机器规格。
 
 ![Pod 卡在 Pending，FailedScheduling（资源超限）](assets/error-types/failed-scheduling-resource.png)
 
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29317502668)
+> [#248](https://github.com/ascend-gha-runners/docs/issues/248)
 
 #### 调度失败：PVC 不存在（FailedBinding） { #failedbinding }
 
@@ -299,6 +305,23 @@
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@b4b3d9d](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28570845291)
 
+#### host 内存不足（aclrtMallocHostWithCfg 207001） { #host-memory-oom }
+
+**现象**：**Running** 阶段进程退出，日志报 **`torch.OutOfMemoryError: allocate_host_memory_slowpath`**，底层为 **`aclrtMallocHostWithCfg ... error code is 207001`**，并伴随 **`Memory_Allocation_Failure(EL0004)`**（issue #264 / #272）。注意：**不是** K8s 的 `OOMKilled`（容器 limit 未超），而是节点 host 侧内存不足。
+
+**根因**（按 issue #264 / #272 定位结论）：用例申请的 **host 内存（pin memory、KV cache 等）超过节点可用内存**——#272 为用例并发较高、hicache size 分配过大；#264 为 a2b3-8 节点资源不足。
+
+**解决**：
+
+1. 先从报错区分是 **host 内存（207001）** 还是容器 `OOMKilled`；
+2. 降低用例并发、**调小 hicache size** 等 host 内存分配（#272 调整后解决）；
+3. 资源仍不足时改用**更大规格的标签**（#264 改用 a3-800i-8，并提高内存限制）；
+4. 重跑验证。
+
+> **Ref:**
+> [#264](https://github.com/ascend-gha-runners/docs/issues/264)
+> [#272](https://github.com/ascend-gha-runners/docs/issues/272)
+
 #### /dev/shm 不足 { #dev-shm-oom }
 
 **现象**：多模态用例（如 qwen2.5-VL）在 2 卡等小卡数 runner 上因 **`/dev/shm` 空间不足** 而 OOM，必须换更大规格的机器才能跑过（issue #27）。
@@ -328,6 +351,21 @@
 
 > **Ref:**
 > [linux-aarch64-test-hook_user-script-error · ascend-gha-runners/add-node-check@3cd45c8](https://github.com/ascend-gha-runners/add-node-check/actions/runs/29319724802)
+
+#### kubeconfig / secret 指向错误集群 { #kubeconfig-wrong-cluster }
+
+**现象**：**Running** 阶段任务内 kubectl / 客户端连不上 API：**`dial tcp <internal-ip>:5443: i/o timeout`**、**`Unable to connect to the server`**（issue #293）。
+
+**根因**（按 issue #293 定位结论）：仓库 secret 中的 **kubeconfig 指向了非目标集群**（本次指向香港集群），业务方配置错误。
+
+**解决**（按 issue #293 处理过程）：
+
+1. 核对 secret 中 kubeconfig 的 **server 地址**是否为目标集群；
+2. 向基础设施方获取目标集群正确的 kubeconfig（优先使用**内部 server 地址**）；
+3. 更新 secret 后重跑（#293 更新后任务通过）。
+
+> **Ref:**
+> [#293](https://github.com/ascend-gha-runners/docs/issues/293)
 
 #### 上传日志 / 产物失败（需加网络白名单） { #upload-artifact-whitelist }
 
@@ -362,16 +400,18 @@
 
 #### 依赖缓存异常（pypi / rust） { #dependency-cache-error }
 
-**现象**：安装依赖报 **`read timeout`**、**`Download failed because not enough bytes were received`**、**`HTTP status server error (503)`**（issue #32 / #98 / #113 / #117）；或依赖下载耗时超过 2h（rust 依赖走官方源，issue #89）。
+**现象**：安装依赖报 **`read timeout`**、**`Download failed because not enough bytes were received`**、**`HTTP status server error (503)`**（issue #32 / #98 / #113 / #117）；或依赖下载耗时超过 2h（rust 依赖走官方源，issue #89）；或包 **hash 校验不匹配**：`THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE`（issue #208）；或 cargo 拉取 **crates.io 反代超时**（issue #274）。
 
-**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。
+**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。hash 不匹配多为**镜像站未同步 / 缓存服务版本旧**（issue #208 定位为 download-r2 镜像站未同步、nginx 版本过旧）；crates.io 反代超时为**代理稳定性**问题（issue #274）。
 
 **解决**：
 
 1. 确认报错来自缓存服务还是已外溢到官方源；
-2. 调整缓存服务配置（关闭 keepalive、增大 `proxy_read_timeout`、缩短锁寿命）；
-3. 转发镜像站改用 CDN 加速域名；
-4. 社区依赖（如 rust）改用国内镜像站。
+2. 若报 **hash 校验不匹配**：联系 CI 侧刷新镜像站 / 更新缓存服务，**不要反复重试**（issue #208）；
+3. 若 **cargo / crates.io 超时**：先 Re-run failed jobs，反复超时反馈 CI 侧（issue #274）；
+4. 调整缓存服务配置（关闭 keepalive、增大 `proxy_read_timeout`、缩短锁寿命）；
+5. 转发镜像站改用 CDN 加速域名；
+6. 社区依赖（如 rust）改用国内镜像站。
 
 > **Ref:**
 > [#32](https://github.com/ascend-gha-runners/docs/issues/32)
@@ -379,6 +419,8 @@
 > [#98](https://github.com/ascend-gha-runners/docs/issues/98)
 > [#113](https://github.com/ascend-gha-runners/docs/issues/113)
 > [#117](https://github.com/ascend-gha-runners/docs/issues/117)
+> [#208](https://github.com/ascend-gha-runners/docs/issues/208)
+> [#274](https://github.com/ascend-gha-runners/docs/issues/274)
 
 #### 任务耗时异常（模型加载 / checkout） { #ci-slow }
 
@@ -395,6 +437,24 @@
 > **Ref:**
 > [#13](https://github.com/ascend-gha-runners/docs/issues/13)
 > [#202](https://github.com/ascend-gha-runners/docs/issues/202)
+
+### 构建错误
+
+#### 构建缓存损坏（BuildKit parent snapshot 不存在） { #buildkit-cache-corrupt }
+
+**现象**：镜像构建报 **`ERROR: failed to solve: failed to compute cache key: parent snapshot sha256:... does not exist: not found`**，同一脚本只有**部分 agent / 机器**失败（issue #291）。
+
+**根因**（按 issue #291 定位结论）：agent 本地 **buildx 缓存层链损坏**（历史构建中断 / 磁盘写满导致缓存导出截断），父 snapshot 丢失后每次构建必挂；清缓存后的冷构建还暴露了缓存服务地址失效、安全组未放行等隐藏问题。
+
+**解决**（按 issue #291 处理过程）：
+
+1. 重跑确认失败是否**固定在某些 agent / 机器**上；
+2. 联系 CI 侧**清理并重建该 agent 的 buildx 缓存**；
+3. 若清缓存后冷构建暴露缓存服务地址失效 / 网络未放行，一并修复；
+4. 重跑验证。
+
+> **Ref:**
+> [#291](https://github.com/ascend-gha-runners/docs/issues/291)
 
 ### 任务卡死 / 超时
 
@@ -437,24 +497,27 @@
 
 #### 模型缓存缺失 / 不完整 { #incomplete-model-snapshot }
 
-**现象**：**Running** 阶段报模型缓存相关错误，两种形态：
+**现象**：**Running** 阶段报模型缓存相关错误，三种形态：
 
 - 缓存**残缺**：`huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing`（issue #242）；
-- 缓存**缺失**：`huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled`（issue #220）；或缓存缺 shard（issue #200：`1 valid / 1 missing`）。
+- 缓存**缺失**：`huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled`（issue #220）；或缓存缺 shard（issue #200：`1 valid / 1 missing`）；
+- 缓存**版本不兼容**：加载权重报 `KeyError: 'wkv.weight_offset'` 等键缺失（issue #268），多为**残留旧版本缓存**与当前代码的索引结构不一致。
 
-**根因**：任务实际调度到的集群上**没有该模型缓存**或**缓存缺文件**，离线模式（`local_files_only=True`）下无法在线补齐。
+**根因**：任务实际调度到的集群上**没有该模型缓存**、**缓存缺文件**，或**缓存是旧版本**，离线模式（`local_files_only=True`）下无法在线补齐。
 
-**解决**（按 issue #242 / #220 / #200 处理过程）：
+**解决**（按 issue #242 / #220 / #200 / #268 处理过程）：
 
 1. 从报错确认缺失的模型与文件清单（issue #242 给出的排查地址：https://fayespica.github.io/ascend-image-ci/ ）；
 2. 确认任务实际调度到的集群上是否有该模型缓存（缺失与残缺都可能，issue #220 确认 gy005 已有对应模型）；
-3. 联系基础设施方**补齐 / 重新下载**缺失的模型缓存（issue #242 i2v 已存在、t2v 缺失，重新下载后解决；issue #200 下载缺少的相关模型）；
-4. 补齐后重新触发 workflow。
+3. 若报 **KeyError** 等版本不兼容错误：确认缓存版本与当前代码匹配，**清理旧版本缓存后重新下载**（issue #268 清理旧版本模型后任务恢复正常）；
+4. 联系基础设施方**补齐 / 重新下载**缺失的模型缓存（issue #242 i2v 已存在、t2v 缺失，重新下载后解决；issue #200 下载缺少的相关模型）；
+5. 补齐后重新触发 workflow。
 
 > **Ref:**
 > [#242](https://github.com/ascend-gha-runners/docs/issues/242)
 > [#220](https://github.com/ascend-gha-runners/docs/issues/220)
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
+> [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 
 ---
 
@@ -505,26 +568,61 @@
 > [#221](https://github.com/ascend-gha-runners/docs/issues/221)
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
 
+### 控制面
+
+#### 控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403） { #apiserver-transient-window }
+
+**现象**：job 收尾（cleanup）阶段突然失败，日志报 **`FetchError: request to https://<internal-ip>/apis/authorization.k8s.io/v1/selfsubjectaccessreviews failed, reason: connect ECONNREFUSED`**，或同一请求返回 **`403 forbidden`**；**同一时间窗口多个 PR / 仓库一起红**，重跑即过（issue #274）。
+
+**根因**（按 issue #274 定位结论）：托管 apiserver 后端轮换窗口内**转发规则未原子切换** / 新实例 **RBAC 缓存未完成同步**；容器钩子的预检请求「单发无重试」，把秒级抖动放大成 job 失败。
+
+**解决**：
+
+1. 确认是否**同一时间窗口多条 CI 同时失败**、重跑能否通过；
+2. 直接 **Re-run failed jobs**；
+3. **不要**据此修改 RBAC / ServiceAccount 权限；
+4. 反复出现时反馈 CI 侧（钩子预检重试已在推进）。
+
+> **Ref:**
+> [#274](https://github.com/ascend-gha-runners/docs/issues/274)
+
 ### 节点异常
+
+#### 节点维护后异常（共享盘未挂载 / 白名单缺失） { #node-after-maintenance }
+
+**现象**：节点下电再上电 / 维护后出现两类问题：CI **找不到模型**；恢复挂载后又因**无法访问 `api.github.com`** 而接收不到任务（issue #284）。
+
+**根因**（按 issue #284 定位结论）：维护后**共享盘未重新挂载**；实验室防火墙**白名单未放行** CI 所需域名。
+
+**解决**（按 issue #284 处理过程）：
+
+1. 检查该节点**共享盘是否已挂载**（CI 找不到模型）；
+2. 确认节点到 GitHub / 依赖源的**出网白名单**齐全；
+3. 恢复挂载、补齐白名单后重跑。
+
+> **Ref:**
+> [#284](https://github.com/ascend-gha-runners/docs/issues/284)
 
 #### 节点 DNS 解析异常 / 时钟偏移 { #node-infra-abnormal }
 
-**现象**：runner 日志报 **`Could not resolve host: pipelinesghubeus11.actions.githubusercontent.com`**、**`Socket Error: TryAgain`**（issue #48 / #88），任务持续排队无法执行；或安装阶段报 `No module named 'deep_ep'`（torch_npu 下载失败，issue #49）；或 runner 无法注册、arc 向 GitHub 鉴权失败（issue #99）。
+**现象**：runner 日志报 **`Could not resolve host: pipelinesghubeus11.actions.githubusercontent.com`**、**`Socket Error: TryAgain`**（issue #48 / #88），任务持续排队无法执行；或安装阶段报 `No module named 'deep_ep'`（torch_npu 下载失败，issue #49）；或 runner 无法注册、arc 向 GitHub 鉴权失败（issue #99）；或任务内访问集群服务报 `Could not resolve host: rayjob-submitter.ci-system.svc.cluster.local`（issue #270）。
 
-**根因**：节点 **DNS 解析插件异常**，runner pod 无法访问 GitHub 中央服务 / 无法下载依赖；或节点**未配置 NTP**，时钟偏移导致鉴权失败。
+**根因**：节点 **DNS 解析插件异常**，runner pod 无法访问 GitHub 中央服务 / 无法下载依赖；或节点**未配置 NTP**，时钟偏移导致鉴权失败；或**目标集群未部署所需服务 / 服务配置与集群实际不一致**（issue #270：集群缺少 ray 服务；磁盘路径调整后 ray 服务仍指向旧路径，报 `FailedMount ... hostPath type check failed`）。
 
 **解决**：
 
 1. 在 runner pod 内用 `curl -v` / `nslookup` 验证解析，并检查节点时间是否偏移；
-2. 确认为节点级故障；
-3. 置换该节点；
-4. 排查修复 DNS 插件 / 配置 NTP。
+2. 若是**服务域名解析失败**：确认目标集群是否部署了所需服务，以及服务配置中的节点路径是否与集群实际一致（issue #270 修正 ray 配置后恢复）；
+3. 确认为节点级故障；
+4. 置换该节点；
+5. 排查修复 DNS 插件 / 配置 NTP。
 
 > **Ref:**
 > [#48](https://github.com/ascend-gha-runners/docs/issues/48)
 > [#49](https://github.com/ascend-gha-runners/docs/issues/49)
 > [#88](https://github.com/ascend-gha-runners/docs/issues/88)
 > [#99](https://github.com/ascend-gha-runners/docs/issues/99)
+> [#270](https://github.com/ascend-gha-runners/docs/issues/270)
 
 #### 节点硬件故障（NPU 挂死 / NotReady） { #node-hardware-failure }
 
@@ -605,5 +703,5 @@
 
 ---
 
-**Document version:** v2.3
-**Last updated:** 2026-09-28
+**Document version:** v2.4
+**Last updated:** 2026-10-22
