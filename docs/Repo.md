@@ -12,13 +12,13 @@
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | - | - | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
-| [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | - | - | - |
+| [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | - | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | ✅ | ✅ | - |
@@ -30,4 +30,4 @@
 >
 > Last checked: 2026-10-22
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/39759761766](https://github.com/ascend-gha-runners/docs/actions/runs/39759761766)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/39780859007](https://github.com/ascend-gha-runners/docs/actions/runs/39780859007)
