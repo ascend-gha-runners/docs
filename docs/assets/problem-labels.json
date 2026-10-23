@@ -5,10 +5,6 @@
       "linux-amd64-cpu-4-cn12-001"
     ],
     "Ascend/pytorch": [
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -23,15 +19,6 @@
       "linux-aarch64-a2b3-2",
       "linux-aarch64-a2b3-4",
       "linux-aarch64-a2b3-8",
-      "linux-aarch64-a3-0-cn12-001",
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-16-cn12-001",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-2-cn12-001",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-4-cn12-001",
-      "linux-aarch64-a3-8",
-      "linux-aarch64-a3-8-cn12-001",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -45,22 +32,12 @@
       "linux-amd64-cpu-8"
     ],
     "alibaba/ROLL": [
-      "linux-aarch64-a3-0",
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
       "linux-aarch64-a3-800i-8-cn12-001"
     ],
     "areal-project/AReaL": [
-      "linux-aarch64-a3-0",
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-16",
       "linux-aarch64-a3-800i-2",
       "linux-aarch64-a3-800i-4",
@@ -145,10 +122,6 @@
       "linux-amd64-a5-8-sh-002"
     ],
     "tile-ai/tilelang-mlir-ascend": [
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -159,10 +132,6 @@
       "linux-aarch64-a2b1-2",
       "linux-aarch64-a2b1-4",
       "linux-aarch64-a2b1-8",
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -200,10 +169,6 @@
       "linux-aarch64-a2b3-2",
       "linux-aarch64-a2b3-4",
       "linux-aarch64-a2b3-8",
-      "linux-aarch64-a3-16",
-      "linux-aarch64-a3-2",
-      "linux-aarch64-a3-4",
-      "linux-aarch64-a3-8",
       "linux-aarch64-a3-800i-0-cn12-001",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
@@ -483,19 +448,11 @@
     "linux-aarch64-a3": [
       "ascend-cn12-001-cluster"
     ],
-    "linux-aarch64-a3-0": [
-      "ascend-cn12-001-cluster"
-    ],
-    "linux-aarch64-a3-0-cn12-001": [
-      "ascend-cn12-001-cluster"
-    ],
     "linux-aarch64-a3-0-sh-001": [
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a3-16": [
-      "ascend-aiframework",
       "ascend-cn12-001-cluster",
-      "ascend-mind-third-ci",
       "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-16-cn12-001": [
@@ -505,9 +462,7 @@
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a3-2": [
-      "ascend-aiframework",
       "ascend-cn12-001-cluster",
-      "ascend-mind-third-ci",
       "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-2-cn12-001": [
@@ -517,9 +472,7 @@
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a3-4": [
-      "ascend-aiframework",
       "ascend-cn12-001-cluster",
-      "ascend-mind-third-ci",
       "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-4-cn12-001": [
@@ -529,9 +482,7 @@
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a3-8": [
-      "ascend-aiframework",
       "ascend-cn12-001-cluster",
-      "ascend-mind-third-ci",
       "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-8-cn12-001": [
