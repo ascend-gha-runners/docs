@@ -16,7 +16,7 @@
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | - | - | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
-| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
+| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | - | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ❌ | ❌ | - | ✅ | - |
@@ -30,4 +30,4 @@
 >
 > Last checked: 2026-10-27
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40476175135](https://github.com/ascend-gha-runners/docs/actions/runs/40476175135)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40478990244](https://github.com/ascend-gha-runners/docs/actions/runs/40478990244)
