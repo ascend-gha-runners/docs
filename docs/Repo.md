@@ -30,4 +30,4 @@
 >
 > Last checked: 2026-10-27
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40438257149](https://github.com/ascend-gha-runners/docs/actions/runs/40438257149)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40447315442](https://github.com/ascend-gha-runners/docs/actions/runs/40447315442)
