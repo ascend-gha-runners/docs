@@ -19,6 +19,11 @@
       "linux-aarch64-a2b3-2",
       "linux-aarch64-a2b3-4",
       "linux-aarch64-a2b3-8",
+      "linux-aarch64-a3-0-cn12-001",
+      "linux-aarch64-a3-16-cn12-001",
+      "linux-aarch64-a3-2-cn12-001",
+      "linux-aarch64-a3-4-cn12-001",
+      "linux-aarch64-a3-8-cn12-001",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -67,6 +72,10 @@
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
       "linux-aarch64-a2-8",
+      "linux-aarch64-a3-16-cn12-001",
+      "linux-aarch64-a3-2-cn12-001",
+      "linux-aarch64-a3-4-cn12-001",
+      "linux-aarch64-a3-8-cn12-001",
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
@@ -442,6 +451,9 @@
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a3": [
+      "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-0-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-0-sh-001": [
