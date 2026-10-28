@@ -144,6 +144,41 @@ title: 问题登记
 .pr-tree-result-path { display: block; margin-top: 0.15rem; font-size: 0.74rem; color: var(--md-default-fg-color--light); }
 .pr-tree-noresult { font-size: 0.78rem; color: var(--md-default-fg-color--light); margin: 0; }
 
+/* 第 1 步：两个入口（Job 链接 / 报错搜索） */
+.pr-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.6rem; }
+.pr-tab {
+  font-size: 0.82rem; padding: 0.32rem 0.7rem; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--md-default-fg-color--light);
+  border: 1px solid var(--md-default-fg-color--lighter);
+}
+.pr-tab:hover { border-color: var(--md-primary-fg-color); color: var(--md-primary-fg-color); }
+.pr-tab.is-active { background: var(--md-primary-fg-color); border-color: var(--md-primary-fg-color); color: var(--md-primary-bg-color); }
+.pr-entry[hidden] { display: none; }
+.pr-job-row { display: flex; gap: 0.4rem; align-items: center; }
+.pr-job-row input { flex: 0 1 40%; max-width: 40%; margin: 0; padding: 0.45rem 0.7rem; min-height: 2.4rem; font-size: 0.95rem; }
+@media (max-width: 600px) {
+  .pr-job-row { flex-wrap: wrap; }
+  .pr-job-row input { flex: 1 1 100%; max-width: 100%; }
+}
+.pr-job-result { margin-top: 0.55rem; }
+.pr-job-result[hidden] { display: none; }
+.pr-job-kv { font-size: 0.8rem; line-height: 1.75; margin: 0 0 0.45rem; }
+.pr-job-kv-grid { display: grid; grid-template-columns: max-content 1fr; column-gap: 0.9rem; row-gap: 0.1rem; align-items: baseline; }
+.pr-job-k { color: var(--md-default-fg-color--light); white-space: nowrap; }
+.pr-job-v { word-break: break-all; }
+.pr-job-badge { display: inline-block; border-radius: 999px; padding: 0.06rem 0.5rem; font-size: 0.72rem; font-weight: 600; vertical-align: middle; }
+.pr-job-badge--fail { background: rgba(217, 48, 37, 0.14); color: #d93025; }
+.pr-job-badge--run { background: rgba(26, 115, 232, 0.14); color: #1a73e8; }
+.pr-job-badge--ok { background: rgba(30, 126, 52, 0.14); color: #1e7e34; }
+.pr-job-badge--wait { background: rgba(160, 90, 0, 0.14); color: #a05a00; }
+.pr-job-note { font-size: 0.76rem; color: var(--md-default-fg-color--light); margin: 0.35rem 0 0; }
+.pr-link-btn {
+  background: none; border: none; padding: 0; cursor: pointer; font-size: 0.8rem;
+  color: var(--md-primary-fg-color); text-decoration: underline;
+}
+.pr-job-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.pr-job-pick { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.4rem 0 0.2rem; max-height: 260px; overflow: auto; }
+
 /* 叶子：案例卡 */
 .pr-leaf { border: 1px solid var(--md-default-fg-color--lightest); border-left: 3px solid var(--md-primary-fg-color); border-radius: 10px; padding: 0.6rem 0.9rem; }
 .pr-leaf-title { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
@@ -165,6 +200,9 @@ title: 问题登记
 .pr-leaf-steps li { margin: 0.2rem 0; }
 .pr-leaf-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
 .pr-leaf-links a { font-size: 0.8rem; }
+.pr-leaf-related { margin: 0 0 0.4rem; }
+.pr-leaf-related-title { font-size: 0.76rem; color: var(--md-default-fg-color--light); margin: 0 0 0.35rem; }
+.pr-related { font-size: 0.78rem; }
 .pr-leaf-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem; }
 
 /* 补充信息复选框 */
@@ -208,7 +246,7 @@ title: 问题登记
     <ol class="pr-steps-v" aria-label="登记流程">
       <li class="pr-step is-active" data-step="1">
         <span class="pr-step-dot">1</span>
-        <span class="pr-step-meta"><span class="pr-step-title">自查与自助</span><span class="pr-step-sub">先自查能否解决</span></span>
+        <span class="pr-step-meta"><span class="pr-step-title">定位问题</span><span class="pr-step-sub">Job 链接或报错搜索</span></span>
       </li>
       <li class="pr-step" data-step="2">
         <span class="pr-step-dot">2</span>
@@ -233,14 +271,29 @@ title: 问题登记
     <form id="pr-form" autocomplete="off">
 
       <section class="pr-panel" data-step="1">
-        <h2>1 · 自查与自助</h2>
-        <p class="pr-hint">按下面的分叉流程逐步判断，或直接输入报错关键词搜索案例（命中后一次展开整条链路）；能自助解决的当场处理，解决后可点叶子节点里的「已解决」自愿登记（仅统计用，可不留名）；确实解决不了再点「仍未解决 → 继续登记」进入提单。</p>
-        <input type="search" id="pr-tree-search" class="pr-tree-search"
-               placeholder="输入报错关键词搜索案例，如 ErrImagePull / exit 137 / Disk quota…" autocomplete="off" aria-label="搜索错误信息">
-        <div id="pr-tree-results" class="pr-tree-results" hidden></div>
-        <div class="pr-tree" id="pr-tree">
-          <div class="pr-tree-path" id="pr-tree-path" aria-label="已选择路径"></div>
-          <div class="pr-tree-node" id="pr-tree-node"></div>
+        <h2>1 · 定位问题</h2>
+        <p class="pr-hint">先按报错关键词或现象找案例；没找到再贴失败的 Job 链接，自动识别状态、标签、集群并匹配案例；都不行再提单。</p>
+        <div class="pr-tabs" role="tablist">
+          <button type="button" class="pr-tab is-active" data-entry="tree" role="tab">根据报错信息和现象</button>
+          <button type="button" class="pr-tab" data-entry="job" role="tab">根据失败 Job 链接</button>
+        </div>
+        <div class="pr-entry" id="pr-entry-tree">
+          <input type="search" id="pr-tree-search" class="pr-tree-search"
+                 placeholder="输入报错关键词搜索案例，如 ErrImagePull / exit 137 / Disk quota…" autocomplete="off" aria-label="搜索错误信息">
+          <div id="pr-tree-results" class="pr-tree-results" hidden></div>
+          <div class="pr-tree" id="pr-tree">
+            <div class="pr-tree-path" id="pr-tree-path" aria-label="已选择路径"></div>
+            <div class="pr-tree-node" id="pr-tree-node"></div>
+          </div>
+        </div>
+        <div class="pr-entry" id="pr-entry-job" hidden>
+          <div class="pr-job-row">
+            <input type="url" id="pr-job-url" autocomplete="off"
+                   placeholder="粘贴 .../actions/runs/123456/job/789012 或 .../actions/runs/123456">
+            <button type="button" id="pr-job-btn" class="pr-btn pr-btn-sm">识别任务</button>
+          </div>
+          <p class="pr-job-note">支持单个 Job 链接或整条 run 链接（会列出该次运行的 job 让你选）；只读 GitHub 公开接口，不需要登录。</p>
+          <div id="pr-job-result" class="pr-job-result" hidden></div>
         </div>
       </section>
 

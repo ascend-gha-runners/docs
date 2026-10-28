@@ -96,6 +96,7 @@
       "type": "leaf",
       "title": "ErrImagePull（镜像拉取失败）",
       "summary": "镜像不存在、名称或版本写错，或私有镜像缺拉取凭证。",
+      "symptoms": ["ErrImagePull", "ImagePullBackOff", "failed to pull and unpack image", "not found"],
       "badge": "check-workflow",
       "steps": [
         "核对 workflow 中 container.image 的镜像名、tag 是否真实存在",
@@ -143,6 +144,7 @@
       "type": "leaf",
       "title": "FailedScheduling（调度失败）",
       "summary": "nodeSelector 无匹配节点，或资源请求超过节点上限；也可能是节点 CPU 不足导致 Pod 被拒（OutOfcpu）。",
+      "symptoms": ["FailedScheduling", "OutOfcpu", "didn't have enough resource", "Insufficient cpu", "didn't match Pod's node affinity"],
       "badge": "check-resource",
       "steps": [
         "检查 runs-on / nodeSelector 是否有匹配的节点",
@@ -208,6 +210,7 @@
       "type": "leaf",
       "title": "host 内存不足（aclrtMallocHostWithCfg 207001）",
       "summary": "Running 阶段报 torch.OutOfMemoryError: allocate_host_memory_slowpath，错误码 207001（Memory_Allocation_Failure EL0004）；不是 K8s OOMKilled。",
+      "symptoms": ["207001", "aclrtMallocHostWithCfg", "allocate_host_memory_slowpath", "Memory_Allocation_Failure", "EL0004", "allocate host memory"],
       "badge": "check-resource",
       "steps": [
         "从报错确认是 host 内存（207001）而非容器 OOMKilled",
@@ -241,6 +244,7 @@
       "type": "leaf",
       "title": "kubeconfig / secret 指向错误集群",
       "summary": "任务内连不上 K8s API：dial tcp ...:5443: i/o timeout、Unable to connect to the server；secret 中的 kubeconfig 指向了非目标集群。",
+      "symptoms": ["dial tcp", "i/o timeout", "Unable to connect to the server", "5443", "kubeconfig"],
       "badge": "check-workflow",
       "steps": [
         "核对 secret 中 kubeconfig 的 server 地址是否为目标集群",
@@ -344,6 +348,7 @@
       "type": "leaf",
       "title": "构建缓存损坏（BuildKit parent snapshot 不存在）",
       "summary": "镜像构建报 failed to compute cache key: parent snapshot ... does not exist，固定在某些 agent 上失败。",
+      "symptoms": ["parent snapshot", "failed to compute cache key", "does not exist", "buildkit", "failed to solve"],
       "badge": "ci-infra",
       "steps": [
         "重跑确认失败是否固定在部分 agent / 机器上",
@@ -388,6 +393,7 @@
       "type": "leaf",
       "title": "模型缓存缺失 / 不完整",
       "summary": "Running 阶段报 IncompleteSnapshotError、LocalEntryNotFoundError，或残留旧版本缓存与当前代码不兼容（如 KeyError: ...weight_offset）：集群侧无该模型缓存、缓存缺文件，或缓存版本不对。",
+      "symptoms": ["IncompleteSnapshotError", "LocalEntryNotFoundError", "KeyError", "weight_offset", "local_files_only", "snapshot is incomplete"],
       "badge": "ci-infra",
       "steps": [
         "从报错信息确认缺失的模型与文件清单",
@@ -448,6 +454,7 @@
       "type": "leaf",
       "title": "镜像拉取慢（Initialize containers 卡住）",
       "summary": "Pod 停在 Initialize containers 很久不前进，镜像在目标架构节点上没有缓存、拉取很慢。",
+      "symptoms": ["Initialize containers", "PodInitializing", "ContainerCreating", "image pull slow", "ErrImagePull"],
       "badge": "check-workflow",
       "steps": [
         "改用国内加速镜像源（如 ghcr 南京源）",
@@ -463,6 +470,7 @@
       "type": "leaf",
       "title": "容器启动即死（postStart 钩子 exit 137）",
       "summary": "pod 启动即死，报 exit code 137（非 OOM）；kubelet 报 Failed to execute PostStartHook: failed to drain exec process io in 2s。",
+      "symptoms": ["exit code 137", "FailedPostStartHook", "drain exec process io", "postStart", "Likely OOM"],
       "badge": "ci-infra",
       "steps": [
         "把 postStart 钩子里的 bash 写法 &> /dev/null 改为 POSIX 的 > /dev/null 2>&1",
@@ -509,6 +517,7 @@
       "type": "leaf",
       "title": "/dev/shm 不足",
       "summary": "多模态等用例在小卡数 runner 上 /dev/shm OOM，需要更大规格才能跑过。",
+      "symptoms": ["/dev/shm", "shm OOM", "Bus error", "No space left on device"],
       "badge": "ci-infra",
       "steps": [
         "确认报错指向 /dev/shm 空间不足",
@@ -539,6 +548,7 @@
       "type": "leaf",
       "title": "依赖缓存异常（pypi / rust）",
       "summary": "安装依赖报 read timeout / 503 / 下载字节不足、包 hash 校验不匹配、crates.io 反代超时，或依赖下载耗时极长。",
+      "symptoms": ["read timeout", "503", "THESE PACKAGES DO NOT MATCH THE HASHES", "crates.io", "not enough bytes were received", "Download failed"],
       "badge": "ci-infra",
       "steps": [
         "确认报错来自缓存服务还是外溢到官方源",
@@ -606,6 +616,7 @@
       "type": "leaf",
       "title": "节点维护后异常（共享盘未挂载 / 白名单缺失）",
       "summary": "节点下电再上电 / 维护后，任务找不到模型，或 runner 无法访问 api.github.com、一直不接收任务。",
+      "symptoms": ["FailedMount", "hostPath type check failed", "Could not resolve host", "api.github.com", "shared disk"],
       "badge": "ci-infra",
       "steps": [
         "检查该节点共享盘是否已重新挂载",
@@ -638,6 +649,7 @@
       "type": "leaf",
       "title": "控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403）",
       "summary": "job 收尾阶段报 selfsubjectaccessreviews 请求 ECONNREFUSED 或 403，同一时间窗口多个 PR 一起红，重跑即过。",
+      "symptoms": ["ECONNREFUSED", "selfsubjectaccessreviews", "403 forbidden", "Forbidden", "FetchError"],
       "badge": "ci-infra",
       "steps": [
         "确认是否同一时间窗口多条 CI 同时失败",
