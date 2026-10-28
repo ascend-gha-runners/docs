@@ -213,6 +213,7 @@
       "linux-aarch64-310p-2",
       "linux-aarch64-310p-4",
       "linux-aarch64-310p-8",
+      "linux-aarch64-310p-test-8",
       "linux-aarch64-910b-1",
       "linux-aarch64-910b-2",
       "linux-aarch64-910b-4",
@@ -236,6 +237,7 @@
       "linux-aarch64-a2b1b3-2-hk-001",
       "linux-aarch64-a2b1b3-4-hk-001",
       "linux-aarch64-a2b1b3-8-hk-001",
+      "linux-aarch64-a2b1b3-test-8-hk-001",
       "linux-aarch64-a2b3-0",
       "linux-aarch64-a2b3-1",
       "linux-aarch64-a2b3-2",
@@ -260,11 +262,14 @@
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
       "linux-aarch64-a3-800i-8-cn12-001",
+      "linux-aarch64-a3-800i-test-16-cn12-001",
       "linux-aarch64-a3-800t-0-cn12-001",
       "linux-aarch64-a3-800t-16-cn12-001",
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
+      "linux-aarch64-a3-test-16-gy005",
+      "linux-aarch64-a3-test-16-sh-001",
       "linux-aarch64-a5-0",
       "linux-aarch64-a5-2",
       "linux-aarch64-a5-4",
@@ -310,6 +315,9 @@
       "openmerlin-guiyang-003-cluster"
     ],
     "linux-aarch64-310p-8": [
+      "openmerlin-guiyang-003-cluster"
+    ],
+    "linux-aarch64-310p-test-8": [
       "openmerlin-guiyang-003-cluster"
     ],
     "linux-aarch64-910b-1": [
@@ -397,6 +405,9 @@
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b1b3-8-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2b1b3-test-8-hk-001": [
       "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b3": [
@@ -553,6 +564,12 @@
     ],
     "linux-aarch64-a3-offload-test": [
       "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-test-16-gy005": [
+      "openmerlin-guiyang-005-cluster"
+    ],
+    "linux-aarch64-a3-test-16-sh-001": [
+      "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a5": [
       "openmerlin-sh-001-cluster"
