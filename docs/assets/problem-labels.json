@@ -250,6 +250,7 @@
       "linux-aarch64-a2b4-4-hk-001",
       "linux-aarch64-a2b4-8-hk-001",
       "linux-aarch64-a3-0-sh-001",
+      "linux-aarch64-a3-1",
       "linux-aarch64-a3-16",
       "linux-aarch64-a3-16-sh-001",
       "linux-aarch64-a3-2",
@@ -271,6 +272,7 @@
       "linux-aarch64-a3-test-16-gy005",
       "linux-aarch64-a3-test-16-sh-001",
       "linux-aarch64-a5-0",
+      "linux-aarch64-a5-1",
       "linux-aarch64-a5-2",
       "linux-aarch64-a5-4",
       "linux-aarch64-a5-8",
@@ -474,6 +476,9 @@
     "linux-aarch64-a3-0-sh-001": [
       "openmerlin-sh-001-cluster"
     ],
+    "linux-aarch64-a3-1": [
+      "ascend-cn12-001-cluster"
+    ],
     "linux-aarch64-a3-16": [
       "ascend-cn12-001-cluster",
       "openmerlin-guiyang-004-cluster"
@@ -575,6 +580,9 @@
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a5-0": [
+      "openmerlin-sh-001-cluster"
+    ],
+    "linux-aarch64-a5-1": [
       "openmerlin-sh-001-cluster"
     ],
     "linux-aarch64-a5-2": [
