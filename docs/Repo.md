@@ -16,7 +16,7 @@
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | - | - | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
-| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
+| [Ascend/sglang](https://github.com/Ascend/sglang) | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | - | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ |
@@ -28,6 +28,6 @@
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
-> Last checked: 2026-10-28
+> Last checked: 2026-10-29
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40708672501](https://github.com/ascend-gha-runners/docs/actions/runs/40708672501)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/40802424581](https://github.com/ascend-gha-runners/docs/actions/runs/40802424581)
