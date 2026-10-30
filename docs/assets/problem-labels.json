@@ -40,6 +40,16 @@
       "linux-amd64-cpu-4",
       "linux-amd64-cpu-8"
     ],
+    "XPU-Forces/mojo_opset": [
+      "linux-aarch64-a2b3-1-hk-001",
+      "linux-aarch64-a2b3-2-hk-001",
+      "linux-aarch64-a2b3-4-hk-001",
+      "linux-aarch64-a2b3-8-hk-001",
+      "linux-aarch64-a3-800i-16-cn12-001",
+      "linux-aarch64-a3-800i-2-cn12-001",
+      "linux-aarch64-a3-800i-4-cn12-001",
+      "linux-aarch64-a3-800i-8-cn12-001"
+    ],
     "alibaba/ROLL": [
       "linux-aarch64-a3-800i-16-cn12-001",
       "linux-aarch64-a3-800i-2-cn12-001",
@@ -424,17 +434,29 @@
       "ascend-hk-001-cluster",
       "in-cluster"
     ],
+    "linux-aarch64-a2b3-1-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b3-2": [
       "ascend-hk-001-cluster",
       "in-cluster"
+    ],
+    "linux-aarch64-a2b3-2-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b3-4": [
       "ascend-hk-001-cluster",
       "in-cluster"
     ],
+    "linux-aarch64-a2b3-4-hk-001": [
+      "ascend-hk-001-cluster"
+    ],
     "linux-aarch64-a2b3-8": [
       "ascend-hk-001-cluster",
       "in-cluster"
+    ],
+    "linux-aarch64-a2b3-8-hk-001": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b3-v-half": [
       "ascend-hk-001-cluster"

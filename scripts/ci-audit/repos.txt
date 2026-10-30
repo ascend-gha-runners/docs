@@ -34,3 +34,5 @@ verl-project/uni-agent||||||||
 tile-ai/tilelang||||||||
 
 Ascend/cann-container-image|||||
+
+XPU-Forces/mojo_opset|||||
