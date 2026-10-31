@@ -128,7 +128,8 @@
       "linux-amd64-a5-8-sh-002",
       "linux-amd64-cpu-2",
       "linux-amd64-cpu-4",
-      "linux-amd64-cpu-8"
+      "linux-amd64-cpu-8",
+      "linux-amd64-cpu-test-8"
     ],
     "sgl-project/sglang-omni": [
       "linux-aarch64-a2-1",
@@ -711,6 +712,9 @@
     ],
     "linux-amd64-cpu-8-hk": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-amd64-cpu-test-8": [
+      "openmerlin-guiyang-004-cluster"
     ],
     "linux-arm64-cpu-16": [
       "openmerlin-guiyang-005-cluster"
