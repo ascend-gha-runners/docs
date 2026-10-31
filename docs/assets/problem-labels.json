@@ -282,6 +282,7 @@
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
+      "linux-aarch64-a3-800t-test-0-cn12-001",
       "linux-aarch64-a3-test-16-gy005",
       "linux-aarch64-a3-test-16-sh-001",
       "linux-aarch64-a5-0",
@@ -587,6 +588,9 @@
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800t-8-cn12-001": [
+      "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-800t-test-0-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800t-test-16-cn12-001": [

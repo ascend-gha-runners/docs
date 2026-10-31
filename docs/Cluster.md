@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">271</span>
+    <span class="stat-num">272</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -25,20 +25,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980">ascend-1980 · 163</option>
   <option value="cpu">CPU (no NPU) · 53</option>
   <option value="npu">npu · 29</option>
-  <option value="on-demand">on-demand · 10</option>
+  <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 9</option>
   <option value="ascend-310">ascend-310 · 5</option>
   <option value="ascend-1980-10c.3cpu.32g">ascend-1980-10c.3cpu.32g · 1</option>
   <option value="ascend-1980-5c.1cpu.16g">ascend-1980-5c.1cpu.16g · 1</option>
 </select>
-<span class="cluster-hint">9 clusters · 271 labels</span>
+<span class="cluster-hint">9 clusters · 272 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
 <div class="cluster-card" data-name="ascend-cn12-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">ascend-cn12-001-cluster</span>
-    <span class="cluster-meta">14 projects · 93 labels</span>
+    <span class="cluster-meta">14 projects · 94 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/cann-container-image linux-amd64-cpu-4 linux-aarch64-cpu-4">
@@ -195,17 +195,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-ascend-vllm-ascend-recipes</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a3-1 linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-amd64-cpu-4 linux-aarch64-cpu-4 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800t-0 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-8 linux-aarch64-a3-800i-16 linux-aarch64-a3-800t-16 linux-aarch64-a3-800i-test-16">
+    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a3-1 linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16 linux-amd64-cpu-4 linux-aarch64-cpu-4 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-8 linux-aarch64-a3-800t-0 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-8 linux-aarch64-a3-800i-16 linux-aarch64-a3-800t-16 linux-aarch64-a3-800t-test-0 linux-aarch64-a3-800i-test-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">17 labels</span>
+          <span class="project-count">18 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4-cn12-001" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-cpu-4-cn12-001" data-npu="cpu"><span class="machine-label">linux-aarch64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-800t-0-cn12-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-800t-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-test-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-test-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4-cn12-001" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-aarch64-cpu-4-cn12-001" data-npu="cpu"><span class="machine-label">linux-aarch64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-800t-0-cn12-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-800t-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-2-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-4-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-8-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-800t-test-0-cn12-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-800t-test-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-test-16-cn12-001" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-test-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
