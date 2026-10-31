@@ -15,7 +15,7 @@
 | [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | ❌ | - | ✅ | - |
-| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
+| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ✅ | - | ✅ | - |
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | - |
@@ -30,4 +30,4 @@
 >
 > Last checked: 2026-10-31
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/41160168609](https://github.com/ascend-gha-runners/docs/actions/runs/41160168609)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/41176430395](https://github.com/ascend-gha-runners/docs/actions/runs/41176430395)
