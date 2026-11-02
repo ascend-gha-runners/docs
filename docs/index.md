@@ -2,7 +2,7 @@
 
 Welcome!
 
-This document will assist organizations in using Github Actions Runners equipped with Ascend NPU chips.
+This document will assist organizations in using Github Actions Runners equipped with Huawei Ascend NPU chips.
 
 If your organization would like to use GitHub Actions runners, configure your organization according to the [GitHub Actions Integration Guide](./user-manual-gha-en.md).
 
