@@ -35,6 +35,7 @@
 | Running | 构建 | [构建缓存损坏（BuildKit parent snapshot）](#buildkit-cache-corrupt) |
 | Running | 通信 | [HCCL 通信端口被占用](#hccl-port-already-bound) |
 | Running | 环境 | [模型缓存缺失 / 不完整](#incomplete-model-snapshot) |
+| Running | 存储 | [容器可写层（临时盘）配额耗尽](#container-writable-layer-quota) |
 | 平台 | 节点资源 | [节点 NPU 被外部进程 / 带外容器占用](#npu-occupied-by-external) |
 | 平台 | 存储 | [共享盘空间不足 / 锁文件残留](#shared-storage-lock-and-space) |
 | 平台 | 节点异常 | [节点维护后异常（共享盘未挂载 / 白名单缺失）](#node-after-maintenance) |
@@ -519,6 +520,24 @@
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 
+### 存储 / 临时盘错误
+
+#### 容器可写层（临时盘）配额耗尽（EDQUOT / Disk quota exceeded） { #container-writable-layer-quota }
+
+**现象**：**Running** 阶段写文件报 **`Disk quota exceeded (os error 122)`**（EDQUOT）或 **`no space left on device`**，但共享盘 / 集群侧仍有空间，且同一 run 里其余任务正常。
+
+**根因**（按 issue #324 定位结论）：每个任务的**临时盘（容器可写层）空间有限**（单容器配额，如 100GiB），任务内有**持续写操作**且不在中间步骤清理时会写满配额——例如 pytest 的 `model.save_pretrained()` 每个用例落盘数 GB、会话内不清理，累计触顶。`/root/.cache` 除只读挂载子目录外的本体、以及 `/tmp`，都与 `/__w` 不同、同属容器可写层，把临时目录从 `/tmp` 换到这些路径并不解决配额。
+
+**解决**：
+
+1. 先从报错区分是**容器可写层配额（EDQUOT / Errno 122）**还是**共享盘满 / 配额（Errno 28 / ENOSPC）**；
+2. 任务内有持续写操作时，在**中间步骤**（每个 step / 每个用例结束）主动清理临时文件，避免反复累计；
+3. 不要把临时目录指到仍挂在容器可写层下的路径（如 `/root/.cache/temp`），它与 `/tmp` 同一文件系统，规避无效；
+4. 确需写较大文件：把临时目录指到 pod 内有更大空间的卷（如 `/__w`），并控制总量、用完即清。
+
+> **Ref:**
+> [#324](https://github.com/ascend-gha-runners/docs/issues/324)
+
 ---
 
 ## 平台 / 集群错误（集群侧）
@@ -567,6 +586,8 @@
 > [#191](https://github.com/ascend-gha-runners/docs/issues/191)
 > [#221](https://github.com/ascend-gha-runners/docs/issues/221)
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
+
+> 注意：`Errno 122`（EDQUOT）也可能来自**容器可写层（临时盘）配额**写满而非共享盘，判据见[容器可写层（临时盘）配额耗尽](#container-writable-layer-quota)。
 
 ### 控制面
 
@@ -703,5 +724,5 @@
 
 ---
 
-**Document version:** v2.4
-**Last updated:** 2026-10-22
+**Document version:** v2.5
+**Last updated:** 2026-11-04

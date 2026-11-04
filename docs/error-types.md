@@ -35,6 +35,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Running | Build | [BuildKit cache corrupt (parent snapshot not found)](#buildkit-cache-corrupt) |
 | Running | Communication | [HCCL Port Already Bound](#hccl-port-already-bound) |
 | Running | Environment | [Model Cache Missing / Incomplete](#incomplete-model-snapshot) |
+| Running | Storage | [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) |
 | Platform | Node Resource | [Node NPU occupied by an out-of-band process / container](#npu-occupied-by-external) |
 | Platform | Storage | [Shared disk full / stale lock file](#shared-storage-lock-and-space) |
 | Platform | Node | [Node abnormal after maintenance (shared disk not mounted / whitelist missing)](#node-after-maintenance) |
@@ -311,6 +312,24 @@ Running phase fails with model-cache errors in three forms: **incomplete** — `
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 
+### Storage / Temp Disk Errors
+
+#### Container writable layer (temp disk) quota exhausted (EDQUOT / Disk quota exceeded) { #container-writable-layer-quota }
+
+Reports **`Disk quota exceeded (os error 122)`** (EDQUOT) or **`no space left on device`** during the Running phase, while the shared disk / cluster still has space and the other jobs in the same run succeed.
+
+**Root cause** (per issue #324): each job's **temp disk (container writable layer) has a limited per-container quota** (e.g. 100GiB). A job with **continuous writes** that does not clean up intermediate steps fills the quota — e.g. pytest's `model.save_pretrained()` writes several GB per case with no cleanup within the session, accumulating until it hits the limit. The rest of `/root/.cache` (aside from its read-only mounted subdirs) and `/tmp` share the same writable layer (unlike `/__w`); moving the temp dir from `/tmp` to these paths does not escape the quota.
+
+**Resolution**:
+
+1. First tell **container writable-layer quota (EDQUOT / Errno 122)** apart from **shared disk full / quota (Errno 28 / ENOSPC)**;
+2. For jobs with continuous writes, clean up temp files at intermediate steps (end of each step / test case) to avoid accumulation;
+3. Don't point the temp dir at a path still on the container writable layer (e.g. `/root/.cache/temp`) — it shares the same filesystem as `/tmp`, so the workaround is ineffective;
+4. When large files are unavoidable, point the temp dir at a volume with more space on the pod (e.g. `/__w`), cap the total, and clean up when done.
+
+> **Ref:**
+> [#324](https://github.com/ascend-gha-runners/docs/issues/324)
+
 ---
 
 ## Platform / Cluster Errors
@@ -339,6 +358,8 @@ Reports **`OSError: [Errno 122] Disk quota exceeded`** (issues #191 / #221) or *
 > [#191](https://github.com/ascend-gha-runners/docs/issues/191)
 > [#221](https://github.com/ascend-gha-runners/docs/issues/221)
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
+
+> Note: `Errno 122` (EDQUOT) can also come from the **container writable layer (temp disk) quota** being exhausted rather than the shared disk — see [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) for how to tell them apart.
 
 ### Control Plane
 
@@ -412,5 +433,5 @@ If you encounter an issue not listed on this page, please [create a discussion](
 
 ---
 
-**Document version:** v2.4
-**Last updated:** 2026-10-22
+**Document version:** v2.5
+**Last updated:** 2026-11-04

@@ -1,7 +1,7 @@
 # 决策树全量路径表（人工检查用）
 
-> 生成时间：2026-10-22 11:35（由 export_tree_view.py 从 problem-tree.json 自动生成，请勿手改）
-> 共 39 条 根→叶子 路径，其中新增 6 条（与 git HEAD 已提交版本对比）
+> 生成时间：2026-11-04 18:19（由 export_tree_view.py 从 problem-tree.json 自动生成，请勿手改）
+> 共 40 条 根→叶子 路径，其中新增 1 条（与 git HEAD 已提交版本对比）
 > 步骤列中与上一行相同的留空（等效合并单元格）；— 表示该路径没有这一步
 > 已有路径视为已检查过，人工只需复查带 🆕 的新增行（下方清单可勾选）
 
@@ -18,10 +18,10 @@
 |  |  | PVC 不存在 | FailedBinding（PVC 不存在） | 检查 workflow |  |
 |  | Running（运行中报错） | 容器退出（崩溃） | Container crash（容器崩溃） | 检查 workflow |  |
 |  |  | OOM 内存不足 | OOMKilled（内存不足） | 检查资源申请 |  |
-|  |  | host 内存不足（207001） | host 内存不足（aclrtMallocHostWithCfg 207001） | 检查资源申请 | 🆕 |
+|  |  | host 内存不足（207001） | host 内存不足（aclrtMallocHostWithCfg 207001） | 检查资源申请 |  |
 |  |  | /dev/shm 不足 | /dev/shm 不足 | 基础设施处理 |  |
 |  |  | 用户脚本报错 | UserScriptError（用户脚本报错） | 检查 workflow |  |
-|  |  | kubeconfig / secret 指向错误集群 | kubeconfig / secret 指向错误集群 | 检查 workflow | 🆕 |
+|  |  | kubeconfig / secret 指向错误集群 | kubeconfig / secret 指向错误集群 | 检查 workflow |  |
 |  |  | 安装 / 编译阶段 OOM（并行度过高） | 安装 / 编译阶段 OOM（并行度过高） | 检查 workflow |  |
 |  |  | 依赖缓存异常（pypi / rust） | 依赖缓存异常（pypi / rust） | 基础设施处理 |  |
 |  |  | HCCL 通信端口被占用 | HCCL 通信端口被占用 | 检查 workflow |  |
@@ -29,21 +29,22 @@
 |  |  | 任务长时间卡住 / 超时 | 任务长时间卡住 / 超时（引擎进程挂起） | 检查 workflow |  |
 |  |  | 任务耗时异常（模型加载 / checkout） | 任务耗时异常（模型加载 / checkout） | 基础设施处理 |  |
 |  |  | 上传日志 / 产物失败 | 上传日志 / 产物失败（需加网络白名单） | 基础设施处理 |  |
+|  |  | 临时盘 / 容器可写层空间不足 | 临时盘 / 容器可写层空间不足（Disk quota exceeded / EDQUOT） | 检查 workflow | 🆕 |
 | 一直等待 / 排队 | 可能在等资源（队列满） | — | 等待资源（队列可能已满） | 基础设施处理 |  |
 |  | runs-on 标签可能不存在 | — | runs-on 标签可能不存在 | 检查 workflow |  |
 |  | Runner 可能未上线 | — | Runner 可能未上线 | 检查 GitHub 配置 |  |
 |  | Runner 名额被残留 EphemeralRunner 占用 | — | Runner 名额被残留 EphemeralRunner 占用 | 基础设施处理 |  |
 |  | Runner 版本过旧（GitHub 提升最低版本） | — | Runner 版本过旧（GitHub 提升最低版本） | 基础设施处理 |  |
 |  | 任务卡在虚拟节点（接管异常） | — | 任务卡在虚拟节点（Liqo 接管异常） | 基础设施处理 |  |
-| 构建 / 打包失败 | 构建缓存损坏（parent snapshot 不存在） | — | 构建缓存损坏（BuildKit parent snapshot 不存在） | 基础设施处理 | 🆕 |
-|  | 构建脚本 / 依赖错误 | — | 构建脚本 / 依赖错误 | 检查 workflow | 🆕 |
+| 构建 / 打包失败 | 构建缓存损坏（parent snapshot 不存在） | — | 构建缓存损坏（BuildKit parent snapshot 不存在） | 基础设施处理 |  |
+|  | 构建脚本 / 依赖错误 | — | 构建脚本 / 依赖错误 | 检查 workflow |  |
 | 集群 / 机器问题 | 弹性节点不缩容 | — | 弹性节点不缩容 | 基础设施处理 |  |
 |  | 弹性扩容失败 / 弹性节点不健康 | — | 弹性扩容失败 / 弹性节点不健康 | 基础设施处理 |  |
 |  | 节点 NPU 被外部进程 / 带外容器占用 | — | 节点 NPU 被外部进程 / 带外容器占用 | 基础设施处理 |  |
 |  | 共享盘空间不足 / 锁文件残留 | — | 共享盘空间不足 / 锁文件残留 | 基础设施处理 |  |
-|  | 节点维护后异常（共享盘未挂载 / 白名单缺失） | — | 节点维护后异常（共享盘未挂载 / 白名单缺失） | 基础设施处理 | 🆕 |
+|  | 节点维护后异常（共享盘未挂载 / 白名单缺失） | — | 节点维护后异常（共享盘未挂载 / 白名单缺失） | 基础设施处理 |  |
 |  | 节点异常（DNS 解析 / 时钟偏移） | — | 节点异常（DNS 解析 / 时钟偏移） | 基础设施处理 |  |
-|  | 控制面 API 瞬断（cleanup 阶段） | — | 控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403） | 基础设施处理 | 🆕 |
+|  | 控制面 API 瞬断（cleanup 阶段） | — | 控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403） | 基础设施处理 |  |
 |  | 节点硬件故障（NPU 挂死 / NotReady） | — | 节点硬件故障（NPU 挂死 / NotReady） | 基础设施处理 |  |
 | 其它 | — | — | 其它问题 | — |  |
 
@@ -51,9 +52,4 @@
 
 > 逐条检查路径、案例与归属是否合理；确认后勾选。
 
-- [ ] 报错 / Job 失败 → Running（运行中报错） → host 内存不足（207001） → host 内存不足（aclrtMallocHostWithCfg 207001）（检查资源申请）
-- [ ] 报错 / Job 失败 → Running（运行中报错） → kubeconfig / secret 指向错误集群 → kubeconfig / secret 指向错误集群（检查 workflow）
-- [ ] 构建 / 打包失败 → 构建缓存损坏（parent snapshot 不存在） → 构建缓存损坏（BuildKit parent snapshot 不存在）（基础设施处理）
-- [ ] 构建 / 打包失败 → 构建脚本 / 依赖错误 → 构建脚本 / 依赖错误（检查 workflow）
-- [ ] 集群 / 机器问题 → 节点维护后异常（共享盘未挂载 / 白名单缺失） → 节点维护后异常（共享盘未挂载 / 白名单缺失）（基础设施处理）
-- [ ] 集群 / 机器问题 → 控制面 API 瞬断（cleanup 阶段） → 控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403）（基础设施处理）
+- [ ] 报错 / Job 失败 → Running（运行中报错） → 临时盘 / 容器可写层空间不足 → 临时盘 / 容器可写层空间不足（Disk quota exceeded / EDQUOT）（检查 workflow）
