@@ -32,6 +32,10 @@
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
+      "linux-aarch64-a3-800t-ascend-sglang-fed-16",
+      "linux-aarch64-a3-800t-ascend-sglang-fed-2",
+      "linux-aarch64-a3-800t-ascend-sglang-fed-4",
+      "linux-aarch64-a3-800t-ascend-sglang-fed-8",
       "linux-amd64-a5-1-sh-002",
       "linux-amd64-a5-2-sh-002",
       "linux-amd64-a5-4-sh-002",
@@ -98,6 +102,10 @@
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
+      "linux-aarch64-a3-800t-sgl-kernel-fed-16",
+      "linux-aarch64-a3-800t-sgl-kernel-fed-2",
+      "linux-aarch64-a3-800t-sgl-kernel-fed-4",
+      "linux-aarch64-a3-800t-sgl-kernel-fed-8",
       "linux-amd64-a5-1-sh-002",
       "linux-amd64-a5-2-sh-002",
       "linux-amd64-a5-4-sh-002",
@@ -120,6 +128,10 @@
       "linux-aarch64-a3-800t-2-cn12-001",
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
+      "linux-aarch64-a3-800t-sglang-fed-16",
+      "linux-aarch64-a3-800t-sglang-fed-2",
+      "linux-aarch64-a3-800t-sglang-fed-4",
+      "linux-aarch64-a3-800t-sglang-fed-8",
       "linux-aarch64-a3-800t-test-16-cn12-001",
       "linux-aarch64-a3-test-16-cn12-001",
       "linux-amd64-a5-1-sh-002",
@@ -239,6 +251,10 @@
       "linux-aarch64-a2-4-binding-hk-001",
       "linux-aarch64-a2-4-hk-001",
       "linux-aarch64-a2-8-hk-001",
+      "linux-aarch64-a2-fed-1",
+      "linux-aarch64-a2-fed-2",
+      "linux-aarch64-a2-fed-4",
+      "linux-aarch64-a2-fed-8",
       "linux-aarch64-a2b1-1",
       "linux-aarch64-a2b1-1-hk-001",
       "linux-aarch64-a2b1-2",
@@ -277,6 +293,10 @@
       "linux-aarch64-a3-800i-2-cn12-001",
       "linux-aarch64-a3-800i-4-cn12-001",
       "linux-aarch64-a3-800i-8-cn12-001",
+      "linux-aarch64-a3-800i-fed-16",
+      "linux-aarch64-a3-800i-fed-2",
+      "linux-aarch64-a3-800i-fed-4",
+      "linux-aarch64-a3-800i-fed-8",
       "linux-aarch64-a3-800i-test-16-cn12-001",
       "linux-aarch64-a3-800t-0-cn12-001",
       "linux-aarch64-a3-800t-16-cn12-001",
@@ -284,8 +304,16 @@
       "linux-aarch64-a3-800t-4-cn12-001",
       "linux-aarch64-a3-800t-8-cn12-001",
       "linux-aarch64-a3-800t-test-0-cn12-001",
+      "linux-aarch64-a3-800t-vllm-ascend-fed-16",
+      "linux-aarch64-a3-800t-vllm-ascend-fed-2",
+      "linux-aarch64-a3-800t-vllm-ascend-fed-4",
+      "linux-aarch64-a3-800t-vllm-ascend-fed-8",
       "linux-aarch64-a3-test-16-gy005",
       "linux-aarch64-a3-test-16-sh-001",
+      "linux-aarch64-a3-vllm-ascend-fed-16",
+      "linux-aarch64-a3-vllm-ascend-fed-2",
+      "linux-aarch64-a3-vllm-ascend-fed-4",
+      "linux-aarch64-a3-vllm-ascend-fed-8",
       "linux-aarch64-a5-0",
       "linux-aarch64-a5-1",
       "linux-aarch64-a5-2",
@@ -384,6 +412,18 @@
     ],
     "linux-aarch64-a2-8-hk-001": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2-test-8": [
       "ascend-hk-001-cluster"
@@ -576,6 +616,18 @@
     "linux-aarch64-a3-800i-8-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-800i-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a3-800i-test-16-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
@@ -594,11 +646,59 @@
     "linux-aarch64-a3-800t-8-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-800t-ascend-sglang-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-ascend-sglang-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-ascend-sglang-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-ascend-sglang-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sgl-kernel-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sgl-kernel-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sgl-kernel-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sgl-kernel-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sglang-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sglang-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sglang-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-sglang-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a3-800t-test-0-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
     "linux-aarch64-a3-800t-test-16-cn12-001": [
       "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-800t-vllm-ascend-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-vllm-ascend-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-vllm-ascend-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800t-vllm-ascend-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a3-offload": [
       "ascend-cn12-001-cluster"
@@ -614,6 +714,18 @@
     ],
     "linux-aarch64-a3-test-16-sh-001": [
       "openmerlin-sh-001-cluster"
+    ],
+    "linux-aarch64-a3-vllm-ascend-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-vllm-ascend-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-vllm-ascend-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-vllm-ascend-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a5": [
       "openmerlin-sh-001-cluster"
