@@ -156,7 +156,7 @@ Operating System
 ## 安装
 
 我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种方式安装，也可以搭配多种方式混合安装。
-如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。
+如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。建议优先采用仓库级接入、减少组织级接入：仓库级安装权限边界更小、更易管理，也更贴合最小权限原则。
 GitHub App 权限更安全，但是需要组织管理者权限。如果觉得很难获取组织层面的许可，可以选择 PAT 权限。
 如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
 

@@ -139,7 +139,7 @@ Operating System
 ## Installation
 
 We introduce installation methods based on scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method or combine multiple methods.
-If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner.
+If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner. We recommend prioritizing repository-level installation over organization-level installation: repository-level installs have a smaller permission boundary, are easier to manage, and align better with the principle of least privilege.
 GitHub App is more secure but requires organization admin permissions. If difficult to obtain organization-level approval, you can choose PAT permissions.
 If you encounter any issues during installation/usage, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions).
 
