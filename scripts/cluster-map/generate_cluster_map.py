@@ -56,6 +56,14 @@ MAIN_CLUSTERS = {
     "ascend-cn12-001-cluster",
 }
 
+# destination.server → cluster display name. Some Applications (federated /
+# fedsched runner scale sets) target the Karmada control plane by server URL
+# instead of by a registered cluster name; map those here so they show up in
+# the cluster map.
+SERVER_TO_CLUSTER = {
+    "https://1.95.146.120:32443": "Karmada Federated Scheduling",
+}
+
 
 # ---------------------------------------------------------------------------
 # GitHub API
@@ -168,10 +176,16 @@ def parse_applications(text):
             continue
         dest_text = dest_block.group(1)
         name_m = re.search(r"name:\s*(\S+)", dest_text)
+        server_m = re.search(r"server:\s*(\S+)", dest_text)
         ns_m   = re.search(r"namespace:\s*(\S+)", dest_text)
-        if not name_m:
+        if name_m:
+            dest_name = name_m.group(1)
+        elif server_m:
+            dest_name = SERVER_TO_CLUSTER.get(server_m.group(1))
+            if not dest_name:
+                continue
+        else:
             continue
-        dest_name = name_m.group(1)
         namespace = ns_m.group(1) if ns_m else ""
 
         # source path
