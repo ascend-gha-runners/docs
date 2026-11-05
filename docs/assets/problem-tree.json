@@ -26,7 +26,8 @@
         { "label": "节点维护后异常（共享盘未挂载 / 白名单缺失）", "to": "leaf_node_after_maintenance" },
         { "label": "节点异常（DNS 解析 / 时钟偏移）", "to": "leaf_node_infra_abnormal" },
         { "label": "控制面 API 瞬断（cleanup 阶段）", "to": "leaf_apiserver_transient" },
-        { "label": "节点硬件故障（NPU 挂死 / NotReady）", "to": "leaf_node_hardware" }
+        { "label": "节点硬件故障（NPU 挂死 / NotReady）", "to": "leaf_node_hardware" },
+        { "label": "弹性节点被 drift 驱逐（任务被中断 exit 130）", "to": "leaf_karpenter_drift" }
       ]
     },
 
@@ -48,7 +49,7 @@
         { "label": "镜像拉取失败", "to": "leaf_err_image_pull" },
         { "label": "镜像名非法", "to": "leaf_invalid_image_name" },
         { "label": "镜像拉取慢（Initialize containers 卡住）", "to": "leaf_image_pull_slow" },
-        { "label": "容器创建失败（Secret）", "to": "leaf_create_container" },
+        { "label": "容器创建失败（Secret / ConfigMap 缺失）", "to": "leaf_create_container" },
         { "label": "容器启动即死（postStart 钩子）", "to": "leaf_poststart_exit_137" },
         { "label": "novolume 模式失败 / 额外耗时", "to": "leaf_novolume_hook" },
         { "label": "调度失败（资源 / 节点）", "to": "leaf_scheduling" },
@@ -75,7 +76,9 @@
         { "label": "任务长时间卡住 / 超时", "to": "leaf_running_hang" },
         { "label": "任务耗时异常（模型加载 / checkout）", "to": "leaf_ci_slow" },
         { "label": "上传日志 / 产物失败", "to": "leaf_upload_log_failed" },
-        { "label": "临时盘 / 容器可写层空间不足", "to": "leaf_container_writable_layer" }
+        { "label": "临时盘 / 容器可写层空间不足", "to": "leaf_container_writable_layer" },
+        { "label": "checkout / 子模块拉取失败（断流 / DNS）", "to": "leaf_checkout_submodule" },
+        { "label": "NPU 算子 / 内核层报错（EZ3002 / 500002）", "to": "leaf_npu_operator_kernel" }
       ]
     },
 
@@ -128,8 +131,8 @@
 
     "leaf_create_container": {
       "type": "leaf",
-      "title": "CreateContainerConfigError（容器创建失败）",
-      "summary": "引用了不存在的 Secret 或配置项。",
+      "title": "CreateContainerConfigError / MountVolume.SetUp failed（容器创建失败）",
+      "summary": "引用了不存在的 Secret 或 ConfigMap（如 pod 依赖的 ConfigMap 被误删）。",
       "badge": "check-workflow",
       "steps": [
         "确认 workflow 引用的 Secret 已创建且名称一致",
@@ -393,13 +396,14 @@
     "leaf_incomplete_snapshot": {
       "type": "leaf",
       "title": "模型缓存缺失 / 不完整",
-      "summary": "Running 阶段报 IncompleteSnapshotError、LocalEntryNotFoundError，或残留旧版本缓存与当前代码不兼容（如 KeyError: ...weight_offset）：集群侧无该模型缓存、缓存缺文件，或缓存版本不对。",
+      "summary": "Running 阶段报 IncompleteSnapshotError、LocalEntryNotFoundError、残留旧版本缓存版本不兼容（如 KeyError: ...weight_offset），或缓存分片数异常（新旧两版分片混放）：集群侧无该模型缓存、缓存缺文件、缓存版本不对，或缓存目录混入旧版本分片。",
       "symptoms": ["IncompleteSnapshotError", "LocalEntryNotFoundError", "KeyError", "weight_offset", "local_files_only", "snapshot is incomplete"],
       "badge": "ci-infra",
       "steps": [
         "从报错信息确认缺失的模型与文件清单",
         "确认任务实际调度到的集群上是否有该模型缓存（缺失与残缺都可能）",
         "若报 KeyError（如 weight_offset）：确认缓存版本与当前代码匹配，旧版本残留时清理后重新下载",
+        "若报分片数异常（如应 74/75 个却出现 149 个）：删除重复 / 旧的旧版本分片后重跑，并建议定时校验模型完整性与冗余",
         "联系基础设施方核对对应集群的模型缓存并补齐 / 重新下载",
         "补齐后重新触发 workflow"
       ],
@@ -454,12 +458,14 @@
     "leaf_image_pull_slow": {
       "type": "leaf",
       "title": "镜像拉取慢（Initialize containers 卡住）",
-      "summary": "Pod 停在 Initialize containers 很久不前进，镜像在目标架构节点上没有缓存、拉取很慢。",
+      "summary": "Pod 停在 Initialize containers 很久不前进；除下载慢外，还有 containerd 1.6 并发拉取死锁（本地已拉完整却 0 流量、无 ErrImagePull/BackOff）与 kubelet serializeImagePulls 队头阻塞两种形态。",
       "symptoms": ["Initialize containers", "PodInitializing", "ContainerCreating", "image pull slow", "ErrImagePull"],
       "badge": "check-workflow",
       "steps": [
-        "改用国内加速镜像源（如 ghcr 南京源）",
-        "若镜像变动不多，可请 CI 侧用 sync-tools 同步到 SWR 镜像站后改用该镜像",
+        "先区分「下载慢 / fetch 死锁 / kubelet 排队」三态（看 containerd 是否收到 PullImage、到 registry 连接数、ingest 目录增速）",
+        "下载慢：改用国内加速镜像源（如 ghcr 南京源），或请 CI 侧用 sync-tools 同步到 SWR 镜像站后改用",
+        "fetch 死锁：重启该节点 containerd 秒恢复",
+        "kubelet 队头阻塞：对节点显式 serializeImagePulls: false",
         "重跑 workflow"
       ],
       "links": [
@@ -742,6 +748,54 @@
       ],
       "links": [
         { "text": "查看案例", "href": "/docs/error-types-zh/#container-writable-layer-quota" }
+      ]
+    },
+
+    "leaf_checkout_submodule": {
+      "type": "leaf",
+      "title": "checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败）",
+      "summary": "checkout / 依赖准备阶段 git clone / 拉 submodule 报 RPC failed; curl 18 transfer closed + early EOF，或 Could not resolve host；源站截断或 git 代理域名覆盖缺口。",
+      "symptoms": ["RPC failed", "curl 18", "early EOF", "Could not resolve host", "submodule", "transfer closed"],
+      "badge": "ci-infra",
+      "steps": [
+        "按报错区分「传输中途截断（early EOF）」还是「DNS 解析失败」",
+        "源站截断：clone 加 --depth 1 + 重试，或复用顶层 submodule（actions/checkout 自带重试），并向源站报障",
+        "DNS 覆盖缺口：反馈基础设施方补 git 代理域名覆盖后重跑"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#checkout-submodule-fetch-failed" }
+      ]
+    },
+
+    "leaf_npu_operator_kernel": {
+      "type": "leaf",
+      "title": "NPU 算子 / 内核层报错（EZ3002 / 500002）",
+      "summary": "Running 阶段模型加载 / 初始化崩溃，报 Unsupported_Operator(EZ3002): Optype [TransData] + build op model failed, result = 500002；同一 workflow 多个 job 同一条算子签名一起失败。",
+      "symptoms": ["Unsupported_Operator", "EZ3002", "500002", "TransData", "build op model failed"],
+      "badge": "check-workflow",
+      "steps": [
+        "确认是否整批 job 同一条算子签名一起失败（环境 / 镜像类问题特征）",
+        "对比「红」与「绿」run 的镜像差异（vLLM-Ascend commit / CANN 包版本）",
+        "反馈业务方核对其新引入的算子包或镜像版本，回退 / 修复后重跑"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#npu-operator-kernel-error" }
+      ]
+    },
+
+    "leaf_karpenter_drift": {
+      "type": "leaf",
+      "title": "弹性节点被 drift 驱逐（任务被中断 exit 130）",
+      "summary": "任务运行中无预兆被中断，多个 job 同一秒 exit 130 + received a shutdown signal + custom container implementation failed；弹性节点被 drift 判定后删除且无替换节点。",
+      "symptoms": ["exit 130", "received a shutdown signal", "custom container implementation failed", "drift"],
+      "badge": "ci-infra",
+      "steps": [
+        "认 exit 130 + shutdown signal 为基础设施打断，非 PR / 用例问题",
+        "直接 Re-run failed jobs",
+        "平台侧已加 anti-drift 标注防误删；反复出现再反馈基础设施方"
+      ],
+      "links": [
+        { "text": "查看案例", "href": "/docs/error-types-zh/#karpenter-drift-interruption" }
       ]
     }
   }

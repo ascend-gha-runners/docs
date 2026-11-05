@@ -13,7 +13,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [ErrImagePull: 401 after registry change](#errimagepull-401-unauthorized-after-registry-change) |
 | Pending | Image | [Image not synced to SWR (not found)](#image-not-synced-to-swr) |
 | Pending | Image | [Image pull slow (Initialize containers stuck)](#image-pull-slow) |
-| Pending | Container Creation | [CreateContainerConfigError](#createcontainerconfigerror) |
+| Pending | Container Creation | [Secret / ConfigMap config error](#createcontainerconfigerror) |
 | Pending | Container Creation | [Container dies immediately (postStart hook exit 137)](#poststart-exit-137) |
 | Pending | Container Creation | [novolume mode failures / extra time](#novolume-hook-failures) |
 | Pending | Scheduling | [FailedScheduling (nodeSelector)](#failedscheduling-nodeselector) |
@@ -31,10 +31,12 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Running | Workflow | [Install / build OOM (parallelism too high)](#compile-oom-threads) |
 | Running | Workflow | [Dependency cache errors (pypi / rust)](#dependency-cache-error) |
 | Running | Workflow | [Abnormally slow steps (model load / checkout)](#ci-slow) |
+| Running | Workflow | [checkout / submodule fetch failed (stream break early EOF / DNS resolution)](#checkout-submodule-fetch-failed) |
 | Running | Task Hang | [Task hang / timeout (engine process stuck)](#vllm-v1-streaming-hang) |
 | Running | Build | [BuildKit cache corrupt (parent snapshot not found)](#buildkit-cache-corrupt) |
 | Running | Communication | [HCCL Port Already Bound](#hccl-port-already-bound) |
 | Running | Environment | [Model Cache Missing / Incomplete](#incomplete-model-snapshot) |
+| Running | Operator | [NPU operator / kernel error (EZ3002 / 500002)](#npu-operator-kernel-error) |
 | Running | Storage | [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) |
 | Platform | Node Resource | [Node NPU occupied by an out-of-band process / container](#npu-occupied-by-external) |
 | Platform | Storage | [Shared disk full / stale lock file](#shared-storage-lock-and-space) |
@@ -43,6 +45,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Platform | Node | [Node DNS failure / clock skew](#node-infra-abnormal) |
 | Platform | Node | [Node hardware failure (NPU hang / NotReady)](#node-hardware-failure) |
 | Platform | Autoscaling | [Scale-out failure / unhealthy elastic node](#elastic-scale-out-failed) |
+| Platform | Autoscaling | [Elastic node drift-evicted (exit 130)](#karpenter-drift-interruption) |
 | Platform | Runner | [Runner slots held by stuck EphemeralRunners](#ephemeralrunner-stuck) |
 | Platform | Runner | [Runner version too old (GitHub minimum bumped)](#runner-version-eol) |
 <!-- ERROR_SUMMARY_TABLE_END -->
@@ -98,22 +101,24 @@ Build / image pull fails with `failed to resolve source metadata ... not found` 
 
 #### Image pull slow (Initialize containers stuck) { #image-pull-slow }
 
-The pod sits at **Initialize containers** for a long time: the image has no cache on a node of the target architecture and pulls very slowly (issue #271); sometimes container initialization simply hangs (issue #121). This happens when the image address is not cached on the CI side (e.g., a direct `ghcr.io` pull). Switch to a domestic accelerator mirror (e.g., `ghcr.nju.edu.cn`), or ask the CI side to sync the image to the SWR mirror via sync-tools and use that image, then re-run.
+The pod sits at **Initialize containers** for a long time: the image has no cache on a node of the target architecture and pulls very slowly (issue #271); sometimes container initialization simply hangs (issue #121). There are two more "stuck but not slow-to-download" forms (issue #308): ① containerd 1.6 deadlocks when multiple pods on one node concurrently pull the same image — the local copy is already complete with **zero traffic** and no `ErrImagePull`/`BackOff` event, and it recovers instantly after restarting containerd; ② kubelet's `serializeImagePulls` serializes image pulls node-wide, so one slow image at the head of the queue stalls even locally-present images. The image address is not cached on the CI side (e.g., a direct `ghcr.io` pull), containerd 1.6 has a concurrent-pull deadlock defect, and kubelet's `serializeImagePulls` is enabled by default. First tell the three states apart — "slow download / fetch deadlock / kubelet queueing" (check whether containerd received a PullImage, registry connection count, and ingest-dir growth rate). For slow downloads, switch to a domestic accelerator mirror (e.g., `ghcr.nju.edu.cn`) or ask the CI side to sync the image to the SWR mirror; for a fetch deadlock, restart containerd on that node; for kubelet head-of-line blocking, set `serializeImagePulls: false` explicitly; then re-run.
 
 > **Ref:**
 > [#271](https://github.com/ascend-gha-runners/docs/issues/271)
 > [#121](https://github.com/ascend-gha-runners/docs/issues/121)
+> [#308](https://github.com/ascend-gha-runners/docs/issues/308)
 
 ### Container Creation Errors
 
-#### CreateContainerConfigError
+#### Secret / ConfigMap config error (CreateContainerConfigError / MountVolume.SetUp failed) { #createcontainerconfigerror }
 
-Referencing a non-existent Secret.
+Two forms: the pod is stuck at **Pending** with **`CreateContainerConfigError`** (referencing a non-existent Secret); or the runner pod is stuck at **`ContainerCreating`** with a kubelet event **`MountVolume.SetUp failed for volume ...: configmap ... not found`** (a required ConfigMap is missing, issue #313). The workflow references a non-existent Secret, or a ConfigMap the pod depends on (e.g. a pod template config) was deleted by mistake (a borrowed reference was removed while cleaning up old label config). Check the Secret name and confirm it exists in the right namespace; for **`configmap ... not found`**, ask the infrastructure team to restore the deleted ConfigMap and re-run (#313).
 
 ![Pod stuck in Pending with CreateContainerConfigError due to missing Secret](assets/error-types/create-container-config-error.png)
 
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346768522)
+> [#313](https://github.com/ascend-gha-runners/docs/issues/313)
 
 #### Container dies immediately (postStart hook exit 137) { #poststart-exit-137 }
 
@@ -273,6 +278,14 @@ Loading a 70G model takes about **1100s** (issue #13); checkout is occasionally 
 > [#13](https://github.com/ascend-gha-runners/docs/issues/13)
 > [#202](https://github.com/ascend-gha-runners/docs/issues/202)
 
+#### checkout / submodule fetch failed (stream break early EOF / DNS resolution failure) { #checkout-submodule-fetch-failed }
+
+During checkout or a dependency-prepare step, `git clone` / submodule pull reports **`RPC failed; curl 18 transfer closed`** + **`early EOF`** (#304), or a submodule clone reports a DNS resolution failure **`Could not resolve host`** (#311), so the job fails at the fetch-dependency stage. Two distinct causes: (a) the source site (e.g. gitcode) git smart-http backend truncates / intermittently stops responding mid-stream to the full-pack response, and the single clone has no retry; (b) the cluster git-proxy domain coverage has a gap, and some repositories' checkout requests land on an uncovered mirror, causing DNS resolution failure. Tell "mid-stream truncation (early EOF)" apart from "DNS resolution failure"; for source-side truncation, add `--depth 1` + retry to the clone or reuse the top-level submodule (actions/checkout retries on its own) and report the issue upstream; for DNS coverage gaps, ask the infrastructure team to complete the git-proxy domain coverage and re-run.
+
+> **Ref:**
+> [#304](https://github.com/ascend-gha-runners/docs/issues/304)
+> [#311](https://github.com/ascend-gha-runners/docs/issues/311)
+
 ### Build Errors
 
 #### BuildKit cache corrupt (parent snapshot not found) { #buildkit-cache-corrupt }
@@ -304,13 +317,23 @@ Multi-node job fails in Running phase with `Communication_Error_Bind_IP_Port(EI0
 
 #### Model Cache Missing / Incomplete { #incomplete-model-snapshot }
 
-Running phase fails with model-cache errors in three forms: **incomplete** — `huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing` (issue #242); **missing** — `huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled` (issue #220), or a missing shard (issue #200); or **version-incompatible** — loading weights raises `KeyError: 'wkv.weight_offset'` and similar missing keys (issue #268), usually because a **stale older cache** doesn't match the current code's index structure. The cluster the task actually landed on has no such model cache, an incomplete one, or an old-version one, and `local_files_only=True` prevents online completion. Identify the missing model/files from the error, verify the cache on that cluster, for **KeyError**-style version mismatches check that the cache version matches the current code and **clear the old cache then re-download** (issue #268 recovered this way), ask the infrastructure team to complete / re-download missing caches, then re-trigger the workflow.
+Running phase fails with model-cache errors in four forms: **incomplete** — `huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing` (issue #242); **missing** — `huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled` (issue #220), or a missing shard (issue #200); **version-incompatible** — loading weights raises `KeyError: 'wkv.weight_offset'` and similar missing keys (issue #268), usually because a **stale older cache** doesn't match the current code's index structure; or **redundant / mixed shards** — loading reports an abnormal shard count (e.g. should be 74/75 shards but 149 appear), i.e. old and new model shards are mixed in the cache directory (issue #222). The cluster the task actually landed on has no such model cache, an incomplete one, or an old-version one (with `local_files_only=True` preventing online completion); or the cache directory retains old-version shards that weren't cleaned up and are mixed with the new version. Identify the missing model/files from the error, verify the cache on that cluster, for **KeyError**-style version mismatches check that the cache version matches the current code and **clear the old cache then re-download** (issue #268 recovered this way); for an **abnormal shard count**, delete the duplicate / old-version shards and re-run, and recommend periodically validating model completeness and redundancy (issue #222); ask the infrastructure team to complete / re-download missing caches, then re-trigger the workflow.
 
 > **Ref:**
 > [#242](https://github.com/ascend-gha-runners/docs/issues/242)
 > [#220](https://github.com/ascend-gha-runners/docs/issues/220)
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
+> [#222](https://github.com/ascend-gha-runners/docs/issues/222)
+
+### Operator / Kernel Errors
+
+#### NPU operator / kernel error (Unsupported_Operator EZ3002 / GE build 500002) { #npu-operator-kernel-error }
+
+The model load / initialization crashes in the Running phase with **`Unsupported_Operator(EZ3002): Optype [TransData] ...`** plus **`build op model failed, result = 500002`**; several jobs in the same workflow fail almost all together with the same operator signature. Root cause (per issue #318): the business side introduced a new operator package / produced an image content change, so the graph engine (GE) hits a `TransData` `groups=1` path with no available kernel while moving small tensors in eager mode — a business / image problem, not an infrastructure problem. Confirm whether a whole batch of jobs fails on the same operator signature (the signature of an environment / image problem); diff the images between the red and green runs (vLLM-Ascend commit / CANN package version); and ask the business side to check its newly introduced operator package or image version, roll back / fix, and re-run.
+
+> **Ref:**
+> [#318](https://github.com/ascend-gha-runners/docs/issues/318)
 
 ### Storage / Temp Disk Errors
 
@@ -407,6 +430,13 @@ Pods stay Pending for a long time but Karpenter doesn't scale out; after the Nod
 > [#226](https://github.com/ascend-gha-runners/docs/issues/226)
 > [#255](https://github.com/ascend-gha-runners/docs/issues/255)
 
+#### Elastic node drift-evicted (task interrupted, exit 130) { #karpenter-drift-interruption }
+
+Tasks are interrupted without warning mid-run; multiple jobs exit **`130`** in the same second with **`received a shutdown signal`** + **`custom container implementation failed`**, and the log tail has no test-case failure stack. Root cause (per issue #309): an elastic node (Karpenter) was judged drifted, deleted directly with no replacement node, killing the running tasks. Recognize exit 130 + shutdown signal as an infrastructure interruption, not a PR / test-case problem; just re-run failed jobs; the platform has added an anti-drift annotation to runners to prevent false deletion — report it to the infrastructure team if it recurs.
+
+> **Ref:**
+> [#309](https://github.com/ascend-gha-runners/docs/issues/309)
+
 ### Runner Management
 
 #### Runner slots occupied by stuck EphemeralRunners { #ephemeralrunner-stuck }
@@ -433,5 +463,5 @@ If you encounter an issue not listed on this page, please [create a discussion](
 
 ---
 
-**Document version:** v2.5
-**Last updated:** 2026-11-04
+**Document version:** v2.6
+**Last updated:** 2026-11-05

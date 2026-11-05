@@ -75,6 +75,8 @@
 |linux-amd64-cpu-4|0|4|8Gi|
 |linux-aarch64-cpu-24|0|24|32Gi|
 
+> 每个 runner pod 的可写层（临时盘）空间固定为 **100GiB**，`/root/.cache`、`/tmp` 等目录都落在这块可写层上（共享盘 `huggingface/`、`modelscope/` 为只读挂载）。如果任务里有持续写盘操作（模型保存、测试临时文件等），请在各步骤结束后及时清理，避免写满配额报 `Disk quota exceeded (os error 122)`。
+
 ### Runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
