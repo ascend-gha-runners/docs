@@ -13,7 +13,7 @@
 | Pending | 镜像 | [更换仓库后镜像拉取报 401](#errimagepull-401-unauthorized-after-registry-change) |
 | Pending | 镜像 | [镜像未同步到 SWR（not found）](#image-not-synced-to-swr) |
 | Pending | 镜像 | [镜像拉取慢（Initialize containers 卡住）](#image-pull-slow) |
-| Pending | 容器创建 | [Secret 配置错误](#createcontainerconfigerror) |
+| Pending | 容器创建 | [Secret / ConfigMap 配置错误](#createcontainerconfigerror) |
 | Pending | 容器创建 | [容器启动即死（postStart 钩子 exit 137）](#poststart-exit-137) |
 | Pending | 容器创建 | [novolume 模式失败 / 额外耗时](#novolume-hook-failures) |
 | Pending | 调度 | [调度失败：nodeSelector 不匹配](#failedscheduling-nodeselector) |
@@ -31,10 +31,13 @@
 | Running | Workflow | [安装 / 编译阶段 OOM（并行度过高）](#compile-oom-threads) |
 | Running | Workflow | [依赖缓存异常（pypi / rust）](#dependency-cache-error) |
 | Running | Workflow | [任务耗时异常（模型加载 / checkout）](#ci-slow) |
+| Running | Workflow | [checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败）](#checkout-submodule-fetch-failed) |
 | Running | 任务卡死 | [任务长时间卡住 / 超时（引擎进程挂起）](#vllm-v1-streaming-hang) |
 | Running | 构建 | [构建缓存损坏（BuildKit parent snapshot）](#buildkit-cache-corrupt) |
 | Running | 通信 | [HCCL 通信端口被占用](#hccl-port-already-bound) |
 | Running | 环境 | [模型缓存缺失 / 不完整](#incomplete-model-snapshot) |
+| Running | 算子 | [NPU 算子 / 内核层报错（EZ3002 / 500002）](#npu-operator-kernel-error) |
+| Running | 存储 | [容器可写层（临时盘）配额耗尽](#container-writable-layer-quota) |
 | 平台 | 节点资源 | [节点 NPU 被外部进程 / 带外容器占用](#npu-occupied-by-external) |
 | 平台 | 存储 | [共享盘空间不足 / 锁文件残留](#shared-storage-lock-and-space) |
 | 平台 | 节点异常 | [节点维护后异常（共享盘未挂载 / 白名单缺失）](#node-after-maintenance) |
@@ -42,6 +45,7 @@
 | 平台 | 节点异常 | [节点 DNS 解析异常 / 时钟偏移](#node-infra-abnormal) |
 | 平台 | 节点异常 | [节点硬件故障（NPU 挂死 / NotReady）](#node-hardware-failure) |
 | 平台 | 弹性伸缩 | [弹性扩容失败 / 弹性节点不健康](#elastic-scale-out-failed) |
+| 平台 | 弹性伸缩 | [弹性节点被 drift 驱逐（exit 130）](#karpenter-drift-interruption) |
 | 平台 | Runner | [Runner 名额被残留 EphemeralRunner 占用](#ephemeralrunner-stuck) |
 | 平台 | Runner | [Runner 版本过旧（GitHub 提升最低版本）](#runner-version-eol) |
 <!-- ERROR_SUMMARY_TABLE_END -->
@@ -124,34 +128,41 @@
 
 #### 镜像拉取慢（Initialize containers 长时间卡住） { #image-pull-slow }
 
-**现象**：Pod 停在 **Initialize containers** 阶段很久不前进，镜像在目标架构节点上没有缓存、拉取很慢（issue #271）；有时容器初始化一直卡住（issue #121）。
+**现象**：Pod 停在 **Initialize containers** 阶段很久不前进，镜像在目标架构节点上没有缓存、拉取很慢（issue #271）；有时容器初始化一直卡住（issue #121）。另有两种「卡住但非下载慢」形态（issue #308）：① containerd 1.6 同节点多 pod 并发拉同一镜像时触发 pull 死锁——本地已拉完整、**0 流量**、无 ErrImagePull / BackOff 事件，重启 containerd 后秒恢复；② kubelet `serializeImagePulls` 让单节点镜像拉取全局串行，一个慢镜像占住队头把本地已有镜像也压死。
 
-**根因**：使用了未在 CI 侧缓存的镜像地址（如 `ghcr.io` 直连，见 issue #271 的 `ghcr.io/<vendor>/areal_npu:v1.0.5-a2`），拉取速度慢甚至超时。
+**根因**：使用了未在 CI 侧缓存的镜像地址（如 `ghcr.io` 直连，见 issue #271 的 `ghcr.io/<vendor>/areal_npu:v1.0.5-a2`），拉取速度慢甚至超时；containerd 1.6 并发拉取存在死锁缺陷；kubelet `serializeImagePulls` 默认开启导致单节点拉取串行排队。
 
 **解决**：
 
-1. 改用国内加速镜像源（如 ghcr 南京源 `ghcr.nju.edu.cn/...`）；
-2. 若镜像变动不多，可请 CI 侧用 sync-tools 把镜像同步到 SWR 镜像站后改用该镜像；
-3. 重跑 workflow。
+1. 先区分「下载慢 / fetch 死锁 / kubelet 排队」三态（看 containerd 是否收到 PullImage、到 registry 连接数、ingest 目录增速）；
+2. 下载慢：改用国内加速镜像源（如 ghcr 南京源 `ghcr.nju.edu.cn/...`），或请 CI 侧用 sync-tools 同步到 SWR 镜像站后改用该镜像；
+3. fetch 死锁：重启该节点的 containerd 秒恢复；
+4. kubelet 队头阻塞：对节点显式 `serializeImagePulls: false`；
+5. 重跑 workflow。
 
 > **Ref:**
 > [#271](https://github.com/ascend-gha-runners/docs/issues/271)
 > [#121](https://github.com/ascend-gha-runners/docs/issues/121)
+> [#308](https://github.com/ascend-gha-runners/docs/issues/308)
 
 ### 容器创建错误
 
-#### Secret 配置错误（CreateContainerConfigError） { #createcontainerconfigerror }
+#### Secret / ConfigMap 配置错误（CreateContainerConfigError / MountVolume.SetUp failed） { #createcontainerconfigerror }
 
-**现象**：Pod 卡在 **Pending**，报 **`CreateContainerConfigError`**。
+**现象**：两类形态——Pod 卡在 **Pending**，报 **`CreateContainerConfigError`**（引用了不存在的 Secret）；或 runner pod 卡 **`ContainerCreating`**，kubelet 事件报 **`MountVolume.SetUp failed for volume ...: configmap ... not found`**（依赖的 ConfigMap 缺失，issue #313）。
 
-**根因**：workflow 引用了不存在的 Secret。
+**根因**：workflow 引用了不存在的 Secret；或 pod 依赖的 ConfigMap（如 pod 模板配置）被误删（清理旧标签配置时误删借用关系）。
 
-**解决**：[AI] 核对引用的 Secret 名称拼写，确认该 Secret 已在对应命名空间创建；补建或修正后重新触发。
+**解决**：
+
+1. 核对引用的 Secret 名称拼写，确认该 Secret 已在对应命名空间创建；
+2. 若报 **ConfigMap not found**：反馈基础设施方补齐被误删的 ConfigMap 后重跑（#313）。
 
 ![Pod 卡在 Pending，报 CreateContainerConfigError（Secret 缺失）](assets/error-types/create-container-config-error.png)
 
 > **Ref:**
 > [linux-aarch64-test-hook · ascend-gha-runners/add-node-check@22e524c](https://github.com/ascend-gha-runners/add-node-check/actions/runs/28346768522)
+> [#313](https://github.com/ascend-gha-runners/docs/issues/313)
 
 #### 容器启动即死：postStart 钩子 exit 137 { #poststart-exit-137 }
 
@@ -438,6 +449,22 @@
 > [#13](https://github.com/ascend-gha-runners/docs/issues/13)
 > [#202](https://github.com/ascend-gha-runners/docs/issues/202)
 
+#### checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败） { #checkout-submodule-fetch-failed }
+
+**现象**：checkout 阶段或依赖准备步骤里 `git clone` / 拉 submodule 报 **`RPC failed; curl 18 transfer closed`** + **`early EOF`**（#304），或 submodule clone 报域名解析失败 **`Could not resolve host`**（#311），job 在取依赖阶段失败。
+
+**根因**：两类不同成因——(a) 源站（如 gitcode）git smart-http 后端对全量 pack 流式响应发生服务端截断 / 间歇不应答，命中无重试的单次 clone；(b) 集群 git 代理域名覆盖存在缺口，某些仓库 checkout 请求落到未覆盖的镜像源导致 DNS 解析失败。
+
+**解决**：
+
+1. 按报错区分「传输中途截断（early EOF）」还是「DNS 解析失败」；
+2. 源站截断：业务侧给 clone 加 `--depth 1` + 重试、或复用顶层 submodule（actions/checkout 自带重试），同时向源站报障；
+3. DNS 覆盖缺口：反馈基础设施方补 git 代理域名覆盖后重跑。
+
+> **Ref:**
+> [#304](https://github.com/ascend-gha-runners/docs/issues/304)
+> [#311](https://github.com/ascend-gha-runners/docs/issues/311)
+
 ### 构建错误
 
 #### 构建缓存损坏（BuildKit parent snapshot 不存在） { #buildkit-cache-corrupt }
@@ -497,27 +524,65 @@
 
 #### 模型缓存缺失 / 不完整 { #incomplete-model-snapshot }
 
-**现象**：**Running** 阶段报模型缓存相关错误，三种形态：
+**现象**：**Running** 阶段报模型缓存相关错误，四种形态：
 
 - 缓存**残缺**：`huggingface_hub.errors.IncompleteSnapshotError: The cached snapshot ... is incomplete: N file(s) are missing`（issue #242）；
 - 缓存**缺失**：`huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder ... outgoing traffic has been disabled`（issue #220）；或缓存缺 shard（issue #200：`1 valid / 1 missing`）；
-- 缓存**版本不兼容**：加载权重报 `KeyError: 'wkv.weight_offset'` 等键缺失（issue #268），多为**残留旧版本缓存**与当前代码的索引结构不一致。
+- 缓存**版本不兼容**：加载权重报 `KeyError: 'wkv.weight_offset'` 等键缺失（issue #268），多为**残留旧版本缓存**与当前代码的索引结构不一致；
+- 缓存**冗余 / 混放**：模型加载报缓存分片数异常（如应 74/75 个分片却出现 149 个），即缓存目录里**新旧两版模型分片混在一起**（issue #222）。
 
-**根因**：任务实际调度到的集群上**没有该模型缓存**、**缓存缺文件**，或**缓存是旧版本**，离线模式（`local_files_only=True`）下无法在线补齐。
+**根因**：任务实际调度到的集群上**没有该模型缓存**、**缓存缺文件**，或**缓存是旧版本**，离线模式（`local_files_only=True`）下无法在线补齐；或**缓存目录残留旧版本分片未清理，与新版本混放**。
 
-**解决**（按 issue #242 / #220 / #200 / #268 处理过程）：
+**解决**（按 issue #242 / #220 / #200 / #268 / #222 处理过程）：
 
 1. 从报错确认缺失的模型与文件清单（issue #242 给出的排查地址：https://fayespica.github.io/ascend-image-ci/ ）；
 2. 确认任务实际调度到的集群上是否有该模型缓存（缺失与残缺都可能，issue #220 确认 gy005 已有对应模型）；
 3. 若报 **KeyError** 等版本不兼容错误：确认缓存版本与当前代码匹配，**清理旧版本缓存后重新下载**（issue #268 清理旧版本模型后任务恢复正常）；
-4. 联系基础设施方**补齐 / 重新下载**缺失的模型缓存（issue #242 i2v 已存在、t2v 缺失，重新下载后解决；issue #200 下载缺少的相关模型）；
-5. 补齐后重新触发 workflow。
+4. 若报**分片数异常**（冗余 / 混放）：**删除重复 / 旧的旧版本分片**后重跑，并建议定时校验模型完整性与冗余（issue #222）；
+5. 联系基础设施方**补齐 / 重新下载**缺失的模型缓存（issue #242 i2v 已存在、t2v 缺失，重新下载后解决；issue #200 下载缺少的相关模型）；
+6. 补齐后重新触发 workflow。
 
 > **Ref:**
 > [#242](https://github.com/ascend-gha-runners/docs/issues/242)
 > [#220](https://github.com/ascend-gha-runners/docs/issues/220)
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
+> [#222](https://github.com/ascend-gha-runners/docs/issues/222)
+
+### 算子 / 内核错误
+
+#### NPU 算子 / 内核层报错（Unsupported_Operator EZ3002 / GE 建图 500002） { #npu-operator-kernel-error }
+
+**现象**：**Running** 阶段模型加载 / 初始化崩溃，报 **`Unsupported_Operator(EZ3002): Optype [TransData] ...`** + **`build op model failed, result = 500002`**；同一 workflow 里多个 job 以同一算子签名几乎全部失败。
+
+**根因**（按 issue #318 定位结论）：业务侧引入新的算子包 / 镜像内容变化，导致图引擎（GE）在 eager 模式下小 tensor 搬运命中 `TransData` `groups=1` 这类无可用内核的路径，属业务 / 镜像问题，非基础设施问题。
+
+**解决**：
+
+1. 确认是否整批 job 同一条算子签名一起失败（环境 / 镜像类问题的特征）；
+2. 对比「红」与「绿」run 之间的镜像差异（对应 vLLM-Ascend commit / CANN 包版本）；
+3. 反馈业务方核对其新引入的算子包或镜像版本，回退 / 修复后重跑。
+
+> **Ref:**
+> [#318](https://github.com/ascend-gha-runners/docs/issues/318)
+
+### 存储 / 临时盘错误
+
+#### 容器可写层（临时盘）配额耗尽（EDQUOT / Disk quota exceeded） { #container-writable-layer-quota }
+
+**现象**：**Running** 阶段写文件报 **`Disk quota exceeded (os error 122)`**（EDQUOT）或 **`no space left on device`**，但共享盘 / 集群侧仍有空间，且同一 run 里其余任务正常。
+
+**根因**（按 issue #324 定位结论）：每个任务的**临时盘（容器可写层）空间有限**（单容器配额，如 100GiB），任务内有**持续写操作**且不在中间步骤清理时会写满配额——例如 pytest 的 `model.save_pretrained()` 每个用例落盘数 GB、会话内不清理，累计触顶。`/root/.cache` 除只读挂载子目录外的本体、以及 `/tmp`，都与 `/__w` 不同、同属容器可写层，把临时目录从 `/tmp` 换到这些路径并不解决配额。
+
+**解决**：
+
+1. 先从报错区分是**容器可写层配额（EDQUOT / Errno 122）**还是**共享盘满 / 配额（Errno 28 / ENOSPC）**；
+2. 任务内有持续写操作时，在**中间步骤**（每个 step / 每个用例结束）主动清理临时文件，避免反复累计；
+3. 不要把临时目录指到仍挂在容器可写层下的路径（如 `/root/.cache/temp`），它与 `/tmp` 同一文件系统，规避无效；
+4. 确需写较大文件：把临时目录指到 pod 内有更大空间的卷（如 `/__w`），并控制总量、用完即清。
+
+> **Ref:**
+> [#324](https://github.com/ascend-gha-runners/docs/issues/324)
 
 ---
 
@@ -567,6 +632,8 @@
 > [#191](https://github.com/ascend-gha-runners/docs/issues/191)
 > [#221](https://github.com/ascend-gha-runners/docs/issues/221)
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
+
+> 注意：`Errno 122`（EDQUOT）也可能来自**容器可写层（临时盘）配额**写满而非共享盘，判据见[容器可写层（临时盘）配额耗尽](#container-writable-layer-quota)。
 
 ### 控制面
 
@@ -660,6 +727,21 @@
 > [#226](https://github.com/ascend-gha-runners/docs/issues/226)
 > [#255](https://github.com/ascend-gha-runners/docs/issues/255)
 
+#### 弹性节点被 drift 驱逐（任务被中断 exit 130） { #karpenter-drift-interruption }
+
+**现象**：任务运行中无预兆被中断，多个 job 同一秒一起 exit **`130`** + **`received a shutdown signal`** + **`custom container implementation failed`**，日志末尾没有用例失败堆栈。
+
+**根因**（按 issue #309 定位结论）：弹性节点（Karpenter）被 drift 判定为 drifted，被直接删除且无替换节点，节点上正在跑的任务被腰斩。
+
+**解决**：
+
+1. 认 exit 130 + shutdown signal 为基础设施打断，非 PR / 用例问题；
+2. 直接 Re-run failed jobs；
+3. 平台侧已给 runner 加 anti-drift 标注防止误删；反复出现再反馈基础设施方。
+
+> **Ref:**
+> [#309](https://github.com/ascend-gha-runners/docs/issues/309)
+
 ### Runner 管理
 
 #### Runner 名额被残留 EphemeralRunner 占用 { #ephemeralrunner-stuck }
@@ -703,5 +785,5 @@
 
 ---
 
-**Document version:** v2.4
-**Last updated:** 2026-10-22
+**Document version:** v2.6
+**Last updated:** 2026-11-05

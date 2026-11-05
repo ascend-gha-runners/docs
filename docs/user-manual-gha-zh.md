@@ -75,6 +75,8 @@
 |linux-amd64-cpu-4|0|4|8Gi|
 |linux-aarch64-cpu-24|0|24|32Gi|
 
+> 每个 runner pod 的可写层（临时盘）空间固定为 **100GiB**，`/root/.cache`、`/tmp` 等目录都落在这块可写层上（共享盘 `huggingface/`、`modelscope/` 为只读挂载）。如果任务里有持续写盘操作（模型保存、测试临时文件等），请在各步骤结束后及时清理，避免写满配额报 `Disk quota exceeded (os error 122)`。
+
 ### Runner pod 命名规范
 
 Runner pod 名称由以下部分组成：
@@ -154,7 +156,7 @@ Operating System
 ## 安装
 
 我们按照安装范围(组织/仓库)和接入权限(GitHub App/PAT)分别介绍安装方式。您可以选择其中一种方式安装，也可以搭配多种方式混合安装。
-如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。
+如果安装到组织，可以在仓库间复用 runner。并且可以通过 runner group 限制仓库范围。如果安装到仓库，只有单个仓库可以使用 runner。建议优先采用仓库级接入、减少组织级接入：仓库级安装权限边界更小、更易管理，也更贴合最小权限原则。
 GitHub App 权限更安全，但是需要组织管理者权限。如果觉得很难获取组织层面的许可，可以选择 PAT 权限。
 如果您在安装/使用过程中有任何问题，请[提出discussion](https://github.com/ascend-gha-runners/docs/discussions)。
 

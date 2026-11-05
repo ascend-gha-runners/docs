@@ -58,6 +58,8 @@ CPU and memory quota of each runner pod scales proportionally with the number of
 |linux-aarch64-a2b4-4|4|92|256Gi|
 |linux-aarch64-a2b4-8|8|184|512Gi|
 
+> Each runner pod's writable layer (temp disk) is fixed at **100GiB**, and directories like `/root/.cache` and `/tmp` all live on this writable layer (the shared `huggingface/` and `modelscope/` volumes are read-only mounts). If a job has continuous disk writes (model saves, test temp files, etc.), clean them up promptly after each step to avoid filling the quota and hitting `Disk quota exceeded (os error 122)`.
+
 ### Runner Naming Convention
 
 The naming convention for runner pod is composed of the following parts:
@@ -137,7 +139,7 @@ Operating System
 ## Installation
 
 We introduce installation methods based on scope (organization/repository) and access permissions (GitHub App/PAT). You can choose one method or combine multiple methods.
-If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner.
+If installing to organization, runners can be reused across repositories. Runner groups can limit repository scope. If installing to repository, only that repository can use the runner. We recommend prioritizing repository-level installation over organization-level installation: repository-level installs have a smaller permission boundary, are easier to manage, and align better with the principle of least privilege.
 GitHub App is more secure but requires organization admin permissions. If difficult to obtain organization-level approval, you can choose PAT permissions.
 If you encounter any issues during installation/usage, please [create a discussion](https://github.com/ascend-gha-runners/docs/discussions).
 
