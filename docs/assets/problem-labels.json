@@ -216,6 +216,7 @@
       "linux-aarch64-a2-8"
     ],
     "verl-project/verl-omni": [
+      "linux-aarch64-a2b4-2",
       "linux-aarch64-a2b4-4",
       "linux-aarch64-a2b4-8"
     ],
@@ -263,22 +264,38 @@
       "linux-aarch64-a2b1-4-hk-001",
       "linux-aarch64-a2b1-8",
       "linux-aarch64-a2b1-8-hk-001",
+      "linux-aarch64-a2b1-fed-1",
+      "linux-aarch64-a2b1-fed-2",
+      "linux-aarch64-a2b1-fed-4",
+      "linux-aarch64-a2b1-fed-8",
       "linux-aarch64-a2b1b3-1-hk-001",
       "linux-aarch64-a2b1b3-2-hk-001",
       "linux-aarch64-a2b1b3-4-hk-001",
       "linux-aarch64-a2b1b3-8-hk-001",
+      "linux-aarch64-a2b1b3-fed-1",
+      "linux-aarch64-a2b1b3-fed-2",
+      "linux-aarch64-a2b1b3-fed-4",
+      "linux-aarch64-a2b1b3-fed-8",
       "linux-aarch64-a2b1b3-test-8-hk-001",
       "linux-aarch64-a2b3-0",
       "linux-aarch64-a2b3-1",
       "linux-aarch64-a2b3-2",
       "linux-aarch64-a2b3-4",
       "linux-aarch64-a2b3-8",
+      "linux-aarch64-a2b3-fed-1",
+      "linux-aarch64-a2b3-fed-2",
+      "linux-aarch64-a2b3-fed-4",
+      "linux-aarch64-a2b3-fed-8",
       "linux-aarch64-a2b3-v-half",
       "linux-aarch64-a2b3-v-quarter",
       "linux-aarch64-a2b4-1-hk-001",
       "linux-aarch64-a2b4-2-hk-001",
       "linux-aarch64-a2b4-4-hk-001",
       "linux-aarch64-a2b4-8-hk-001",
+      "linux-aarch64-a2b4-fed-1",
+      "linux-aarch64-a2b4-fed-2",
+      "linux-aarch64-a2b4-fed-4",
+      "linux-aarch64-a2b4-fed-8",
       "linux-aarch64-a3-0-sh-001",
       "linux-aarch64-a3-1",
       "linux-aarch64-a3-16",
@@ -452,6 +469,18 @@
     "linux-aarch64-a2b1-8-hk-001": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2b1-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2b1b3-1-hk-001": [
       "ascend-hk-001-cluster"
     ],
@@ -463,6 +492,18 @@
     ],
     "linux-aarch64-a2b1b3-8-hk-001": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2b1b3-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1b3-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1b3-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b1b3-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2b1b3-test-8-hk-001": [
       "ascend-hk-001-cluster"
@@ -501,6 +542,18 @@
     "linux-aarch64-a2b3-8-hk-001": [
       "ascend-hk-001-cluster"
     ],
+    "linux-aarch64-a2b3-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b3-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b3-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b3-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2b3-v-half": [
       "ascend-hk-001-cluster"
     ],
@@ -533,6 +586,18 @@
     ],
     "linux-aarch64-a2b4-8-hk-001": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2b4-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a3": [
       "ascend-cn12-001-cluster"
