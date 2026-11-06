@@ -12,7 +12,7 @@
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ❌ | ❌ | - | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
@@ -24,10 +24,10 @@
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ✅ | ✅ | - |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental).
+> Cache audit runs daily (full scan).
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
 > Last checked: 2026-11-06
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/42192050043](https://github.com/ascend-gha-runners/docs/actions/runs/42192050043)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/42195845931](https://github.com/ascend-gha-runners/docs/actions/runs/42195845931)
