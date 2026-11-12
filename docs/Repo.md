@@ -20,7 +20,7 @@
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ |
-| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
+| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ✅ | ✅ | - |
 <!-- CACHE_AUDIT_TABLE_END -->
 
@@ -30,4 +30,4 @@
 >
 > Last checked: 2026-11-12
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/43167800739](https://github.com/ascend-gha-runners/docs/actions/runs/43167800739)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/43167855389](https://github.com/ascend-gha-runners/docs/actions/runs/43167855389)
