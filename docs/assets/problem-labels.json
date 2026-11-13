@@ -123,6 +123,7 @@
       "linux-aarch64-a3-sgl-kernel-fed-4",
       "linux-aarch64-a3-sgl-kernel-fed-8",
       "linux-amd64-a5-1-sh-002",
+      "linux-amd64-a5-1-tilelang-sh-002",
       "linux-amd64-a5-2-sh-002",
       "linux-amd64-a5-4-sh-002",
       "linux-amd64-a5-8-sh-002"
@@ -921,6 +922,9 @@
       "openmerlin-guiyang-005-cluster"
     ],
     "linux-amd64-a5-1-sh-002": [
+      "openmerlin-sh-002-cluster"
+    ],
+    "linux-amd64-a5-1-tilelang-sh-002": [
       "openmerlin-sh-002-cluster"
     ],
     "linux-amd64-a5-2-sh-002": [
