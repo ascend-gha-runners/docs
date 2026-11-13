@@ -78,7 +78,11 @@
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a5-fed-1",
+      "linux-aarch64-a5-fed-2",
+      "linux-aarch64-a5-fed-4",
+      "linux-aarch64-a5-fed-8"
     ],
     "hiyouga/LlamaFactory": [
       "linux-aarch64-a2-1",
@@ -887,6 +891,18 @@
     ],
     "linux-aarch64-a5-8": [
       "openmerlin-sh-001-cluster"
+    ],
+    "linux-aarch64-a5-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a5-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a5-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a5-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-cpu-1": [
       "openmerlin-guiyang-005-cluster"
