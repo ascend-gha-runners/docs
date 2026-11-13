@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">314</span>
+    <span class="stat-num">338</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,14 +22,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords (space-separated)" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 203</option>
+  <option value="ascend-1980">ascend-1980 · 227</option>
   <option value="cpu">CPU (no NPU) · 53</option>
   <option value="npu">npu · 33</option>
   <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 9</option>
   <option value="ascend-310">ascend-310 · 5</option>
 </select>
-<span class="cluster-hint">10 clusters · 314 labels</span>
+<span class="cluster-hint">10 clusters · 338 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -688,48 +688,48 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="Karmada Federated Scheduling">
   <div class="cluster-card-header">
     <span class="cluster-name">Karmada Federated Scheduling</span>
-    <span class="cluster-meta">4 projects · 44 labels</span>
+    <span class="cluster-meta">4 projects · 68 labels</span>
   </div>
   <div class="cluster-body">
-    <div class="project-row" data-search="Ascend/sglang linux-aarch64-a3-800t-ascend-sglang-fed-2 linux-aarch64-a3-800t-ascend-sglang-fed-4 linux-aarch64-a3-800t-ascend-sglang-fed-8 linux-aarch64-a3-800t-ascend-sglang-fed-16">
+    <div class="project-row" data-search="Ascend/sglang linux-aarch64-a3-ascend-sglang-fed-2 linux-aarch64-a3-ascend-sglang-fed-4 linux-aarch64-a3-ascend-sglang-fed-8 linux-aarch64-a3-ascend-sglang-fed-16 linux-aarch64-a3-800i-ascend-sglang-fed-2 linux-aarch64-a3-800i-ascend-sglang-fed-4 linux-aarch64-a3-800i-ascend-sglang-fed-8 linux-aarch64-a3-800t-ascend-sglang-fed-2 linux-aarch64-a3-800t-ascend-sglang-fed-4 linux-aarch64-a3-800t-ascend-sglang-fed-8 linux-aarch64-a3-800i-ascend-sglang-fed-16 linux-aarch64-a3-800t-ascend-sglang-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">Ascend/sglang</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">12 labels</span>
         </button>
         <a class="project-link" href="https://github.com/Ascend/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-ascend-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-ascend-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-ascend-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-ascend-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-ascend-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-ascend-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-ascend-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-ascend-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-ascend-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-ascend-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-ascend-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-ascend-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-ascend-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-ascend-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-ascend-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-ascend-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-ascend-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-ascend-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="sgl-project/sgl-kernel-npu linux-aarch64-a3-800t-sgl-kernel-fed-2 linux-aarch64-a3-800t-sgl-kernel-fed-4 linux-aarch64-a3-800t-sgl-kernel-fed-8 linux-aarch64-a3-800t-sgl-kernel-fed-16">
+    <div class="project-row" data-search="sgl-project/sgl-kernel-npu linux-aarch64-a3-sgl-kernel-fed-2 linux-aarch64-a3-sgl-kernel-fed-4 linux-aarch64-a3-sgl-kernel-fed-8 linux-aarch64-a3-sgl-kernel-fed-16 linux-aarch64-a3-800i-sgl-kernel-fed-2 linux-aarch64-a3-800i-sgl-kernel-fed-4 linux-aarch64-a3-800i-sgl-kernel-fed-8 linux-aarch64-a3-800t-sgl-kernel-fed-2 linux-aarch64-a3-800t-sgl-kernel-fed-4 linux-aarch64-a3-800t-sgl-kernel-fed-8 linux-aarch64-a3-800i-sgl-kernel-fed-16 linux-aarch64-a3-800t-sgl-kernel-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sgl-kernel-npu</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">12 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sgl-kernel-npu" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-sgl-kernel-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sgl-kernel-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sgl-kernel-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sgl-kernel-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sgl-kernel-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sgl-kernel-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sgl-kernel-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sgl-kernel-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sgl-kernel-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sgl-kernel-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sgl-kernel-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sgl-kernel-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sgl-kernel-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sgl-kernel-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sgl-kernel-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sgl-kernel-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sgl-kernel-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sgl-kernel-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>sgl-kernel-npu</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="sgl-project/sglang linux-aarch64-a3-800t-sglang-fed-2 linux-aarch64-a3-800t-sglang-fed-4 linux-aarch64-a3-800t-sglang-fed-8 linux-aarch64-a3-800t-sglang-fed-16">
+    <div class="project-row" data-search="sgl-project/sglang linux-aarch64-a3-sglang-fed-2 linux-aarch64-a3-sglang-fed-4 linux-aarch64-a3-sglang-fed-8 linux-aarch64-a3-sglang-fed-16 linux-aarch64-a3-800i-sglang-fed-2 linux-aarch64-a3-800i-sglang-fed-4 linux-aarch64-a3-800i-sglang-fed-8 linux-aarch64-a3-800t-sglang-fed-2 linux-aarch64-a3-800t-sglang-fed-4 linux-aarch64-a3-800t-sglang-fed-8 linux-aarch64-a3-800i-sglang-fed-16 linux-aarch64-a3-800t-sglang-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">sgl-project/sglang</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">12 labels</span>
         </button>
         <a class="project-link" href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a3-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800t-sglang-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800t-sglang-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>sgl-project</code></div>
       </div>
     </div>
