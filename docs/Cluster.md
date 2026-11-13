@@ -705,7 +705,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="fla-org/flash-linear-attention linux-aarch64-a5-fed-1 linux-aarch64-a5-fed-2 linux-aarch64-a5-fed-4 linux-aarch64-a5-fed-8">
+    <div class="project-row" data-search="fla-org/flash-linear-attention linux-aarch64-a5-fed-1 linux-aarch64-a5-1 linux-aarch64-a5-fed-2 linux-aarch64-a5-2 linux-aarch64-a5-fed-4 linux-aarch64-a5-4 linux-aarch64-a5-fed-8 linux-aarch64-a5-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
@@ -715,7 +715,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <a class="project-link" href="https://github.com/fla-org/flash-linear-attention" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a5-fed-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-8</span><span class="machine-npu"> · 8 × npu</span></div>
+        <div class="machine" data-label="linux-aarch64-a5-fed-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-1 + linux-aarch64-a5-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-2 + linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-4 + linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-8 + linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
         <div class="project-ns">namespace: <code>arc-fedsched-a5</code></div>
       </div>
     </div>
