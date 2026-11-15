@@ -28,6 +28,6 @@
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
-> Last checked: 2026-11-14
+> Last checked: 2026-11-15
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/43579009171](https://github.com/ascend-gha-runners/docs/actions/runs/43579009171)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/43700159797](https://github.com/ascend-gha-runners/docs/actions/runs/43700159797)
