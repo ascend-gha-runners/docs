@@ -218,13 +218,15 @@
     "leaf_host_memory_oom": {
       "type": "leaf",
       "title": "host 内存不足（aclrtMallocHostWithCfg 207001）",
-      "summary": "Running 阶段报 torch.OutOfMemoryError: allocate_host_memory_slowpath，错误码 207001（Memory_Allocation_Failure EL0004）；不是 K8s OOMKilled。",
-      "symptoms": ["207001", "aclrtMallocHostWithCfg", "allocate_host_memory_slowpath", "Memory_Allocation_Failure", "EL0004", "allocate host memory"],
+      "summary": "Running 阶段报 torch.OutOfMemoryError: allocate_host_memory_slowpath，错误码 207001（Memory_Allocation_Failure EL0004）；不是 K8s OOMKilled。可能是真不足、宿主机 pinned 页残留，也可能是 devmm 把 get_user_pages_fast 返回 0 页当致命错误的误报。",
+      "symptoms": ["207001", "aclrtMallocHostWithCfg", "allocate_host_memory_slowpath", "Memory_Allocation_Failure", "EL0004", "allocate host memory", "devmm", "get_user_pages_fast"],
       "badge": "check-resource",
       "steps": [
         "从报错确认是 host 内存（207001）而非容器 OOMKilled",
         "降低用例并发、调小 hicache size 等 host 内存分配",
         "资源仍不足时改用更大规格的标签",
+        "在容器创建前加一步清理宿主机内存（pinned 页残留场景，见 issue #276）",
+        "若节点可回收内存充足、dmesg 中 devmm 计数无增长，按驱动误报处理并转基础设施侧，不要继续加内存（issue #300）",
         "重跑验证",
         "前往 Cluster 文档查看各标签规格"
       ],

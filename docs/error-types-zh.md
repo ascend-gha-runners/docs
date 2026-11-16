@@ -149,6 +149,8 @@ current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
 3. 等云侧证书换发完成后 **Re-run failed jobs**，不需要改任何配置；
 4. 同一次运行里若既有证书失败、又有真实用例失败，按报错区分，只重跑前者。
 
+> 补充（#334 后续）：云侧已于 11-11 完成整改并加上证书到期监控；复盘结论是原巡检未覆盖 SWR 域名，需把镜像仓库域名补进巡检清单。
+
 > **Ref:**
 > [#334](https://github.com/ascend-gha-runners/docs/issues/334)
 
@@ -344,20 +346,28 @@ current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
 
 #### host 内存不足（aclrtMallocHostWithCfg 207001） { #host-memory-oom }
 
-**现象**：**Running** 阶段进程退出，日志报 **`torch.OutOfMemoryError: allocate_host_memory_slowpath`**，底层为 **`aclrtMallocHostWithCfg ... error code is 207001`**，并伴随 **`Memory_Allocation_Failure(EL0004)`**（issue #264 / #272）。注意：**不是** K8s 的 `OOMKilled`（容器 limit 未超），而是节点 host 侧内存不足。
+**现象**：**Running** 阶段进程退出，日志报 **`torch.OutOfMemoryError: allocate_host_memory_slowpath`**，底层为 **`aclrtMallocHostWithCfg ... error code is 207001`**，并伴随 **`Memory_Allocation_Failure(EL0004)`**（issue #264 / #272）。注意：**不是** K8s 的 `OOMKilled`（容器 limit 未超），而是节点 host 侧内存相关失败。同一报错码还有**误报**形态（issue #300）：节点可回收内存充足，是 devmm 把 `get_user_pages_fast` 返回 0 页当成致命错误。
 
-**根因**（按 issue #264 / #272 定位结论）：用例申请的 **host 内存（pin memory、KV cache 等）超过节点可用内存**——#272 为用例并发较高、hicache size 分配过大；#264 为 a2b3-8 节点资源不足。
+**根因**（三种，需分开判）：
+
+- **真实不足**（#264 / #272）：用例申请的 **host 内存（pin memory、KV cache 等）超过节点可用内存**——#272 为用例并发较高、hicache size 分配过大；#264 为 a2b3-8 节点资源不足；
+- **锁页内存残留 / 碎片**（#276）：verl 开启 CPU offload + pin 后触发，同 runner 组内未开 pin 的用例全部通过，属宿主机此前任务留下的 pinned 页未释放；
+- **驱动误报**（#300，未闭环）：`devmm` 把 `get_user_pages_fast` 返回 0 页当致命错误，600~720s 加压实验（12 线程 `aclrtMallocHost` + pin 循环 + 8GB 匿名页打脏）**零失败**，`dmesg` 中 devmm 计数无新增——说明并非每次都是内存真的耗尽。
 
 **解决**：
 
 1. 先从报错区分是 **host 内存（207001）** 还是容器 `OOMKilled`；
 2. 降低用例并发、**调小 hicache size** 等 host 内存分配（#272 调整后解决）；
 3. 资源仍不足时改用**更大规格的标签**（#264 改用 a3-800i-8，并提高内存限制）；
-4. 重跑验证。
+4. 在容器创建步骤加入**清理宿主内存**的动作（#276 实测解决，PR ascend-ci-deployment#2442）；16 卡任务独占整机的场景下对同节点其它任务无影响；
+5. 若节点可回收内存充足、且 `dmesg` 里 devmm 计数没有增长，按**驱动误报**处理（#300），不要再加内存规格：把节点、job 链接与 devmm 计数交给基础设施侧，由驱动 / 业务方联合定位；
+6. 重跑验证。
 
 > **Ref:**
 > [#264](https://github.com/ascend-gha-runners/docs/issues/264)
 > [#272](https://github.com/ascend-gha-runners/docs/issues/272)
+> [#276](https://github.com/ascend-gha-runners/docs/issues/276)
+> [#300](https://github.com/ascend-gha-runners/docs/issues/300)
 
 #### /dev/shm 不足 { #dev-shm-oom }
 
@@ -439,12 +449,12 @@ current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
 
 **现象**：安装依赖报 **`read timeout`**、**`Download failed because not enough bytes were received`**、**`HTTP status server error (503)`**（issue #32 / #98 / #113 / #117）；或依赖下载耗时超过 2h（rust 依赖走官方源，issue #89）；或包 **hash 校验不匹配**：`THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE`（issue #208）；或 cargo 拉取 **crates.io 反代超时**（issue #274）。
 
-**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。hash 不匹配多为**镜像站未同步 / 缓存服务版本旧**（issue #208 定位为 download-r2 镜像站未同步、nginx 版本过旧）；crates.io 反代超时为**代理稳定性**问题（issue #274）。
+**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。hash 不匹配多为**镜像站未同步 / 缓存服务版本旧**（issue #208 定位为 download-r2 镜像站未同步、nginx 版本过旧）；另有一类 hash 失败与缓存里的元数据新旧无关（issue #317）：缓存把 **gzip 变体**发给了只声明 `identity` 的 pip，元数据本身是新的——判据是缓存侧 access 日志里同一个 URL 出现不同 representation，修复见 PR ascend-ci-deployment#2375（注意 squid 7 的 `dstdomain` 不支持 `-i`，该匹配本身已不区分大小写）；crates.io 反代超时为**代理稳定性**问题（issue #274）。
 
 **解决**：
 
 1. 确认报错来自缓存服务还是已外溢到官方源；
-2. 若报 **hash 校验不匹配**：联系 CI 侧刷新镜像站 / 更新缓存服务，**不要反复重试**（issue #208）；
+2. 若报 **hash 校验不匹配**：先按 #317 的判据区分是「元数据未同步」还是「变体发错」（gzip 发给只要 identity 的 pip），前者联系 CI 侧刷新镜像站 / 更新缓存服务，后者按缓存变体配置修复，**不要反复重试**（issue #208 / #317）；
 3. 若 **cargo / crates.io 超时**：先 Re-run failed jobs，反复超时反馈 CI 侧（issue #274）；
 4. 调整缓存服务配置（关闭 keepalive、增大 `proxy_read_timeout`、缩短锁寿命）；
 5. 转发镜像站改用 CDN 加速域名；
@@ -471,6 +481,8 @@ current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
 2. 把 pin 改到仍然存在的版本或提交，或改从稳定的内部镜像源取；
 3. 这类 pin 常被多个 device 矩阵项复用，修一处要检查全部使用点；
 4. re-run 无效，必须改 workflow。
+
+> 补充（#332 后续）：该资产在失效前一天已通知业务方，业务侧 PR vllm-ascend#21203 改为不再 pin 该资产；判定为**非基础设施问题**。
 
 > **Ref:**
 > [#332](https://github.com/ascend-gha-runners/docs/issues/332)
@@ -616,6 +628,8 @@ current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
 1. 自检脚本一律以**调度单元 / CANN device 数**为准（读 `ASCEND_RT_VISIBLE_DEVICES` 或 `huawei.com/ascend-1980` 的 limits），不要用 `npu-smi` 的 `Total Count`；
 2. 必须用物理卡描述时明确换算：`npu-smi 数 = 调度单元数 / 2`；
 3. 看到"conclusion 是绿的但用例没跑"时，先搜日志里有没有 `skip:`，不要只看结论。
+
+> 平台侧口径说明（#337）：a3 交付的是 **4 die、实际 2 卡**，与业务侧理解的「卡」未对齐；这属于口径沟通问题，不是配置错误。
 
 > **Ref:**
 > [#337](https://github.com/ascend-gha-runners/docs/issues/337)
