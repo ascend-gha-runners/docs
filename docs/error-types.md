@@ -12,6 +12,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [ErrImagePull](#errimagepull) |
 | Pending | Image | [ErrImagePull: 401 after registry change](#errimagepull-401-unauthorized-after-registry-change) |
 | Pending | Image | [Image not synced to SWR (not found)](#image-not-synced-to-swr) |
+| Pending | Image | [Image pull failed: registry TLS certificate expired](#image-pull-cert-expired) |
 | Pending | Image | [Image pull slow (Initialize containers stuck)](#image-pull-slow) |
 | Pending | Container Creation | [Secret / ConfigMap config error](#createcontainerconfigerror) |
 | Pending | Container Creation | [Container dies immediately (postStart hook exit 137)](#poststart-exit-137) |
@@ -32,14 +33,17 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Running | Workflow | [Dependency cache errors (pypi / rust)](#dependency-cache-error) |
 | Running | Workflow | [Abnormally slow steps (model load / checkout)](#ci-slow) |
 | Running | Workflow | [checkout / submodule fetch failed (stream break early EOF / DNS resolution)](#checkout-submodule-fetch-failed) |
+| Running | Workflow | [Dependency artifact 404 (upstream release asset removed)](#dependency-artifact-404) |
 | Running | Task Hang | [Task hang / timeout (engine process stuck)](#vllm-v1-streaming-hang) |
 | Running | Build | [BuildKit cache corrupt (parent snapshot not found)](#buildkit-cache-corrupt) |
 | Running | Communication | [HCCL Port Already Bound](#hccl-port-already-bound) |
 | Running | Environment | [Model Cache Missing / Incomplete](#incomplete-model-snapshot) |
+| Running | Environment | [NPU card-count convention mismatch (dual-chip package)](#npu-card-count-convention) |
 | Running | Operator | [NPU operator / kernel error (EZ3002 / 500002)](#npu-operator-kernel-error) |
 | Running | Storage | [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) |
 | Platform | Node Resource | [Node NPU occupied by an out-of-band process / container](#npu-occupied-by-external) |
 | Platform | Storage | [Shared disk full / stale lock file](#shared-storage-lock-and-space) |
+| Platform | Storage | [Shared disk file locks unavailable (NFSv3 NLM down / ENOLCK)](#nfs-lock-unavailable) |
 | Platform | Node | [Node abnormal after maintenance (shared disk not mounted / whitelist missing)](#node-after-maintenance) |
 | Platform | Control Plane | [Control plane API transient outage (ECONNREFUSED / 403 during cleanup)](#apiserver-transient-window) |
 | Platform | Node | [Node DNS failure / clock skew](#node-infra-abnormal) |
@@ -98,6 +102,13 @@ Build / image pull fails with `failed to resolve source metadata ... not found` 
 
 > **Ref:**
 > [#223](https://github.com/ascend-gha-runners/docs/issues/223)
+
+#### Image pull failed: registry TLS certificate expired { #image-pull-cert-expired }
+
+Many clusters and runner sets fail with `ImagePullBackOff` / `ErrImagePull` in the same time window, the "Initialize containers" step fails and every later step is skipped, and the kubelet event carries the decisive line `Get "https://swr.<region>.myhuaweicloud.com/v2/": x509: certificate has expired or is not yet valid` (issue #334). The registry endpoint's server-side TLS certificate expired and the cloud-side reissue lagged; workflow, image content and runner are all fine. Confirm the `x509` line in kubelet events first (do not suspect the image name or pull credentials), check whether the failure is cross-cluster and cross-tenant at once (a platform-level event), then **Re-run failed jobs** after the certificate is renewed — no configuration change is needed. If a run mixes certificate failures with genuine test failures, separate them by message and only re-run the former.
+
+> **Ref:**
+> [#334](https://github.com/ascend-gha-runners/docs/issues/334)
 
 #### Image pull slow (Initialize containers stuck) { #image-pull-slow }
 
@@ -270,6 +281,13 @@ Installing dependencies reports **`read timeout`**, **`Download failed because n
 > [#208](https://github.com/ascend-gha-runners/docs/issues/208)
 > [#274](https://github.com/ascend-gha-runners/docs/issues/274)
 
+#### Dependency artifact 404 (upstream release asset removed) { #dependency-artifact-404 }
+
+The dependency-install step returns **404** four times in a row, every later test step is skipped and `ci-gate` goes red; several matrix entries fail together in the same run and the PR's code changes are irrelevant. The workflow pins an upstream GitHub release asset (e.g. a fixed FLA wheel) that the publisher deleted or renamed, so the download URL is dead — this is not a cache miss, network problem or runner fault, and opening the same URL in a browser also returns 404. Distinguish "asset removed upstream" (404 externally) from cache / whitelist issues, repin to a version or commit that still exists (or use a stable internal mirror), and check every matrix entry that reuses the same pin. Re-running does not help — the workflow must change.
+
+> **Ref:**
+> [#332](https://github.com/ascend-gha-runners/docs/issues/332)
+
 #### Abnormally slow steps (model load / checkout) { #ci-slow }
 
 Loading a 70G model takes about **1100s** (issue #13); checkout is occasionally very slow (issue #202). Storage bandwidth is insufficient (issue #13 reached 1GB/s after moving the model to local storage); checkout's network traffic goes out the same IP used by model downloads and gets saturated (issue #202). Check whether model-load / checkout times are clearly abnormal; upgrade storage / split the traffic (keep checkout and model downloads off the same egress); and contact the infrastructure team for infrastructure-level issues.
@@ -325,6 +343,13 @@ Running phase fails with model-cache errors in four forms: **incomplete** — `h
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 > [#222](https://github.com/ascend-gha-runners/docs/issues/222)
+
+#### NPU card-count convention mismatch (dual-chip package) { #npu-card-count-convention }
+
+The job **looks green but actually skipped work**, logging only `skip: insufficient NPU: 2 visible < 4 required`, even though the step container did request and receive four `huawei.com/ascend-1980` units (issue #337). There are three "card count" conventions, and they diverge only on dual-chip packages (A3 910C, Atlas 300I DUO 310P): Kubernetes scheduling units (`huawei.com/ascend-1980`) = 16 per 8-card node; CANN devices (`/dev/davinciN`, `ASCEND_RT_VISIBLE_DEVICES`) = 16; `npu-smi info -l` physical NPU packages = 8 (each with `Chip Count: 2`). One package equals two scheduling units and two davinci devices; single-chip packages (910B series) make all three equal, which is why this stayed hidden. Always count by scheduling units / CANN devices in self-checks (read `ASCEND_RT_VISIBLE_DEVICES` or the `huawei.com/ascend-1980` limit), convert explicitly when describing physical cards (`npu-smi count = scheduling units / 2`), and when a job is green but the tests did not run, grep the log for `skip:` instead of trusting the conclusion.
+
+> **Ref:**
+> [#337](https://github.com/ascend-gha-runners/docs/issues/337)
 
 ### Operator / Kernel Errors
 
@@ -383,6 +408,14 @@ Reports **`OSError: [Errno 122] Disk quota exceeded`** (issues #191 / #221) or *
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
 
 > Note: `Errno 122` (EDQUOT) can also come from the **container writable layer (temp disk) quota** being exhausted rather than the shared disk — see [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) for how to tell them apart.
+
+#### Shared disk file locks unavailable (NFSv3 NLM down / ENOLCK) { #nfs-lock-unavailable }
+
+Two shapes, both easy to misdiagnose: (a) `uv pip install` / pip fails to take its cache lock with `failed to lock '/root/.cache/uv/.lock': No locks available (os error 37)` (`ENOLCK`) and `set -e` aborts the job (issue #339); (b) a step hangs for **exactly** `timeout-minutes` (e.g. 600s) and is then killed, leaving only `Executing the custom container implementation failed`, while the test assertions had already passed (issue #341). The shared cache disk is a static NFS mount using **NFSv3**, and the NFS host's **NLM (nlockmgr) is not registered / its rpcbind-registered port does not match the port statd actually listens on**. Data I/O is perfectly fine — a 500MB+ download succeeds — only the file-lock protocol is broken. Verify with `rpcinfo -p` on the NFS host that program `100021` exists and the port matches statd; as a workaround use an unlocked local cache or mount with `nolock`; as a permanent fix switch the mount to **NFSv4.1**, where locks are handled by protocol state and no longer depend on NLM / rpcbind. When every step takes exactly `timeout-minutes`, suspect the shared-disk lock before a business-level hang.
+
+> **Ref:**
+> [#339](https://github.com/ascend-gha-runners/docs/issues/339)
+> [#341](https://github.com/ascend-gha-runners/docs/issues/341)
 
 ### Control Plane
 

@@ -1,16 +1,17 @@
 # 决策树全量路径表（人工检查用）
 
-> 生成时间：2026-11-05 10:56（由 export_tree_view.py 从 problem-tree.json 自动生成，请勿手改）
-> 共 43 条 根→叶子 路径，其中新增 4 条（与 git HEAD 已提交版本对比）
+> 生成时间：2026-11-16 10:30（按 export_tree_view.py 同规则整理，请勿手改）
+> 共 47 条 根→叶子 路径，其中新增 4 条（与 git HEAD 已提交版本对比）
 > 步骤列中与上一行相同的留空（等效合并单元格）；— 表示该路径没有这一步
 > 已有路径视为已检查过，人工只需复查带 🆕 的新增行（下方清单可勾选）
 
 | 第 1 步 | 第 2 步 | 第 3 步 | 命中案例 | 归属 | 人工复查 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 报错 / Job 失败 | Pending（排队 / 调度） | 镜像拉取失败 | ErrImagePull（镜像拉取失败） | 检查 workflow |  |
+|  |  | 镜像拉取失败：证书过期（x509） | 镜像拉取失败：仓库 TLS 证书过期 | 基础设施处理 | 🆕 |
 |  |  | 镜像名非法 | InvalidImageName（镜像名非法） | 检查 workflow |  |
 |  |  | 镜像拉取慢（Initialize containers 卡住） | 镜像拉取慢（Initialize containers 卡住） | 检查 workflow |  |
-|  |  | 容器创建失败（Secret / ConfigMap 缺失） | CreateContainerConfigError / MountVolume.SetUp failed（容器创建失败） | 检查 workflow | 🆕 |
+|  |  | 容器创建失败（Secret / ConfigMap 缺失） | CreateContainerConfigError / MountVolume.SetUp failed（容器创建失败） | 检查 workflow |  |
 |  |  | 容器启动即死（postStart 钩子） | 容器启动即死（postStart 钩子 exit 137） | 基础设施处理 |  |
 |  |  | novolume 模式失败 / 额外耗时 | novolume 模式失败 / 额外耗时 | 基础设施处理 |  |
 |  |  | 调度失败（资源 / 节点） | FailedScheduling（调度失败） | 检查资源申请 |  |
@@ -24,14 +25,16 @@
 |  |  | kubeconfig / secret 指向错误集群 | kubeconfig / secret 指向错误集群 | 检查 workflow |  |
 |  |  | 安装 / 编译阶段 OOM（并行度过高） | 安装 / 编译阶段 OOM（并行度过高） | 检查 workflow |  |
 |  |  | 依赖缓存异常（pypi / rust） | 依赖缓存异常（pypi / rust） | 基础设施处理 |  |
+|  |  | 依赖工件下载 404（上游资产已下线） | 依赖工件下载 404（上游 release 资产已被删除或改名，需改 workflow pin） | 检查 workflow | 🆕 |
 |  |  | HCCL 通信端口被占用 | HCCL 通信端口被占用 | 检查 workflow |  |
 |  |  | 模型缓存缺失 / 不完整 | 模型缓存缺失 / 不完整 | 基础设施处理 |  |
+|  |  | NPU 卡数口径不一致（自检误判卡数不足） | NPU 卡数口径不一致（双 chip 封装，npu-smi 物理卡数 = 调度单元数 / 2） | 检查 workflow | 🆕 |
 |  |  | 任务长时间卡住 / 超时 | 任务长时间卡住 / 超时（引擎进程挂起） | 检查 workflow |  |
 |  |  | 任务耗时异常（模型加载 / checkout） | 任务耗时异常（模型加载 / checkout） | 基础设施处理 |  |
 |  |  | 上传日志 / 产物失败 | 上传日志 / 产物失败（需加网络白名单） | 基础设施处理 |  |
 |  |  | 临时盘 / 容器可写层空间不足 | 临时盘 / 容器可写层空间不足（Disk quota exceeded / EDQUOT） | 检查 workflow |  |
-|  |  | checkout / 子模块拉取失败（断流 / DNS） | checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败） | 基础设施处理 | 🆕 |
-|  |  | NPU 算子 / 内核层报错（EZ3002 / 500002） | NPU 算子 / 内核层报错（EZ3002 / 500002） | 检查 workflow | 🆕 |
+|  |  | checkout / 子模块拉取失败（断流 / DNS） | checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败） | 基础设施处理 |  |
+|  |  | NPU 算子 / 内核层报错（EZ3002 / 500002） | NPU 算子 / 内核层报错（EZ3002 / 500002） | 检查 workflow |  |
 | 一直等待 / 排队 | 可能在等资源（队列满） | — | 等待资源（队列可能已满） | 基础设施处理 |  |
 |  | runs-on 标签可能不存在 | — | runs-on 标签可能不存在 | 检查 workflow |  |
 |  | Runner 可能未上线 | — | Runner 可能未上线 | 检查 GitHub 配置 |  |
@@ -44,18 +47,19 @@
 |  | 弹性扩容失败 / 弹性节点不健康 | — | 弹性扩容失败 / 弹性节点不健康 | 基础设施处理 |  |
 |  | 节点 NPU 被外部进程 / 带外容器占用 | — | 节点 NPU 被外部进程 / 带外容器占用 | 基础设施处理 |  |
 |  | 共享盘空间不足 / 锁文件残留 | — | 共享盘空间不足 / 锁文件残留 | 基础设施处理 |  |
+|  | 共享盘文件锁不可用（NFS 锁 / ENOLCK） | — | 共享盘文件锁不可用（NFSv3 NLM 无响应 / ENOLCK，表现为锁失败或每步卡满 timeout） | 基础设施处理 | 🆕 |
 |  | 节点维护后异常（共享盘未挂载 / 白名单缺失） | — | 节点维护后异常（共享盘未挂载 / 白名单缺失） | 基础设施处理 |  |
 |  | 节点异常（DNS 解析 / 时钟偏移） | — | 节点异常（DNS 解析 / 时钟偏移） | 基础设施处理 |  |
 |  | 控制面 API 瞬断（cleanup 阶段） | — | 控制面 API 瞬断（cleanup 阶段 ECONNREFUSED / 403） | 基础设施处理 |  |
 |  | 节点硬件故障（NPU 挂死 / NotReady） | — | 节点硬件故障（NPU 挂死 / NotReady） | 基础设施处理 |  |
-|  | 弹性节点被 drift 驱逐（任务被中断 exit 130） | — | 弹性节点被 drift 驱逐（任务被中断 exit 130） | 基础设施处理 | 🆕 |
+|  | 弹性节点被 drift 驱逐（任务被中断 exit 130） | — | 弹性节点被 drift 驱逐（任务被中断 exit 130） | 基础设施处理 |  |
 | 其它 | — | — | 其它问题 | — |  |
 
 ## 新增路径复查清单
 
 > 逐条检查路径、案例与归属是否合理；确认后勾选。
 
-- [ ] 报错 / Job 失败 → Pending（排队 / 调度） → 容器创建失败（Secret / ConfigMap 缺失） → CreateContainerConfigError / MountVolume.SetUp failed（容器创建失败）（检查 workflow）
-- [ ] 报错 / Job 失败 → Running（运行中报错） → checkout / 子模块拉取失败（断流 / DNS） → checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败）（基础设施处理）
-- [ ] 报错 / Job 失败 → Running（运行中报错） → NPU 算子 / 内核层报错（EZ3002 / 500002） → NPU 算子 / 内核层报错（EZ3002 / 500002）（检查 workflow）
-- [ ] 集群 / 机器问题 → 弹性节点被 drift 驱逐（任务被中断 exit 130） → 弹性节点被 drift 驱逐（任务被中断 exit 130）（基础设施处理）
+- [ ] 报错 / Job 失败 → Pending（排队 / 调度） → 镜像拉取失败：证书过期（x509） → 镜像拉取失败：仓库 TLS 证书过期（基础设施处理）
+- [ ] 报错 / Job 失败 → Running（运行中报错） → 依赖工件下载 404（上游资产已下线） → 依赖工件下载 404（检查 workflow）
+- [ ] 报错 / Job 失败 → Running（运行中报错） → NPU 卡数口径不一致（自检误判卡数不足） → NPU 卡数口径不一致（检查 workflow）
+- [ ] 集群 / 机器问题 → 共享盘文件锁不可用（NFS 锁 / ENOLCK） → 共享盘文件锁不可用（基础设施处理）
