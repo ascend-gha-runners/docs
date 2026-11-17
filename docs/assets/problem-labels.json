@@ -57,6 +57,10 @@
       "linux-amd64-cpu-8"
     ],
     "XPU-Forces/mojo_opset": [
+      "linux-aarch64-a2-mojo-fed-1",
+      "linux-aarch64-a2-mojo-fed-2",
+      "linux-aarch64-a2-mojo-fed-4",
+      "linux-aarch64-a2-mojo-fed-8",
       "linux-aarch64-a2b3-1-hk-001",
       "linux-aarch64-a2b3-2-hk-001",
       "linux-aarch64-a2b3-4-hk-001",
@@ -95,10 +99,20 @@
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
       "linux-aarch64-a2-8",
+      "linux-aarch64-a2-fla-fed-1",
+      "linux-aarch64-a2-fla-fed-2",
+      "linux-aarch64-a2-fla-fed-4",
+      "linux-aarch64-a2-fla-fed-8",
       "linux-aarch64-a5-fed-1",
       "linux-aarch64-a5-fed-2",
       "linux-aarch64-a5-fed-4",
       "linux-aarch64-a5-fed-8"
+    ],
+    "hiyouga/LLaMA-Factory": [
+      "linux-aarch64-a2-llamafactory-fed-1",
+      "linux-aarch64-a2-llamafactory-fed-2",
+      "linux-aarch64-a2-llamafactory-fed-4",
+      "linux-aarch64-a2-llamafactory-fed-8"
     ],
     "hiyouga/LlamaFactory": [
       "linux-aarch64-a2-1",
@@ -110,7 +124,11 @@
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a2-swift-fed-1",
+      "linux-aarch64-a2-swift-fed-2",
+      "linux-aarch64-a2-swift-fed-4",
+      "linux-aarch64-a2-swift-fed-8"
     ],
     "sgl-project/sgl-kernel-npu": [
       "linux-aarch64-a2-0",
@@ -215,6 +233,10 @@
       "linux-amd64-a5-8-sh-002"
     ],
     "triton-lang/triton-ascend": [
+      "linux-aarch64-a2-triton-fed-1",
+      "linux-aarch64-a2-triton-fed-2",
+      "linux-aarch64-a2-triton-fed-4",
+      "linux-aarch64-a2-triton-fed-8",
       "linux-aarch64-a2b1-1",
       "linux-aarch64-a2b1-2",
       "linux-aarch64-a2b1-4",
@@ -256,6 +278,10 @@
       "linux-aarch64-a2-4",
       "linux-aarch64-a2-8",
       "linux-aarch64-a2-test-8",
+      "linux-aarch64-a2-verl-fed-1",
+      "linux-aarch64-a2-verl-fed-2",
+      "linux-aarch64-a2-verl-fed-4",
+      "linux-aarch64-a2-verl-fed-8",
       "linux-aarch64-a2b3-1",
       "linux-aarch64-a2b3-2",
       "linux-aarch64-a2b3-4",
@@ -490,8 +516,80 @@
     "linux-aarch64-a2-fed-8": [
       "Karmada Federated Scheduling"
     ],
+    "linux-aarch64-a2-fla-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fla-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fla-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-fla-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-llamafactory-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-llamafactory-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-llamafactory-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-llamafactory-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mojo-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mojo-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mojo-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mojo-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-swift-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-swift-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-swift-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-swift-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2-test-8": [
       "ascend-hk-001-cluster"
+    ],
+    "linux-aarch64-a2-triton-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-triton-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-triton-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-triton-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2b1-1": [
       "ascend-infra-guiyang-cluster-001"

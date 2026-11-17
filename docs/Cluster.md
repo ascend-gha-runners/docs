@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">375</span>
+    <span class="stat-num">399</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,14 +22,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords (space-separated)" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 259</option>
+  <option value="ascend-1980">ascend-1980 · 283</option>
   <option value="cpu">CPU (no NPU) · 53</option>
   <option value="npu">npu · 38</option>
   <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 9</option>
   <option value="ascend-310">ascend-310 · 5</option>
 </select>
-<span class="cluster-hint">10 clusters · 375 labels</span>
+<span class="cluster-hint">10 clusters · 399 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -688,7 +688,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="Karmada Federated Scheduling">
   <div class="cluster-card-header">
     <span class="cluster-name">Karmada Federated Scheduling</span>
-    <span class="cluster-meta">13 projects · 104 labels</span>
+    <span class="cluster-meta">15 projects · 128 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-800i-pytorch-fed-2 linux-aarch64-a3-800i-pytorch-fed-4 linux-aarch64-a3-800i-pytorch-fed-8 linux-aarch64-a3-800i-pytorch-fed-16">
@@ -719,18 +719,18 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>ascend</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="XPU-Forces/mojo_opset linux-aarch64-a3-800i-mojo-fed-2 linux-aarch64-a3-800i-mojo-fed-4 linux-aarch64-a3-800i-mojo-fed-8 linux-aarch64-a3-800i-mojo-fed-16">
+    <div class="project-row" data-search="XPU-Forces/mojo_opset linux-aarch64-a2-mojo-fed-1 linux-aarch64-a2-mojo-fed-2 linux-aarch64-a2-mojo-fed-4 linux-aarch64-a2-mojo-fed-8 linux-aarch64-a3-800i-mojo-fed-2 linux-aarch64-a3-800i-mojo-fed-4 linux-aarch64-a3-800i-mojo-fed-8 linux-aarch64-a3-800i-mojo-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">XPU-Forces/mojo_opset</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">8 labels</span>
         </button>
         <a class="project-link" href="https://github.com/XPU-Forces/mojo_opset" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
-        <div class="project-ns">namespace: <code>arc-fedsched-a3-800i</code></div>
+        <div class="machine" data-label="linux-aarch64-a2-mojo-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mojo-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-mojo-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mojo-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-mojo-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mojo-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-mojo-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mojo-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mojo-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mojo-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>arc-fedsched-a2</code></div>
       </div>
     </div>
     <div class="project-row" data-search="alibaba/ROLL linux-aarch64-a3-800i-roll-fed-2 linux-aarch64-a3-800i-roll-fed-4 linux-aarch64-a3-800i-roll-fed-8 linux-aarch64-a3-800i-roll-fed-16">
@@ -761,18 +761,46 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>arc-fedsched-a3-800i</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="fla-org/flash-linear-attention linux-aarch64-a5-fed-1 linux-aarch64-a5-1 linux-aarch64-a5-fed-2 linux-aarch64-a5-2 linux-aarch64-a5-fed-4 linux-aarch64-a5-4 linux-aarch64-a5-fed-8 linux-aarch64-a5-8">
+    <div class="project-row" data-search="fla-org/flash-linear-attention linux-aarch64-a5-fed-1 linux-aarch64-a5-1 linux-aarch64-a5-fed-2 linux-aarch64-a5-2 linux-aarch64-a5-fed-4 linux-aarch64-a5-4 linux-aarch64-a5-fed-8 linux-aarch64-a5-8 linux-aarch64-a2-fla-fed-1 linux-aarch64-a2-fla-fed-2 linux-aarch64-a2-fla-fed-4 linux-aarch64-a2-fla-fed-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">fla-org/flash-linear-attention</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">8 labels</span>
         </button>
         <a class="project-link" href="https://github.com/fla-org/flash-linear-attention" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a5-fed-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-1 + linux-aarch64-a5-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-2 + linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-4 + linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-8 + linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
+        <div class="machine" data-label="linux-aarch64-a5-fed-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-1 + linux-aarch64-a5-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-2 + linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-4 + linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-fed-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-fed-8 + linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a2-fla-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-fla-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-fla-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-fla-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-fla-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-fla-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-fla-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-fla-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>arc-fedsched-a5</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="hiyouga/LLaMA-Factory linux-aarch64-a2-llamafactory-fed-1 linux-aarch64-a2-llamafactory-fed-2 linux-aarch64-a2-llamafactory-fed-4 linux-aarch64-a2-llamafactory-fed-8">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">hiyouga/LLaMA-Factory</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/hiyouga/LLaMA-Factory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>hiyouga</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="modelscope/ms-swift linux-aarch64-a2-swift-fed-1 linux-aarch64-a2-swift-fed-2 linux-aarch64-a2-swift-fed-4 linux-aarch64-a2-swift-fed-8">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">modelscope/ms-swift</span>
+          <span class="project-count">4 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/modelscope/ms-swift" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-aarch64-a2-swift-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>modelscope</code></div>
       </div>
     </div>
     <div class="project-row" data-search="sgl-project/sgl-kernel-npu linux-aarch64-a3-sgl-kernel-fed-2 linux-aarch64-a3-2 linux-aarch64-a3-2 linux-aarch64-a3-sgl-kernel-fed-4 linux-aarch64-a3-4 linux-aarch64-a3-4 linux-aarch64-a3-sgl-kernel-fed-8 linux-aarch64-a3-8 linux-aarch64-a3-8 linux-aarch64-a3-sgl-kernel-fed-16 linux-aarch64-a3-16 linux-aarch64-a3-16 linux-aarch64-a3-800i-sgl-kernel-fed-2 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-sgl-kernel-fed-4 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-sgl-kernel-fed-8 linux-aarch64-a3-800i-8 linux-aarch64-a3-800t-sgl-kernel-fed-2 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-sgl-kernel-fed-4 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-sgl-kernel-fed-8 linux-aarch64-a3-800t-8 linux-aarch64-a3-800i-sgl-kernel-fed-16 linux-aarch64-a3-800i-16 linux-aarch64-a3-800t-sgl-kernel-fed-16 linux-aarch64-a3-800t-16">
@@ -817,17 +845,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>arc-fedsched-a3-800i</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="triton-lang/triton-ascend linux-aarch64-a3-800i-triton-fed-2 linux-aarch64-a3-800i-triton-fed-4 linux-aarch64-a3-800i-triton-fed-8 linux-aarch64-a3-800i-triton-fed-16">
+    <div class="project-row" data-search="triton-lang/triton-ascend linux-aarch64-a2-triton-fed-1 linux-aarch64-a2-triton-fed-2 linux-aarch64-a2-triton-fed-4 linux-aarch64-a2-triton-fed-8 linux-aarch64-a3-800i-triton-fed-2 linux-aarch64-a3-800i-triton-fed-4 linux-aarch64-a3-800i-triton-fed-8 linux-aarch64-a3-800i-triton-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">triton-lang/triton-ascend</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">8 labels</span>
         </button>
         <a class="project-link" href="https://github.com/triton-lang/triton-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a2-triton-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-triton-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-triton-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-triton-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-triton-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-triton-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-triton-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-triton-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-triton-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-triton-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>triton-ascend</code></div>
       </div>
     </div>
@@ -859,17 +887,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="verl-project/verl linux-aarch64-a3-800i-verl-fed-2 linux-aarch64-a3-800i-verl-fed-4 linux-aarch64-a3-800i-verl-fed-8 linux-aarch64-a3-800i-verl-fed-16">
+    <div class="project-row" data-search="verl-project/verl linux-aarch64-a2-verl-fed-1 linux-aarch64-a2-verl-fed-2 linux-aarch64-a2-verl-fed-4 linux-aarch64-a2-verl-fed-8 linux-aarch64-a3-800i-verl-fed-2 linux-aarch64-a3-800i-verl-fed-4 linux-aarch64-a3-800i-verl-fed-8 linux-aarch64-a3-800i-verl-fed-16">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">verl-project/verl</span>
-          <span class="project-count">4 labels</span>
+          <span class="project-count">8 labels</span>
         </button>
         <a class="project-link" href="https://github.com/verl-project/verl" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="machine" data-label="linux-aarch64-a2-verl-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-verl-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-verl-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-verl-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-verl-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-verl-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-verl-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-verl-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-verl-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-verl-fed-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>volcengine</code></div>
       </div>
     </div>
