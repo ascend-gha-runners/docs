@@ -775,14 +775,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>arc-fedsched-a5</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="hiyouga/LLaMA-Factory linux-aarch64-a2-llamafactory-fed-1 linux-aarch64-a2-llamafactory-fed-2 linux-aarch64-a2-llamafactory-fed-4 linux-aarch64-a2-llamafactory-fed-8">
+    <div class="project-row" data-search="hiyouga/LlamaFactory linux-aarch64-a2-llamafactory-fed-1 linux-aarch64-a2-llamafactory-fed-2 linux-aarch64-a2-llamafactory-fed-4 linux-aarch64-a2-llamafactory-fed-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
-          <span class="project-name-text">hiyouga/LLaMA-Factory</span>
+          <span class="project-name-text">hiyouga/LlamaFactory</span>
           <span class="project-count">4 labels</span>
         </button>
-        <a class="project-link" href="https://github.com/hiyouga/LLaMA-Factory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+        <a class="project-link" href="https://github.com/hiyouga/LlamaFactory" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-llamafactory-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-llamafactory-fed-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>

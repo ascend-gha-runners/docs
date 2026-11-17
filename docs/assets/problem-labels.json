@@ -108,17 +108,15 @@
       "linux-aarch64-a5-fed-4",
       "linux-aarch64-a5-fed-8"
     ],
-    "hiyouga/LLaMA-Factory": [
-      "linux-aarch64-a2-llamafactory-fed-1",
-      "linux-aarch64-a2-llamafactory-fed-2",
-      "linux-aarch64-a2-llamafactory-fed-4",
-      "linux-aarch64-a2-llamafactory-fed-8"
-    ],
     "hiyouga/LlamaFactory": [
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a2-llamafactory-fed-1",
+      "linux-aarch64-a2-llamafactory-fed-2",
+      "linux-aarch64-a2-llamafactory-fed-4",
+      "linux-aarch64-a2-llamafactory-fed-8"
     ],
     "modelscope/ms-swift": [
       "linux-aarch64-a2-1",
