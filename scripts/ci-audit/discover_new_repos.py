@@ -202,6 +202,11 @@ def main():
             project_dirs.append((org, repo))
     print(f"Found {len(project_dirs)} project dirs")
 
+    # Hard guard: a non-404 API failure is already fatal, but a bizarre
+    # 200-but-degenerate upstream state must never translate into writes.
+    if not project_dirs:
+        sys.exit("FATAL: projects scan returned no dirs; refusing to write or prune")
+
     # ---- Resolve every project dir to its real repo name ----
     resolved = {}  # dir_name -> real name (unresolvable dirs are skipped)
     for org, repo in project_dirs:
@@ -237,6 +242,14 @@ def main():
 
     # ---- Removed repos: in Repo.md but no longer in deployment projects/ ----
     removed = sorted(known - active_real)
+    # Hard guard: refuse mass removal — if more than half of the known repos
+    # would be pruned, the upstream listing is more likely degenerate than
+    # a genuine offboarding. Real mass removals need a manual look first.
+    if removed and len(removed) * 2 > len(known):
+        sys.exit(
+            f"FATAL: scan wants to remove {len(removed)} of {len(known)} known "
+            f"repos ({removed}); refusing, upstream listing looks degenerate"
+        )
     if removed:
         print(f"Removed repos (gone from deployment projects/): {removed}")
         repo_md, _ = _remove_from_md(repo_md, removed)

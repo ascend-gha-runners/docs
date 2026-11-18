@@ -143,14 +143,14 @@ jobs:
             if [ "$attempt" -lt 3 ]; then
               echo "Push attempt $attempt failed, re-fetching latest..."
               # Save untracked files that update_repo_md.py needs
+              # (repos.txt is NOT saved: after reset it comes from origin/main,
+              #  and the discovery re-run below re-appends anything missing)
               cp audit_result.md /tmp/audit_result_retry.md
-              cp scripts/ci-audit/repos.txt /tmp/repos_retry.txt 2>/dev/null || true
               # Reset to latest origin/main
               git fetch origin main
               git reset --hard origin/main
               # Restore saved files
               cp /tmp/audit_result_retry.md audit_result.md
-              cp /tmp/repos_retry.txt scripts/ci-audit/repos.txt 2>/dev/null || true
               # Re-run discovery: reset --hard wiped the rows it inserted
               # (script is idempotent: known set from Repo.md, repos.txt dedup)
               python3 scripts/ci-audit/discover_new_repos.py || echo "::warning::discovery re-run failed; new-repo rows and their audit results are dropped this run"
