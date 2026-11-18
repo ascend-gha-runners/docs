@@ -105,6 +105,10 @@ jobs:
 
       - name: Run log-based cache audit
         id: audit
+        env:
+          # Rotate several read-only tokens per repo so a single 5000/hr REST
+          # bucket can't be exhausted; falls back to GH_TOKEN when unset/empty.
+          AUDIT_TOKENS: ${{ secrets.AUDIT_TOKEN_1 }},${{ secrets.AUDIT_TOKEN_2 }}
         run: |
           bash scripts/ci-audit/check_cache_from_logs.sh /tmp/audit_repos.txt | tee audit_result.md
 
