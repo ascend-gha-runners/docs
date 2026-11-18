@@ -49,6 +49,16 @@ jobs:
         run: sudo apt-get install -y jq
 
       # ================================================================
+      # Phase 0: Sync Repo.md with latest main
+      # Must run BEFORE discovery: discovery inserts new repo rows into
+      # docs/Repo.md, and any later checkout of that file would wipe them.
+      # ================================================================
+      - name: Sync Repo.md with latest main
+        run: |
+          git fetch origin main
+          git checkout origin/main -- docs/Repo.md
+
+      # ================================================================
       # Phase 1: Discover new repos from ascend-ci-deployment
       # ================================================================
       - name: Discover new repos from deployment repo
@@ -98,10 +108,9 @@ jobs:
 
       - name: Update Repo.md with audit results
         run: |
-          # Fetch latest Repo.md from origin/main to avoid stale data
-          # (concurrent runs may have pushed updates after our checkout)
-          git fetch origin main
-          git checkout origin/main -- docs/Repo.md
+          # Repo.md was synced with origin/main in Phase 0 (before discovery);
+          # do NOT checkout it again here, that would wipe the rows discovery
+          # just inserted. Late races are handled by the push-retry loop below.
           python3 scripts/ci-audit/update_repo_md.py \
             audit_result.md \
             scripts/ci-audit/repos.txt \
@@ -140,6 +149,9 @@ jobs:
               # Restore saved files
               cp /tmp/audit_result_retry.md audit_result.md
               cp /tmp/repos_retry.txt scripts/ci-audit/repos.txt 2>/dev/null || true
+              # Re-run discovery: reset --hard wiped the rows it inserted
+              # (script is idempotent: known set from Repo.md, repos.txt dedup)
+              python3 scripts/ci-audit/discover_new_repos.py || true
               # Re-run update with fresh Repo.md
               python3 scripts/ci-audit/update_repo_md.py \
                 audit_result.md \

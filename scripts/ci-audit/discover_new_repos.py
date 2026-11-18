@@ -18,7 +18,6 @@ import sys
 import tempfile
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta, timezone
 
 DEPLOY_REPO = "opensourceways/ascend-ci-deployment"
 TABLE_END   = "<!-- CACHE_AUDIT_TABLE_END -->"
@@ -85,7 +84,7 @@ def resolve_repo(org, repo):
     Resolve the real GitHub org/repo for a deployment directory.
 
     Priority: githubConfigUrl (API-canonicalized) → dir name (API-canonicalized)
-    → dir name as-is (with warning).
+    → None (dir skipped: not a GitHub repo, likely a runner-config dir).
 
     Directory names are often stale org names (e.g. volcengine/verl-omni is
     actually verl-project/verl-omni). Values.yaml URLs can also be stale but
@@ -104,8 +103,8 @@ def resolve_repo(org, repo):
             if full != f"{org}/{repo}":
                 print(f"  resolved {org}/{repo} -> {full}")
             return full
-    print(f"  WARN: cannot resolve {org}/{repo} via API, using dir name")
-    return f"{org}/{repo}"
+    print(f"  SKIP: {org}/{repo} does not resolve to a GitHub repo")
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -181,10 +180,12 @@ def main():
     print(f"Found {len(project_dirs)} project dirs")
 
     # ---- Resolve every project dir to its real repo name ----
-    resolved = {}  # dir_name -> real name
+    resolved = {}  # dir_name -> real name (unresolvable dirs are skipped)
     for org, repo in project_dirs:
         dir_name = f"{org}/{repo}"
-        resolved[dir_name] = resolve_repo(org, repo)
+        real = resolve_repo(org, repo)
+        if real is not None:
+            resolved[dir_name] = real
     active_real = set(resolved.values())
 
     # ---- Rename stale tracked names (e.g. volcengine/verl -> verl-project/verl) ----
@@ -239,9 +240,10 @@ def main():
     print(f"New repos to add: {new_repos}")
 
     # ---- Update Repo.md with new rows ----
-    today = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+    # Row format matches the 7 cache dims; update_repo_md.py rewrites all
+    # cells later, the link is the only thing that matters here.
     new_rows = "".join(
-        f"| [{r}](https://github.com/{r}) | - | - | - | - | {today} |\n"
+        f"| [{r}](https://github.com/{r}) | - | - | - | - | - | - | - |\n"
         for r in new_repos
     )
     if TABLE_END in repo_md:
@@ -258,7 +260,7 @@ def main():
     existing = set(repos_txt.strip().splitlines())
     additions = []
     for r in new_repos:
-        line = f"{r}|||||"
+        line = f"{r}||||||||"
         if line not in existing and not any(
             ln.startswith(f"{r}|") for ln in existing
         ):
