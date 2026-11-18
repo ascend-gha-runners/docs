@@ -32,6 +32,15 @@ TOKEN = os.environ.get("GH_TOKEN", "")
 # ---------------------------------------------------------------------------
 
 def _api(path):
+    """Call the GitHub contents/repos API.
+
+    Returns (body, status). Only HTTP 404 is treated as a normal "not found";
+    any other failure (403 rate limit, 5xx, timeout, bad JSON) is fatal:
+    sys.exit BEFORE any file write, so a transient API error can never cause
+    the removal logic below to prune valid repos (or wipe the whole table).
+    The workflow step runs with continue-on-error, which keeps the audit
+    running on the previous state instead.
+    """
     url = f"https://api.github.com{path}"
     req = urllib.request.Request(url)
     req.add_header("Authorization", f"Bearer {TOKEN}")
@@ -40,13 +49,26 @@ def _api(path):
         with urllib.request.urlopen(req, timeout=20) as resp:  # nosec B310
             return json.loads(resp.read()), resp.status
     except urllib.error.HTTPError as exc:
-        return json.loads(exc.read() or b"{}"), exc.code
+        body = exc.read() or b"{}"
+        if exc.code == 404:
+            return json.loads(body), exc.code
+        sys.exit(
+            f"FATAL: GitHub API {exc.code} on {path}; aborting before any file "
+            f"write to avoid pruning valid repos: {body[:200]!r}"
+        )
+    except Exception as exc:  # network / timeout / JSON decode failures
+        sys.exit(f"FATAL: GitHub API request failed on {path}: {exc!r}")
 
 
-def list_dir(path):
+def list_dir(path, fatal_on_missing=False):
     """Return names of subdirectories at the given repo path."""
     data, status = _api(f"/repos/{DEPLOY_REPO}/contents/{path}")
     if status != 200:
+        if fatal_on_missing:
+            # With _api treating non-404 as fatal, this means the root
+            # projects/ listing itself 404'd: refuse to scan an empty set,
+            # which the removal logic would read as "everything removed".
+            sys.exit(f"FATAL: {path} not found in {DEPLOY_REPO}; refusing to prune")
         return []
     return [item["name"] for item in data if item["type"] == "dir"]
 
@@ -84,7 +106,8 @@ def resolve_repo(org, repo):
     Resolve the real GitHub org/repo for a deployment directory.
 
     Priority: githubConfigUrl (API-canonicalized) → dir name (API-canonicalized)
-    → None (dir skipped: not a GitHub repo, likely a runner-config dir).
+    → None (dir skipped: API 404, i.e. confirmed not a GitHub repo, likely a
+    runner-config dir; transient API errors abort the whole script instead).
 
     Directory names are often stale org names (e.g. volcengine/verl-omni is
     actually verl-project/verl-omni). Values.yaml URLs can also be stale but
@@ -174,7 +197,7 @@ def main():
     # ---- Scan deployment repo projects/ ----
     print(f"Scanning {DEPLOY_REPO} projects/...")
     project_dirs = []
-    for org in list_dir("projects"):
+    for org in list_dir("projects", fatal_on_missing=True):
         for repo in list_dir(f"projects/{org}"):
             project_dirs.append((org, repo))
     print(f"Found {len(project_dirs)} project dirs")
@@ -266,8 +289,8 @@ def main():
         ):
             additions.append(line)
     if additions:
-        with open("scripts/ci-audit/repos.txt", "a", encoding="utf-8") as f:
-            f.write("\n" + "\n".join(additions) + "\n")
+        with open("scripts/ci-audit/repos.txt", "w", encoding="utf-8") as f:
+            f.write(repos_txt.rstrip("\n") + "\n" + "\n".join(additions) + "\n")
         print(f"Appended {len(additions)} line(s) to repos.txt")
 
     if github_output:

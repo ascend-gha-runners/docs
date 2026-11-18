@@ -52,6 +52,8 @@ jobs:
       # Phase 0: Sync Repo.md with latest main
       # Must run BEFORE discovery: discovery inserts new repo rows into
       # docs/Repo.md, and any later checkout of that file would wipe them.
+      # Only Repo.md is synced, not repos.txt: this workflow is its sole
+      # writer and the concurrency group serializes runs.
       # ================================================================
       - name: Sync Repo.md with latest main
         run: |
@@ -151,7 +153,7 @@ jobs:
               cp /tmp/repos_retry.txt scripts/ci-audit/repos.txt 2>/dev/null || true
               # Re-run discovery: reset --hard wiped the rows it inserted
               # (script is idempotent: known set from Repo.md, repos.txt dedup)
-              python3 scripts/ci-audit/discover_new_repos.py || true
+              python3 scripts/ci-audit/discover_new_repos.py || echo "::warning::discovery re-run failed; new-repo rows and their audit results are dropped this run"
               # Re-run update with fresh Repo.md
               python3 scripts/ci-audit/update_repo_md.py \
                 audit_result.md \
