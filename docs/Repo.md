@@ -20,7 +20,7 @@
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ |
-| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
+| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ✅ | ✅ | - |
 | [Ascend/cann-container-image](https://github.com/Ascend/cann-container-image) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | - |
 | [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | - | ✅ | - |
@@ -29,10 +29,10 @@
 | [verl-project/uni-agent](https://github.com/verl-project/uni-agent) | ✅ | ❌ | ❌ | ✅ | - | ✅ | - |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (full scan).
+> Cache audit runs daily (incremental).
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
 > Last checked: 2026-11-18
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44284844055](https://github.com/ascend-gha-runners/docs/actions/runs/44284844055)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44294468569](https://github.com/ascend-gha-runners/docs/actions/runs/44294468569)
