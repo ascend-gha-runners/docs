@@ -18,7 +18,6 @@ import sys
 import tempfile
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta, timezone
 
 DEPLOY_REPO = "opensourceways/ascend-ci-deployment"
 TABLE_END   = "<!-- CACHE_AUDIT_TABLE_END -->"
@@ -33,6 +32,15 @@ TOKEN = os.environ.get("GH_TOKEN", "")
 # ---------------------------------------------------------------------------
 
 def _api(path):
+    """Call the GitHub contents/repos API.
+
+    Returns (body, status). Only HTTP 404 is treated as a normal "not found";
+    any other failure (403 rate limit, 5xx, timeout, bad JSON) is fatal:
+    sys.exit BEFORE any file write, so a transient API error can never cause
+    the removal logic below to prune valid repos (or wipe the whole table).
+    The workflow step runs with continue-on-error, which keeps the audit
+    running on the previous state instead.
+    """
     url = f"https://api.github.com{path}"
     req = urllib.request.Request(url)
     req.add_header("Authorization", f"Bearer {TOKEN}")
@@ -41,13 +49,26 @@ def _api(path):
         with urllib.request.urlopen(req, timeout=20) as resp:  # nosec B310
             return json.loads(resp.read()), resp.status
     except urllib.error.HTTPError as exc:
-        return json.loads(exc.read() or b"{}"), exc.code
+        body = exc.read() or b"{}"
+        if exc.code == 404:
+            return json.loads(body), exc.code
+        sys.exit(
+            f"FATAL: GitHub API {exc.code} on {path}; aborting before any file "
+            f"write to avoid pruning valid repos: {body[:200]!r}"
+        )
+    except Exception as exc:  # network / timeout / JSON decode failures
+        sys.exit(f"FATAL: GitHub API request failed on {path}: {exc!r}")
 
 
-def list_dir(path):
+def list_dir(path, fatal_on_missing=False):
     """Return names of subdirectories at the given repo path."""
     data, status = _api(f"/repos/{DEPLOY_REPO}/contents/{path}")
     if status != 200:
+        if fatal_on_missing:
+            # With _api treating non-404 as fatal, this means the root
+            # projects/ listing itself 404'd: refuse to scan an empty set,
+            # which the removal logic would read as "everything removed".
+            sys.exit(f"FATAL: {path} not found in {DEPLOY_REPO}; refusing to prune")
         return []
     return [item["name"] for item in data if item["type"] == "dir"]
 
@@ -85,7 +106,8 @@ def resolve_repo(org, repo):
     Resolve the real GitHub org/repo for a deployment directory.
 
     Priority: githubConfigUrl (API-canonicalized) → dir name (API-canonicalized)
-    → dir name as-is (with warning).
+    → None (dir skipped: API 404, i.e. confirmed not a GitHub repo, likely a
+    runner-config dir; transient API errors abort the whole script instead).
 
     Directory names are often stale org names (e.g. volcengine/verl-omni is
     actually verl-project/verl-omni). Values.yaml URLs can also be stale but
@@ -104,8 +126,8 @@ def resolve_repo(org, repo):
             if full != f"{org}/{repo}":
                 print(f"  resolved {org}/{repo} -> {full}")
             return full
-    print(f"  WARN: cannot resolve {org}/{repo} via API, using dir name")
-    return f"{org}/{repo}"
+    print(f"  SKIP: {org}/{repo} does not resolve to a GitHub repo")
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -175,16 +197,23 @@ def main():
     # ---- Scan deployment repo projects/ ----
     print(f"Scanning {DEPLOY_REPO} projects/...")
     project_dirs = []
-    for org in list_dir("projects"):
+    for org in list_dir("projects", fatal_on_missing=True):
         for repo in list_dir(f"projects/{org}"):
             project_dirs.append((org, repo))
     print(f"Found {len(project_dirs)} project dirs")
 
+    # Hard guard: a non-404 API failure is already fatal, but a bizarre
+    # 200-but-degenerate upstream state must never translate into writes.
+    if not project_dirs:
+        sys.exit("FATAL: projects scan returned no dirs; refusing to write or prune")
+
     # ---- Resolve every project dir to its real repo name ----
-    resolved = {}  # dir_name -> real name
+    resolved = {}  # dir_name -> real name (unresolvable dirs are skipped)
     for org, repo in project_dirs:
         dir_name = f"{org}/{repo}"
-        resolved[dir_name] = resolve_repo(org, repo)
+        real = resolve_repo(org, repo)
+        if real is not None:
+            resolved[dir_name] = real
     active_real = set(resolved.values())
 
     # ---- Rename stale tracked names (e.g. volcengine/verl -> verl-project/verl) ----
@@ -213,6 +242,14 @@ def main():
 
     # ---- Removed repos: in Repo.md but no longer in deployment projects/ ----
     removed = sorted(known - active_real)
+    # Hard guard: refuse mass removal — if more than half of the known repos
+    # would be pruned, the upstream listing is more likely degenerate than
+    # a genuine offboarding. Real mass removals need a manual look first.
+    if removed and len(removed) * 2 > len(known):
+        sys.exit(
+            f"FATAL: scan wants to remove {len(removed)} of {len(known)} known "
+            f"repos ({removed}); refusing, upstream listing looks degenerate"
+        )
     if removed:
         print(f"Removed repos (gone from deployment projects/): {removed}")
         repo_md, _ = _remove_from_md(repo_md, removed)
@@ -239,9 +276,10 @@ def main():
     print(f"New repos to add: {new_repos}")
 
     # ---- Update Repo.md with new rows ----
-    today = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
+    # Row format matches the 7 cache dims; update_repo_md.py rewrites all
+    # cells later, the link is the only thing that matters here.
     new_rows = "".join(
-        f"| [{r}](https://github.com/{r}) | - | - | - | - | {today} |\n"
+        f"| [{r}](https://github.com/{r}) | - | - | - | - | - | - | - |\n"
         for r in new_repos
     )
     if TABLE_END in repo_md:
@@ -258,14 +296,14 @@ def main():
     existing = set(repos_txt.strip().splitlines())
     additions = []
     for r in new_repos:
-        line = f"{r}|||||"
+        line = f"{r}||||||||"
         if line not in existing and not any(
             ln.startswith(f"{r}|") for ln in existing
         ):
             additions.append(line)
     if additions:
-        with open("scripts/ci-audit/repos.txt", "a", encoding="utf-8") as f:
-            f.write("\n" + "\n".join(additions) + "\n")
+        with open("scripts/ci-audit/repos.txt", "w", encoding="utf-8") as f:
+            f.write(repos_txt.rstrip("\n") + "\n" + "\n".join(additions) + "\n")
         print(f"Appended {len(additions)} line(s) to repos.txt")
 
     if github_output:
