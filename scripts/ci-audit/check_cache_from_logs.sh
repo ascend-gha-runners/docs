@@ -35,6 +35,7 @@ set -euo pipefail
 #   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15；0 = 全量模式（cap 30）
 #   MAX_LOGS_TO_CHECK — Phase 2 最多下载多少个候选日志做聚合，默认 10；0 = 无上限（全量聚合）
 #   PARALLEL          — 并发 repo 数，默认 4
+#   AUDIT_TOKENS      — 逗号分隔的 token 列表，按 repo 轮询分散 API 限额（默认用 GH_TOKEN）
 #   PYPI_CACHE_HOST   — PyPI 缓存主机名
 #   APT_CACHE_PORT    — APT 缓存端口
 #   CCACHE_KEYWORD    — ccache 检测关键词（默认 "ccache"）
@@ -70,6 +71,21 @@ MAX_CANDIDATES="${MAX_CANDIDATES:-15}"
 MAX_LOGS_TO_CHECK="${MAX_LOGS_TO_CHECK:-10}"
 PARALLEL="${PARALLEL:-4}"
 PER_PAGE="${PER_PAGE:-30}"
+
+# Audit token pool: comma-separated tokens, rotated per repo so API usage is
+# spread across multiple rate-limit buckets. Falls back to GH_TOKEN.
+AUDIT_TOKEN_LIST=()
+if [ -n "${AUDIT_TOKENS:-}" ]; then
+    IFS=',' read -r -a _audit_raw <<< "$AUDIT_TOKENS"
+    for _t in "${_audit_raw[@]}"; do
+        if [ -n "$_t" ]; then
+            AUDIT_TOKEN_LIST+=("$_t")
+        fi
+    done
+fi
+if [ ${#AUDIT_TOKEN_LIST[@]} -eq 0 ]; then
+    AUDIT_TOKEN_LIST=("${GH_TOKEN:-}")
+fi
 
 RUNNER_REGEX=$(echo "$RUNNER_FILTER" | sed 's/,/|/g')
 
@@ -854,7 +870,7 @@ while IFS= read -r LINE || [ -n "$LINE" ]; do
     TOTAL=$((TOTAL + 1))
 done < "$INPUT_FILE"
 
-echo "Processing $TOTAL repos with $PARALLEL parallel workers..."
+echo "Processing $TOTAL repos with $PARALLEL parallel workers, ${#AUDIT_TOKEN_LIST[@]} audit token(s)..."
 echo ""
 
 # Output table header
@@ -864,9 +880,13 @@ echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--
 # Process repos in parallel
 # Use background processes with a concurrency limit
 declare -a PIDS=()
+_tok_idx=0
 for line in "${REPO_LINES[@]}"; do
-    process_repo "$line" "$TMPDIR" &
+    # Rotate tokens per repo; each background subshell gets its own GH_TOKEN
+    _tok="${AUDIT_TOKEN_LIST[$(( _tok_idx % ${#AUDIT_TOKEN_LIST[@]} ))]}"
+    ( if [ -n "$_tok" ]; then export GH_TOKEN="$_tok"; fi; process_repo "$line" "$TMPDIR" ) &
     PIDS+=($!)
+    _tok_idx=$((_tok_idx + 1))
 
     # Wait when we hit the concurrency limit
     if [ ${#PIDS[@]} -ge "$PARALLEL" ]; then
