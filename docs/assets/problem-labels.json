@@ -425,6 +425,7 @@
       "linux-aarch64-nightly-a3-2",
       "linux-aarch64-nightly-a3-4",
       "linux-aarch64-nightly-a3-8",
+      "linux-amd64-cpu-1-hk",
       "linux-amd64-cpu-16-hk",
       "linux-amd64-cpu-2-hk",
       "linux-amd64-cpu-32-hk",
@@ -1175,6 +1176,9 @@
     ],
     "linux-amd64-a5-8-sh-002": [
       "openmerlin-sh-002-cluster"
+    ],
+    "linux-amd64-cpu-1-hk": [
+      "ascend-hk-001-cluster"
     ],
     "linux-amd64-cpu-16": [
       "openmerlin-guiyang-005-cluster"
