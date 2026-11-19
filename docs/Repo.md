@@ -23,7 +23,7 @@
 | [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ✅ | ✅ | - |
 | [Ascend/cann-container-image](https://github.com/Ascend/cann-container-image) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | - |
-| [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | - | ✅ | - |
+| [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | ✅ | ✅ | - |
 | [sgl-project/sglang-omni](https://github.com/sgl-project/sglang-omni) | - | - | - | - | - | - | - |
 | [tile-ai/tilelang](https://github.com/tile-ai/tilelang) | ❌ | - | ✅ | ✅ | - | ✅ | - |
 | [verl-project/uni-agent](https://github.com/verl-project/uni-agent) | ✅ | ❌ | ❌ | ✅ | - | ✅ | - |
@@ -35,4 +35,4 @@
 >
 > Last checked: 2026-11-19
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44455883590](https://github.com/ascend-gha-runners/docs/actions/runs/44455883590)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44469892853](https://github.com/ascend-gha-runners/docs/actions/runs/44469892853)
