@@ -12,6 +12,7 @@
 | Pending | 镜像 | [镜像拉取失败](#errimagepull) |
 | Pending | 镜像 | [更换仓库后镜像拉取报 401](#errimagepull-401-unauthorized-after-registry-change) |
 | Pending | 镜像 | [镜像未同步到 SWR（not found）](#image-not-synced-to-swr) |
+| Pending | 镜像 | [镜像拉取失败：仓库证书过期（ImagePullBackOff）](#image-pull-cert-expired) |
 | Pending | 镜像 | [镜像拉取慢（Initialize containers 卡住）](#image-pull-slow) |
 | Pending | 容器创建 | [Secret / ConfigMap 配置错误](#createcontainerconfigerror) |
 | Pending | 容器创建 | [容器启动即死（postStart 钩子 exit 137）](#poststart-exit-137) |
@@ -32,14 +33,17 @@
 | Running | Workflow | [依赖缓存异常（pypi / rust）](#dependency-cache-error) |
 | Running | Workflow | [任务耗时异常（模型加载 / checkout）](#ci-slow) |
 | Running | Workflow | [checkout / 子模块拉取失败（断流 early EOF / DNS 解析失败）](#checkout-submodule-fetch-failed) |
+| Running | Workflow | [依赖工件下载 404（上游 release 资产已下线）](#dependency-artifact-404) |
 | Running | 任务卡死 | [任务长时间卡住 / 超时（引擎进程挂起）](#vllm-v1-streaming-hang) |
 | Running | 构建 | [构建缓存损坏（BuildKit parent snapshot）](#buildkit-cache-corrupt) |
 | Running | 通信 | [HCCL 通信端口被占用](#hccl-port-already-bound) |
 | Running | 环境 | [模型缓存缺失 / 不完整](#incomplete-model-snapshot) |
+| Running | 环境 | [NPU 卡数口径不一致（双 chip 封装，自检误判卡数不足）](#npu-card-count-convention) |
 | Running | 算子 | [NPU 算子 / 内核层报错（EZ3002 / 500002）](#npu-operator-kernel-error) |
 | Running | 存储 | [容器可写层（临时盘）配额耗尽](#container-writable-layer-quota) |
 | 平台 | 节点资源 | [节点 NPU 被外部进程 / 带外容器占用](#npu-occupied-by-external) |
 | 平台 | 存储 | [共享盘空间不足 / 锁文件残留](#shared-storage-lock-and-space) |
+| 平台 | 存储 | [共享盘文件锁不可用（NFSv3 NLM 无响应 / ENOLCK）](#nfs-lock-unavailable) |
 | 平台 | 节点异常 | [节点维护后异常（共享盘未挂载 / 白名单缺失）](#node-after-maintenance) |
 | 平台 | 控制面 | [控制面 API 瞬断（ECONNREFUSED / 403）](#apiserver-transient-window) |
 | 平台 | 节点异常 | [节点 DNS 解析异常 / 时钟偏移](#node-infra-abnormal) |
@@ -125,6 +129,30 @@
 
 > **Ref:**
 > [#223](https://github.com/ascend-gha-runners/docs/issues/223)
+
+#### 镜像拉取失败：仓库 TLS 证书过期 { #image-pull-cert-expired }
+
+**现象**：多个集群、多个 runner set 在同一时间窗集中报 `ImagePullBackOff` / `ErrImagePull`，step「Initialize containers」失败后其余步骤全部 skip；kubelet 事件里有一句决定性的错误：
+
+```text
+Failed to pull image "...":
+Get "https://swr.<region>.myhuaweicloud.com/v2/": x509: certificate has expired or is not yet valid:
+current time 2026-11-09T10:55:32+08:00 is after 2026-11-09T02:26:14Z
+```
+
+**根因**：镜像仓库入口的服务端 TLS 证书到期，云侧换发 / 灰度滞后。workflow、镜像内容、runner 都没有问题。
+
+**解决**：
+
+1. 先看 kubelet 事件里是不是 `x509: certificate has expired`，不要先怀疑镜像名或拉取凭据；
+2. 确认影响面是否**跨集群、跨租户同时发生**（同一时间窗一起红 = 平台级事件）；
+3. 等云侧证书换发完成后 **Re-run failed jobs**，不需要改任何配置；
+4. 同一次运行里若既有证书失败、又有真实用例失败，按报错区分，只重跑前者。
+
+> 补充（#334 后续）：云侧已于 11-11 完成整改并加上证书到期监控；复盘结论是原巡检未覆盖 SWR 域名，需把镜像仓库域名补进巡检清单。
+
+> **Ref:**
+> [#334](https://github.com/ascend-gha-runners/docs/issues/334)
 
 #### 镜像拉取慢（Initialize containers 长时间卡住） { #image-pull-slow }
 
@@ -318,20 +346,28 @@
 
 #### host 内存不足（aclrtMallocHostWithCfg 207001） { #host-memory-oom }
 
-**现象**：**Running** 阶段进程退出，日志报 **`torch.OutOfMemoryError: allocate_host_memory_slowpath`**，底层为 **`aclrtMallocHostWithCfg ... error code is 207001`**，并伴随 **`Memory_Allocation_Failure(EL0004)`**（issue #264 / #272）。注意：**不是** K8s 的 `OOMKilled`（容器 limit 未超），而是节点 host 侧内存不足。
+**现象**：**Running** 阶段进程退出，日志报 **`torch.OutOfMemoryError: allocate_host_memory_slowpath`**，底层为 **`aclrtMallocHostWithCfg ... error code is 207001`**，并伴随 **`Memory_Allocation_Failure(EL0004)`**（issue #264 / #272）。注意：**不是** K8s 的 `OOMKilled`（容器 limit 未超），而是节点 host 侧内存相关失败。同一报错码还有**误报**形态（issue #300）：节点可回收内存充足，是 devmm 把 `get_user_pages_fast` 返回 0 页当成致命错误。
 
-**根因**（按 issue #264 / #272 定位结论）：用例申请的 **host 内存（pin memory、KV cache 等）超过节点可用内存**——#272 为用例并发较高、hicache size 分配过大；#264 为 a2b3-8 节点资源不足。
+**根因**（三种，需分开判）：
+
+- **真实不足**（#264 / #272）：用例申请的 **host 内存（pin memory、KV cache 等）超过节点可用内存**——#272 为用例并发较高、hicache size 分配过大；#264 为 a2b3-8 节点资源不足；
+- **锁页内存残留 / 碎片**（#276）：verl 开启 CPU offload + pin 后触发，同 runner 组内未开 pin 的用例全部通过，属宿主机此前任务留下的 pinned 页未释放；
+- **驱动误报**（#300，未闭环）：`devmm` 把 `get_user_pages_fast` 返回 0 页当致命错误，600~720s 加压实验（12 线程 `aclrtMallocHost` + pin 循环 + 8GB 匿名页打脏）**零失败**，`dmesg` 中 devmm 计数无新增——说明并非每次都是内存真的耗尽。
 
 **解决**：
 
 1. 先从报错区分是 **host 内存（207001）** 还是容器 `OOMKilled`；
 2. 降低用例并发、**调小 hicache size** 等 host 内存分配（#272 调整后解决）；
 3. 资源仍不足时改用**更大规格的标签**（#264 改用 a3-800i-8，并提高内存限制）；
-4. 重跑验证。
+4. 在容器创建步骤加入**清理宿主内存**的动作（#276 实测解决，PR ascend-ci-deployment#2442）；16 卡任务独占整机的场景下对同节点其它任务无影响；
+5. 若节点可回收内存充足、且 `dmesg` 里 devmm 计数没有增长，按**驱动误报**处理（#300），不要再加内存规格：把节点、job 链接与 devmm 计数交给基础设施侧，由驱动 / 业务方联合定位；
+6. 重跑验证。
 
 > **Ref:**
 > [#264](https://github.com/ascend-gha-runners/docs/issues/264)
 > [#272](https://github.com/ascend-gha-runners/docs/issues/272)
+> [#276](https://github.com/ascend-gha-runners/docs/issues/276)
+> [#300](https://github.com/ascend-gha-runners/docs/issues/300)
 
 #### /dev/shm 不足 { #dev-shm-oom }
 
@@ -413,12 +449,12 @@
 
 **现象**：安装依赖报 **`read timeout`**、**`Download failed because not enough bytes were received`**、**`HTTP status server error (503)`**（issue #32 / #98 / #113 / #117）；或依赖下载耗时超过 2h（rust 依赖走官方源，issue #89）；或包 **hash 校验不匹配**：`THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE`（issue #208）；或 cargo 拉取 **crates.io 反代超时**（issue #274）。
 
-**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。hash 不匹配多为**镜像站未同步 / 缓存服务版本旧**（issue #208 定位为 download-r2 镜像站未同步、nginx 版本过旧）；crates.io 反代超时为**代理稳定性**问题（issue #274）。
+**根因**：pypi 缓存服务（nginx）上游走华为云——同步不及时 / 被限速时缓存服务自身也拿不到包；未命中缓存时会**外溢到官方源**；keepalive 与 `proxy_read_timeout` 配置不当。rust 等依赖直接走官方源，与国内网络不通。hash 不匹配多为**镜像站未同步 / 缓存服务版本旧**（issue #208 定位为 download-r2 镜像站未同步、nginx 版本过旧）；另有一类 hash 失败与缓存里的元数据新旧无关（issue #317）：缓存把 **gzip 变体**发给了只声明 `identity` 的 pip，元数据本身是新的——判据是缓存侧 access 日志里同一个 URL 出现不同 representation，修复见 PR ascend-ci-deployment#2375（注意 squid 7 的 `dstdomain` 不支持 `-i`，该匹配本身已不区分大小写）；crates.io 反代超时为**代理稳定性**问题（issue #274）。
 
 **解决**：
 
 1. 确认报错来自缓存服务还是已外溢到官方源；
-2. 若报 **hash 校验不匹配**：联系 CI 侧刷新镜像站 / 更新缓存服务，**不要反复重试**（issue #208）；
+2. 若报 **hash 校验不匹配**：先按 #317 的判据区分是「元数据未同步」还是「变体发错」（gzip 发给只要 identity 的 pip），前者联系 CI 侧刷新镜像站 / 更新缓存服务，后者按缓存变体配置修复，**不要反复重试**（issue #208 / #317）；
 3. 若 **cargo / crates.io 超时**：先 Re-run failed jobs，反复超时反馈 CI 侧（issue #274）；
 4. 调整缓存服务配置（关闭 keepalive、增大 `proxy_read_timeout`、缩短锁寿命）；
 5. 转发镜像站改用 CDN 加速域名；
@@ -432,6 +468,24 @@
 > [#117](https://github.com/ascend-gha-runners/docs/issues/117)
 > [#208](https://github.com/ascend-gha-runners/docs/issues/208)
 > [#274](https://github.com/ascend-gha-runners/docs/issues/274)
+
+#### 依赖工件下载 404（上游 release 资产已下线） { #dependency-artifact-404 }
+
+**现象**：安装依赖的步骤连续 4 次 `curl` 返回 **404**，后续用例步骤全部 skip、`ci-gate` 直接红；同一 run 内多个矩阵项一起挂；与本次 PR 的代码改动无关。
+
+**根因**：workflow 里 pin 的上游 GitHub release 资产（如某个 FLA wheel 的固定版本）已被发布方删除或改名，下载地址失效。不是缓存未命中，也不是网络或 runner 问题——用浏览器打开同一个 URL 也是 404。
+
+**解决**：
+
+1. 用 404 的 URL 判断是**上游资产被下线**（外部同样 404），而不是缓存 / 白名单问题；
+2. 把 pin 改到仍然存在的版本或提交，或改从稳定的内部镜像源取；
+3. 这类 pin 常被多个 device 矩阵项复用，修一处要检查全部使用点；
+4. re-run 无效，必须改 workflow。
+
+> 补充（#332 后续）：该资产在失效前一天已通知业务方，业务侧 PR vllm-ascend#21203 改为不再 pin 该资产；判定为**非基础设施问题**。
+
+> **Ref:**
+> [#332](https://github.com/ascend-gha-runners/docs/issues/332)
 
 #### 任务耗时异常（模型加载 / checkout） { #ci-slow }
 
@@ -549,6 +603,37 @@
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 > [#222](https://github.com/ascend-gha-runners/docs/issues/222)
 
+#### NPU 卡数口径不一致（双 chip 封装，自检误判卡数不足） { #npu-card-count-convention }
+
+**现象**：job **显示成功但实际被跳过**，日志里只有一行：
+
+```text
+[a3-910c-w8a8-mtp] skip: insufficient NPU: 2 visible < 4 required
+```
+
+用户据此认为是"卡没申请够"，但该 step 容器确实申请并拿到了 4 个 `huawei.com/ascend-1980`。
+
+**根因**：同一份算力有三种"卡数"口径，只有双 chip 封装（A3 910C、Atlas 300I DUO 310P）才会不一致：
+
+| 口径 | 一台 8 卡节点（A3 910C） | 谁在用 |
+| :--- | :--- | :--- |
+| K8s 调度单元 `huawei.com/ascend-1980` | **16** | runner label、pod template 的 requests/limits |
+| CANN device（`/dev/davinciN`、`ASCEND_RT_VISIBLE_DEVICES`） | **16** | vLLM / SGLang 的 `tp` / `dp` |
+| `npu-smi info -l` 的 NPU 物理封装数 | **8**（每个 `Chip Count: 2`） | 各种自检脚本 |
+
+即 **1 个物理封装 = 2 个调度单元 = 2 个 davinci 设备**。单 chip 封装（910B 系列）三者相等，所以这个差异一直没暴露。
+
+**解决**：
+
+1. 自检脚本一律以**调度单元 / CANN device 数**为准（读 `ASCEND_RT_VISIBLE_DEVICES` 或 `huawei.com/ascend-1980` 的 limits），不要用 `npu-smi` 的 `Total Count`；
+2. 必须用物理卡描述时明确换算：`npu-smi 数 = 调度单元数 / 2`；
+3. 看到"conclusion 是绿的但用例没跑"时，先搜日志里有没有 `skip:`，不要只看结论。
+
+> 平台侧口径说明（#337）：a3 交付的是 **4 die、实际 2 卡**，与业务侧理解的「卡」未对齐；这属于口径沟通问题，不是配置错误。
+
+> **Ref:**
+> [#337](https://github.com/ascend-gha-runners/docs/issues/337)
+
 ### 算子 / 内核错误
 
 #### NPU 算子 / 内核层报错（Unsupported_Operator EZ3002 / GE 建图 500002） { #npu-operator-kernel-error }
@@ -634,6 +719,33 @@
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
 
 > 注意：`Errno 122`（EDQUOT）也可能来自**容器可写层（临时盘）配额**写满而非共享盘，判据见[容器可写层（临时盘）配额耗尽](#container-writable-layer-quota)。
+
+#### 共享盘文件锁不可用（NFSv3 NLM 无响应 / ENOLCK） { #nfs-lock-unavailable }
+
+**现象**：有两种表现，都容易被误判成别的故障：
+
+- `uv pip install` / pip 取缓存锁时报错，脚本 `set -e` 直接终止：
+
+  ```text
+  error: Could not acquire lock
+    cause: Could not acquire lock for `/root/.cache/uv` at `/root/.cache/uv/.lock`
+    cause: failed to lock `/root/.cache/uv/.lock`: No locks available (os error 37)
+  ```
+
+- 每个 job 的某一步**正好卡满 `timeout-minutes`**（如 600s）后被杀，GitHub 只留一句 `Executing the custom container implementation failed`；此时用例断言其实已经全部 PASSED，不是业务失败。
+
+**根因**：共享缓存盘是静态 NFS 挂载且使用 **NFSv3**，而 NFS 宿主机的 **NLM（nlockmgr）未注册 / rpcbind 登记的端口与 statd 实际监听不一致**。数据读写一切正常（下载 500MB+ 无异常），只有文件锁协议不通。
+
+**解决**：
+
+1. 在 NFS 宿主机上 `rpcinfo -p` 确认 `100021`（nlockmgr）是否存在、端口是否与 statd 一致；
+2. 临时规避：该路径改用不带锁的本地缓存，或挂载参数加 `nolock`；
+3. 根治：把共享盘挂载切到 **NFSv4.1**，锁由协议内置 state 管理，不再依赖 NLM / rpcbind；
+4. 看到"每步都恰好等于 `timeout-minutes`"时，优先怀疑共享盘锁，而不是业务死循环。
+
+> **Ref:**
+> [#339](https://github.com/ascend-gha-runners/docs/issues/339)
+> [#341](https://github.com/ascend-gha-runners/docs/issues/341)
 
 ### 控制面
 

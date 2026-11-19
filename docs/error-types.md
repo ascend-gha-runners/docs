@@ -12,6 +12,7 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Pending | Image | [ErrImagePull](#errimagepull) |
 | Pending | Image | [ErrImagePull: 401 after registry change](#errimagepull-401-unauthorized-after-registry-change) |
 | Pending | Image | [Image not synced to SWR (not found)](#image-not-synced-to-swr) |
+| Pending | Image | [Image pull failed: registry TLS certificate expired](#image-pull-cert-expired) |
 | Pending | Image | [Image pull slow (Initialize containers stuck)](#image-pull-slow) |
 | Pending | Container Creation | [Secret / ConfigMap config error](#createcontainerconfigerror) |
 | Pending | Container Creation | [Container dies immediately (postStart hook exit 137)](#poststart-exit-137) |
@@ -32,14 +33,17 @@ Expected pod state transitions for a successful run: **Pending → Running → S
 | Running | Workflow | [Dependency cache errors (pypi / rust)](#dependency-cache-error) |
 | Running | Workflow | [Abnormally slow steps (model load / checkout)](#ci-slow) |
 | Running | Workflow | [checkout / submodule fetch failed (stream break early EOF / DNS resolution)](#checkout-submodule-fetch-failed) |
+| Running | Workflow | [Dependency artifact 404 (upstream release asset removed)](#dependency-artifact-404) |
 | Running | Task Hang | [Task hang / timeout (engine process stuck)](#vllm-v1-streaming-hang) |
 | Running | Build | [BuildKit cache corrupt (parent snapshot not found)](#buildkit-cache-corrupt) |
 | Running | Communication | [HCCL Port Already Bound](#hccl-port-already-bound) |
 | Running | Environment | [Model Cache Missing / Incomplete](#incomplete-model-snapshot) |
+| Running | Environment | [NPU card-count convention mismatch (dual-chip package)](#npu-card-count-convention) |
 | Running | Operator | [NPU operator / kernel error (EZ3002 / 500002)](#npu-operator-kernel-error) |
 | Running | Storage | [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) |
 | Platform | Node Resource | [Node NPU occupied by an out-of-band process / container](#npu-occupied-by-external) |
 | Platform | Storage | [Shared disk full / stale lock file](#shared-storage-lock-and-space) |
+| Platform | Storage | [Shared disk file locks unavailable (NFSv3 NLM down / ENOLCK)](#nfs-lock-unavailable) |
 | Platform | Node | [Node abnormal after maintenance (shared disk not mounted / whitelist missing)](#node-after-maintenance) |
 | Platform | Control Plane | [Control plane API transient outage (ECONNREFUSED / 403 during cleanup)](#apiserver-transient-window) |
 | Platform | Node | [Node DNS failure / clock skew](#node-infra-abnormal) |
@@ -98,6 +102,15 @@ Build / image pull fails with `failed to resolve source metadata ... not found` 
 
 > **Ref:**
 > [#223](https://github.com/ascend-gha-runners/docs/issues/223)
+
+#### Image pull failed: registry TLS certificate expired { #image-pull-cert-expired }
+
+Many clusters and runner sets fail with `ImagePullBackOff` / `ErrImagePull` in the same time window, the "Initialize containers" step fails and every later step is skipped, and the kubelet event carries the decisive line `Get "https://swr.<region>.myhuaweicloud.com/v2/": x509: certificate has expired or is not yet valid` (issue #334). The registry endpoint's server-side TLS certificate expired and the cloud-side reissue lagged; workflow, image content and runner are all fine. Confirm the `x509` line in kubelet events first (do not suspect the image name or pull credentials), check whether the failure is cross-cluster and cross-tenant at once (a platform-level event), then **Re-run failed jobs** after the certificate is renewed — no configuration change is needed. If a run mixes certificate failures with genuine test failures, separate them by message and only re-run the former.
+
+> Follow-up (#334): the cloud side finished remediation on 11-11 and added certificate-expiry monitoring; the retrospective found that the existing expiry sweep did not cover SWR domains, so mirror registry domains must be added to the sweep list.
+
+> **Ref:**
+> [#334](https://github.com/ascend-gha-runners/docs/issues/334)
 
 #### Image pull slow (Initialize containers stuck) { #image-pull-slow }
 
@@ -211,11 +224,13 @@ Out of memory — container killed by the kernel OOM killer.
 
 #### Host memory exhausted (aclrtMallocHostWithCfg 207001) { #host-memory-oom }
 
-The process exits in the Running phase with `torch.OutOfMemoryError: allocate_host_memory_slowpath`, backed by `aclrtMallocHostWithCfg ... error code is 207001` and `Memory_Allocation_Failure(EL0004)` (issues #264 / #272). This is **not** Kubernetes `OOMKilled` (the container limit was not exceeded) — the **node's host memory** is insufficient. The test case's host-side allocation (pinned memory, KV cache, etc.) exceeds available node memory: #272 had high concurrency and an oversized hicache size; #264 was an under-resourced a2b3-8 node. First tell host memory (207001) apart from container `OOMKilled`; reduce the test case's concurrency / hicache size (#272 was fixed this way); if resources are still short, use a larger label (#264 switched to a3-800i-8 and raised the memory limit); then re-run.
+The process exits in the Running phase with `torch.OutOfMemoryError: allocate_host_memory_slowpath`, backed by `aclrtMallocHostWithCfg ... error code is 207001` and `Memory_Allocation_Failure(EL0004)` (issues #264 / #272). This is **not** Kubernetes `OOMKilled` (the container limit was not exceeded) — the **node's host memory** is insufficient. The same error code also has a **false-alarm** form (issue #300): the node still has plenty of reclaimable memory, and `devmm` treats `get_user_pages_fast` returning 0 pages as fatal. There are three root causes, judged separately: (a) **genuine exhaustion** — the test case's host-side allocation (pinned memory, KV cache, etc.) exceeds available node memory: #272 had high concurrency and an oversized hicache size, #264 was an under-resourced a2b3-8 node; (b) **leftover pinned pages** (#276) — verl with CPU offload + pin fails while non-pinned cases in the same runner group pass, because pinned pages left by earlier tasks on the host were never released; (c) **driver false alarm** (#300, still open) — 600–720s stress runs (12 threads of `aclrtMallocHost` + pin loops + dirtying 8GB of anonymous pages) produced **zero failures** and no new `dmesg` devmm counts, so not every occurrence is real exhaustion. First tell host memory (207001) apart from container `OOMKilled`; reduce the test case's concurrency / hicache size (#272 was fixed this way); if resources are still short, use a larger label (#264 switched to a3-800i-8 and raised the memory limit); add a **host-memory cleanup** step before container creation (#276 fixed it in practice, PR ascend-ci-deployment#2442 — harmless when a 16-card job owns the whole node); if reclaimable memory is plentiful and `dmesg` shows no new devmm counts, treat it as a **driver false alarm** (#300) and stop raising memory limits — hand the node, job links and devmm counts to the infrastructure side for joint driver/application triage; then re-run.
 
 > **Ref:**
 > [#264](https://github.com/ascend-gha-runners/docs/issues/264)
 > [#272](https://github.com/ascend-gha-runners/docs/issues/272)
+> [#276](https://github.com/ascend-gha-runners/docs/issues/276)
+> [#300](https://github.com/ascend-gha-runners/docs/issues/300)
 
 #### /dev/shm exhausted { #dev-shm-oom }
 
@@ -259,7 +274,7 @@ During source compile / install, processes are killed en masse and installation 
 
 #### Dependency cache errors (pypi / rust) { #dependency-cache-error }
 
-Installing dependencies reports **`read timeout`**, **`Download failed because not enough bytes were received`**, or **`HTTP status server error (503)`** (issues #32 / #98 / #113 / #117); or dependency download takes over 2h (rust dependencies going to the official source, issue #89); or a package **hash mismatch**: `THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE` (issue #208); or cargo fails pulling crates.io through the proxy with a timeout (issue #274). The pypi cache service (nginx) upstreams to Huawei Cloud — when sync is delayed or rate-limited the cache itself can't get packages; cache misses **spill over to the official source**; keepalive and `proxy_read_timeout` are misconfigured; and rust-like dependencies bypass the cache and the domestic network can't reach the official source. A hash mismatch usually means the **mirror site hasn't synced** or the **cache service version is old** (issue #208 traced it to the download-r2 mirror not being synced and an outdated nginx); crates.io proxy timeouts are a **proxy stability** issue (issue #274). Determine whether the error comes from the cache service or has already spilled to the official source; for a **hash mismatch** ask the CI side to refresh the mirror / update the cache service and **don't keep retrying** (issue #208); for **cargo / crates.io timeouts** re-run failed jobs first and report repeated timeouts to the CI side (issue #274); tune the cache service (disable keepalive, raise `proxy_read_timeout`, shorten lock lifetime); switch the forwarding mirror to a CDN-accelerated domain; and point community dependencies (e.g. rust) at a domestic mirror.
+Installing dependencies reports **`read timeout`**, **`Download failed because not enough bytes were received`**, or **`HTTP status server error (503)`** (issues #32 / #98 / #113 / #117); or dependency download takes over 2h (rust dependencies going to the official source, issue #89); or a package **hash mismatch**: `THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE` (issue #208); or cargo fails pulling crates.io through the proxy with a timeout (issue #274). The pypi cache service (nginx) upstreams to Huawei Cloud — when sync is delayed or rate-limited the cache itself can't get packages; cache misses **spill over to the official source**; keepalive and `proxy_read_timeout` are misconfigured; and rust-like dependencies bypass the cache and the domestic network can't reach the official source. A hash mismatch usually means the **mirror site hasn't synced** or the **cache service version is old** (issue #208 traced it to the download-r2 mirror not being synced and an outdated nginx); a second class of hash failure is unrelated to how fresh the cached metadata is (issue #317): the cache served a **gzip variant** to a pip client that only asked for `identity`, so the metadata itself was new — the tell is different representations of the same URL in the cache's access log; fixed by PR ascend-ci-deployment#2375 (squid 7's `dstdomain` does not support `-i`; that match is already case-insensitive); crates.io proxy timeouts are a **proxy stability** issue (issue #274). Determine whether the error comes from the cache service or has already spilled to the official source; for a **hash mismatch** first tell "metadata not synced" from "wrong variant" per #317, then ask the CI side to refresh the mirror / update the cache service (or fix the cache's variant handling) and **don't keep retrying** (issues #208 / #317); for **cargo / crates.io timeouts** re-run failed jobs first and report repeated timeouts to the CI side (issue #274); tune the cache service (disable keepalive, raise `proxy_read_timeout`, shorten lock lifetime); switch the forwarding mirror to a CDN-accelerated domain; and point community dependencies (e.g. rust) at a domestic mirror.
 
 > **Ref:**
 > [#32](https://github.com/ascend-gha-runners/docs/issues/32)
@@ -269,6 +284,15 @@ Installing dependencies reports **`read timeout`**, **`Download failed because n
 > [#117](https://github.com/ascend-gha-runners/docs/issues/117)
 > [#208](https://github.com/ascend-gha-runners/docs/issues/208)
 > [#274](https://github.com/ascend-gha-runners/docs/issues/274)
+
+#### Dependency artifact 404 (upstream release asset removed) { #dependency-artifact-404 }
+
+The dependency-install step returns **404** four times in a row, every later test step is skipped and `ci-gate` goes red; several matrix entries fail together in the same run and the PR's code changes are irrelevant. The workflow pins an upstream GitHub release asset (e.g. a fixed FLA wheel) that the publisher deleted or renamed, so the download URL is dead — this is not a cache miss, network problem or runner fault, and opening the same URL in a browser also returns 404. Distinguish "asset removed upstream" (404 externally) from cache / whitelist issues, repin to a version or commit that still exists (or use a stable internal mirror), and check every matrix entry that reuses the same pin. Re-running does not help — the workflow must change.
+
+> Follow-up (#332): the asset owner had notified the business team the day before it disappeared, and the business side stopped pinning it (PR vllm-ascend#21203) — this is **not an infrastructure problem**.
+
+> **Ref:**
+> [#332](https://github.com/ascend-gha-runners/docs/issues/332)
 
 #### Abnormally slow steps (model load / checkout) { #ci-slow }
 
@@ -325,6 +349,15 @@ Running phase fails with model-cache errors in four forms: **incomplete** — `h
 > [#200](https://github.com/ascend-gha-runners/docs/issues/200)
 > [#268](https://github.com/ascend-gha-runners/docs/issues/268)
 > [#222](https://github.com/ascend-gha-runners/docs/issues/222)
+
+#### NPU card-count convention mismatch (dual-chip package) { #npu-card-count-convention }
+
+The job **looks green but actually skipped work**, logging only `skip: insufficient NPU: 2 visible < 4 required`, even though the step container did request and receive four `huawei.com/ascend-1980` units (issue #337). There are three "card count" conventions, and they diverge only on dual-chip packages (A3 910C, Atlas 300I DUO 310P): Kubernetes scheduling units (`huawei.com/ascend-1980`) = 16 per 8-card node; CANN devices (`/dev/davinciN`, `ASCEND_RT_VISIBLE_DEVICES`) = 16; `npu-smi info -l` physical NPU packages = 8 (each with `Chip Count: 2`). One package equals two scheduling units and two davinci devices; single-chip packages (910B series) make all three equal, which is why this stayed hidden. Always count by scheduling units / CANN devices in self-checks (read `ASCEND_RT_VISIBLE_DEVICES` or the `huawei.com/ascend-1980` limit), convert explicitly when describing physical cards (`npu-smi count = scheduling units / 2`), and when a job is green but the tests did not run, grep the log for `skip:` instead of trusting the conclusion.
+
+> Platform wording note (#337): a3 is delivered as **4 die / 2 physical cards**, while the business side counts "cards" differently — this is a wording/alignment problem, not a misconfiguration.
+
+> **Ref:**
+> [#337](https://github.com/ascend-gha-runners/docs/issues/337)
 
 ### Operator / Kernel Errors
 
@@ -383,6 +416,14 @@ Reports **`OSError: [Errno 122] Disk quota exceeded`** (issues #191 / #221) or *
 > [#252](https://github.com/ascend-gha-runners/docs/issues/252)
 
 > Note: `Errno 122` (EDQUOT) can also come from the **container writable layer (temp disk) quota** being exhausted rather than the shared disk — see [Container writable layer (temp disk) quota exhausted](#container-writable-layer-quota) for how to tell them apart.
+
+#### Shared disk file locks unavailable (NFSv3 NLM down / ENOLCK) { #nfs-lock-unavailable }
+
+Two shapes, both easy to misdiagnose: (a) `uv pip install` / pip fails to take its cache lock with `failed to lock '/root/.cache/uv/.lock': No locks available (os error 37)` (`ENOLCK`) and `set -e` aborts the job (issue #339); (b) a step hangs for **exactly** `timeout-minutes` (e.g. 600s) and is then killed, leaving only `Executing the custom container implementation failed`, while the test assertions had already passed (issue #341). The shared cache disk is a static NFS mount using **NFSv3**, and the NFS host's **NLM (nlockmgr) is not registered / its rpcbind-registered port does not match the port statd actually listens on**. Data I/O is perfectly fine — a 500MB+ download succeeds — only the file-lock protocol is broken. Verify with `rpcinfo -p` on the NFS host that program `100021` exists and the port matches statd; as a workaround use an unlocked local cache or mount with `nolock`; as a permanent fix switch the mount to **NFSv4.1**, where locks are handled by protocol state and no longer depend on NLM / rpcbind. When every step takes exactly `timeout-minutes`, suspect the shared-disk lock before a business-level hang.
+
+> **Ref:**
+> [#339](https://github.com/ascend-gha-runners/docs/issues/339)
+> [#341](https://github.com/ascend-gha-runners/docs/issues/341)
 
 ### Control Plane
 
