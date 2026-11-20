@@ -16,11 +16,11 @@
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ✅ | ❌ | ✅ | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
-| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | - |
+| [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ |
-| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | - |
+| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ✅ | ✅ | - |
 | [Ascend/cann-container-image](https://github.com/Ascend/cann-container-image) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | - |
 | [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | ✅ | ✅ | - |
@@ -35,4 +35,4 @@
 >
 > Last checked: 2026-11-20
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44687217252](https://github.com/ascend-gha-runners/docs/actions/runs/44687217252)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/44696477121](https://github.com/ascend-gha-runners/docs/actions/runs/44696477121)
