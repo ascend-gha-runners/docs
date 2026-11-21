@@ -372,6 +372,7 @@
       "linux-aarch64-a2b3-fed-2",
       "linux-aarch64-a2b3-fed-4",
       "linux-aarch64-a2b3-fed-8",
+      "linux-aarch64-a2b3-loop-1",
       "linux-aarch64-a2b4-1-hk-001",
       "linux-aarch64-a2b4-2-hk-001",
       "linux-aarch64-a2b4-4-hk-001",
@@ -698,6 +699,9 @@
     ],
     "linux-aarch64-a2b3-fed-8": [
       "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b3-loop-1": [
+      "ascend-hk-001-cluster"
     ],
     "linux-aarch64-a2b4-0": [
       "ascend-infra-guiyang-cluster-001"
