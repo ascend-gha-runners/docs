@@ -12,7 +12,7 @@
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | - |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ✅ | ❌ | ✅ | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - |
@@ -35,4 +35,4 @@
 >
 > Last checked: 2026-11-23
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45098735727](https://github.com/ascend-gha-runners/docs/actions/runs/45098735727)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45101242149](https://github.com/ascend-gha-runners/docs/actions/runs/45101242149)
