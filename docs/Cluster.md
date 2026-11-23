@@ -10,11 +10,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Clusters</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">22</span>
+    <span class="stat-num">21</span>
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">404</span>
+    <span class="stat-num">400</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -24,12 +24,12 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="">All hardware</option>
   <option value="ascend-1980">ascend-1980 · 287</option>
   <option value="cpu">CPU (no NPU) · 54</option>
-  <option value="npu">npu · 38</option>
+  <option value="npu">npu · 34</option>
   <option value="on-demand">on-demand · 11</option>
   <option value="Ascend910">Ascend910 · 9</option>
   <option value="ascend-310">ascend-310 · 5</option>
 </select>
-<span class="cluster-hint">10 clusters · 404 labels</span>
+<span class="cluster-hint">10 clusters · 400 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -944,7 +944,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-sh-002-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-sh-002-cluster</span>
-    <span class="cluster-meta">7 projects · 27 labels</span>
+    <span class="cluster-meta">6 projects · 23 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-amd64-a5-2 sh-002 linux-amd64-a5-4 sh-002 linux-amd64-a5-8 sh-002">
@@ -1001,20 +1001,6 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-amd64-a5-1-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-1 + sh-002</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-2-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-2 + sh-002</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-4-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-4 + sh-002</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-8-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-8 + sh-002</span><span class="machine-npu"> · 8 × npu</span></div>
         <div class="project-ns">namespace: <code>sgl-project</code></div>
-      </div>
-    </div>
-    <div class="project-row" data-search="tile-ai/tilelang linux-amd64-a5-1 sh-002 linux-amd64-a5-2 sh-002 linux-amd64-a5-4 sh-002 linux-amd64-a5-8 sh-002">
-      <div class="project-line">
-        <button type="button" class="project-head" aria-expanded="false">
-          <span class="project-toggle"></span>
-          <span class="project-name-text">tile-ai/tilelang</span>
-          <span class="project-count">4 labels</span>
-        </button>
-        <a class="project-link" href="https://github.com/tile-ai/tilelang" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
-      </div>
-      <div class="machine-list" hidden>
-        <div class="machine" data-label="linux-amd64-a5-1-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-1 + sh-002</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-2-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-2 + sh-002</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-4-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-4 + sh-002</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-8-sh-002" data-npu="npu"><span class="machine-label">linux-amd64-a5-8 + sh-002</span><span class="machine-npu"> · 8 × npu</span></div>
-        <div class="project-ns">namespace: <code>tile-ai-tilelang</code></div>
       </div>
     </div>
     <div class="project-row" data-search="tile-ai/tilelang-mlir-ascend linux-amd64-a5-1 sh-002 linux-amd64-a5-2 sh-002 linux-amd64-a5-4 sh-002 linux-amd64-a5-8 sh-002">
