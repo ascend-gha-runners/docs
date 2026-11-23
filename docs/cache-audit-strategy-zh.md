@@ -73,9 +73,10 @@
 日志运行时正面证据 ✅ > 部署侧已接线 ✅ > 日志反面证据 ❌ > 部署侧未接线 ❌ > 未在部署仓库找到该项目 -
 ```
 
-- 部署侧"已接线"即判 ✅：接线后任何 `docker build`/`docker buildx build`/HTTP 请求/git clone
-  都会自动走共享缓存，不需要项目做任何事；
-- 部署侧"未接线"判 ❌：该项目的 runner 不会路由到对应缓存（无论项目是否想用）；
+- 部署侧「已接线」即判 ✅：**并集语义**——项目根目录下任一 scale set / config 命中接线特征
+  即判该仓库已接线，不需要项目做任何事；接线的 scale set 上，`docker build` /
+  `docker buildx build` / HTTP 请求 / git clone 自动走共享缓存；
+- 部署侧「未接线」判 ❌：该项目的所有 runner 均未接线，不会路由到对应缓存；
 - 部署仓库中找不到该项目（如尚未部署、或经 Fork 同步的镜像仓库）判 `-`。
 
 ## v4 → v5 修复的三个 bug（含真实案例）
@@ -110,6 +111,11 @@ BuildKit / Squid / git-cdn / runs-on），`update_repo_md.py` 会把 7 列旧表
 
 ## 已知局限
 
+- **并集判定不区分 scale set**：接线判定对项目根目录整体取并集——任一 scale set/config
+    命中即判整个仓库 ✅。多 scale set 仓库（如 vllm-ascend 约 120 个 scale set，BuildKit
+    接线仅在构建用的 `config-cn12-001` CPU 档）会出现「审计的那个 NPU job 所在 scale set
+    实际未接线，但仓库被判 ✅」。审计的是「仓库是否享有接线」，不是「这次 job 是否走了
+    接线」；后者以日志运行时证据为准（证据列会注明并集判定）。
 - **首建无命中**：冷缓存上的第一次构建没有 `CACHED` 行（缓存只写不读）。
   因此日志证据把"buildkit 进度格式"也算正面证据（只要部署侧接线，就是我们的缓存）。
 - **日志不可用**：日志过期/下载失败时，B 类维度靠部署侧接线兜底（这正是权威判定的
@@ -119,7 +125,12 @@ BuildKit / Squid / git-cdn / runs-on），`update_repo_md.py` 会把 7 列旧表
   刻意的（避免一次扫不到就清空），但也意味着历史假阳性会一直留到被新证据推翻——
   B 类维度的部署侧判定恰好提供这种确定性推翻。
 - **部署克隆时效**：部署仓库浅克隆是审计时刻的 HEAD；接线变更后最长延迟一个
-  审计周期（每日 10:24 CST）。
+  审计周期（每日 10:24 CST）。克隆失败时该 step 不阻断审计（continue-on-error），
+  B 类维度自动降级为仅日志判定（退回 `-`）。
+- **无 githubConfigUrl 的项目走目录名回退**：Buildkite agent-stack-k8s 部署的项目
+  （如 vllm-project/vllm-omni，values.yaml 无 githubConfigUrl）按目录名回退匹配
+  （与 discover_new_repos.py 的收录方式一致，大小写不敏感）；`manifests/arc-fedsched/*/pod-templates`
+  下的联邦接线暂不在扫描范围。
 - **progress 格式的歧义**：`#N [x/y]` 进度格式无法区分我们的远程 buildkitd 与
   本地 dind（`building with "buildkitd" ... remote driver` 才能区分）；仅当部署侧
   同时显示未接线时才作为可疑信号记入证据。

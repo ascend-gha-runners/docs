@@ -96,9 +96,10 @@ SQUID_LOG_PATTERN='squid-cache\.squid\.svc\.cluster\.local'
 #   缓存命中      —— #N CACHED（plain progress，GHA 无 TTY 的默认格式）、
 #                    => CACHED / CACHED [（tty/auto 格式）、importing/exporting cache
 #   buildkit 进度 —— #N [internal] load ... / #N [x/y] RUN ...（仅说明走了 buildkit）
-BUILDKIT_REMOTE_PATTERN='building with "?buildkitd"? instance|buildkit-acquire|buildkitd-dispatcher|--builder buildkitd|\.buildkitd:1234'
+BUILDKIT_REMOTE_PATTERN='building with "?buildkitd"? instance|buildkit-acquire|buildkitd-dispatcher|--builder buildkitd|buildkitd:1234'
 BUILDKIT_CACHE_PATTERN='#[0-9]+ CACHED|=> CACHED|CACHED \[[0-9]|importing cache manifest|exporting cache|exporting layers'
-BUILDKIT_PROGRESS_PATTERN='#[0-9]+ \[internal\] load (build definition|metadata)|#[0-9]+ \[[0-9]+/[0-9]+\] '
+# 命名阶段（如 #10 [cann-installer 2/7]）与数字阶段（#5 [2/7]）都算
+BUILDKIT_PROGRESS_PATTERN='#[0-9]+ \[internal\] load (build definition|metadata)|#[0-9]+ \[[^]]+ [0-9]+/[0-9]+\] '
 # BuildKit 反面证据：legacy builder 输出（Step N/M，未走 BuildKit）、
 # 无 daemon / 无 docker（非接线 runner 上构建根本无法发生）
 BUILDKIT_COUNTER_PATTERN='Step [0-9]+/[0-9]+ :|Cannot connect to the Docker daemon|docker: command not found'
@@ -292,7 +293,13 @@ get_npu_jobs() {
 # 必须读部署仓库本身。DEPLOY_REPO_DIR 指向部署仓库的本地克隆（0 API 调用）。
 #
 # repo -> 部署仓库项目根目录的映射以 values.yaml 的 githubConfigUrl 为准
-# （目录名可能是旧 org 名，如 volcengine/verl 实为 verl-project/verl）。
+# （目录名可能是旧 org 名，如 volcengine/verl 实为 verl-project/verl）；
+# 无 githubConfigUrl 的项目（如 Buildkite agent-stack-k8s 部署）回退按
+# 目录名匹配（大小写不敏感）。
+#
+# 注意：wiring 判定是「项目根目录并集」—— 任一 scale set / config 命中即
+# 判整个仓库已接线（多 scale set 仓库不区分 job 实际所在的 scale set，
+# 详见 docs/cache-audit-strategy-zh.md 已知局限）。
 #
 # Sets globals: infra_found ("found" | "notfound" | "unknown")
 #               infra_wired_buildkit infra_ev_buildkit
@@ -321,6 +328,15 @@ scan_deployment_wiring() {
         "github\.com/${repo_esc}([^a-zA-Z0-9_.-]|$)" \
         "$DEPLOY_REPO_DIR/projects" "$DEPLOY_REPO_DIR/other" 2>/dev/null \
         | xargs -r -n1 dirname | xargs -r -n1 dirname | sort -u) || true
+
+    if [ -z "$roots" ]; then
+        # 回退：无 githubConfigUrl 的项目（如 Buildkite agent-stack-k8s 部署）
+        # 按目录名匹配（discover_new_repos.py 收录这些仓库时同样以目录名
+        # + GitHub API 规范化为准）；大小写不敏感以兼容 LLaMA-Factory 式改名
+        roots=$(find "$DEPLOY_REPO_DIR/projects" "$DEPLOY_REPO_DIR/other" \
+            -maxdepth 2 -type d 2>/dev/null \
+            | grep -iE "/${repo_esc}$" || true)
+    fi
 
     if [ -z "$roots" ]; then
         infra_found="notfound"
@@ -749,12 +765,21 @@ process_repo() {
 
     # ===== No NPU jobs found =====
     if [ "$candidate_count" -eq 0 ]; then
+        # B 类维度不依赖项目日志，无 NPU job 时仍按部署侧接线判定
+        local nb_mark ns_mark ng_mark nr_mark
+        nb_mark="-"; ns_mark="-"; ng_mark="-"
+        if [ "$infra_wired_buildkit" = true ]; then nb_mark="✅"; s_buildkit=1
+        elif [ "$infra_found" = "found" ]; then nb_mark="❌"; s_no_cache=1; fi
+        if [ "$infra_wired_squid" = true ]; then ns_mark="✅"; s_squid=1
+        elif [ "$infra_found" = "found" ]; then ns_mark="❌"; s_no_cache=1; fi
+        if [ "$infra_wired_gitcdn" = true ]; then ng_mark="✅"; s_gitcdn=1
+        elif [ "$infra_found" = "found" ]; then ng_mark="❌"; s_no_cache=1; fi
         local row=""
         if [ "$runs_scanned" -gt 0 ]; then
-            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
+            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | - | No NPU runner jobs found in last $runs_scanned runs |"
             s_no_npu=1
         else
-            row="| $REPO | - | - | - | - | - | - | - | - | - | - | No completed runs / no access |"
+            row="| $REPO | - | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | - | No completed runs / no access |"
             s_error=1
         fi
         echo "$row" > "$row_file"
@@ -929,15 +954,15 @@ process_repo() {
         local nb_mark ns_mark ng_mark nr_mark nb_ev="" ns_ev="" ng_ev="" nr_ev=""
         nb_mark="-"; ns_mark="-"; ng_mark="-"; nr_mark="-"
         if [ "$infra_wired_buildkit" = true ]; then nb_mark="✅"; nb_ev="$infra_ev_buildkit"; s_buildkit=1
-        elif [ "$infra_found" = "found" ]; then nb_mark="❌"; nb_ev="部署侧未接线"
+        elif [ "$infra_found" = "found" ]; then nb_mark="❌"; nb_ev="部署侧未接线"; s_no_cache=1
         elif [ "$infra_found" = "notfound" ]; then nb_ev="未在部署仓库找到该项目"
         else nb_ev="部署仓库不可用"; fi
         if [ "$infra_wired_squid" = true ]; then ns_mark="✅"; ns_ev="$infra_ev_squid"; s_squid=1
-        elif [ "$infra_found" = "found" ]; then ns_mark="❌"; ns_ev="部署侧未接线"
+        elif [ "$infra_found" = "found" ]; then ns_mark="❌"; ns_ev="部署侧未接线"; s_no_cache=1
         elif [ "$infra_found" = "notfound" ]; then ns_ev="未在部署仓库找到该项目"
         else ns_ev="部署仓库不可用"; fi
         if [ "$infra_wired_gitcdn" = true ]; then ng_mark="✅"; ng_ev="$infra_ev_gitcdn"; s_gitcdn=1
-        elif [ "$infra_found" = "found" ]; then ng_mark="❌"; ng_ev="部署侧未接线"
+        elif [ "$infra_found" = "found" ]; then ng_mark="❌"; ng_ev="部署侧未接线"; s_no_cache=1
         elif [ "$infra_found" = "notfound" ]; then ng_ev="未在部署仓库找到该项目"
         else ng_ev="部署仓库不可用"; fi
         if [ "$static_runson" = true ]; then nr_mark="✅"; nr_ev="$static_ev_runson"; s_runson=1; fi
@@ -1002,7 +1027,7 @@ process_repo() {
         fi
     elif [ "$infra_wired_buildkit" = true ]; then
         buildkit_mark="✅"
-        buildkit_detail="$infra_ev_buildkit; 近期日志未见构建活动(接线即生效,任何 docker build 都会走共享 buildkitd)"
+        buildkit_detail="$infra_ev_buildkit; 近期所扫日志未见构建活动(并集判定:至少一个 scale set 已接线)"
         s_buildkit=1
     elif [ -n "$agg_counter_buildkit" ]; then
         buildkit_mark="❌"; buildkit_detail="反面证据: ${agg_counter_buildkit}"; s_no_cache=1

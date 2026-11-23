@@ -109,8 +109,11 @@ jobs:
       # ascend-ci-deployment 的 pod template 中，项目仓库与日志不可见，
       # 审计脚本需要部署仓库本地克隆来判定接线状态（0 API 调用）。
       # 公开仓库，匿名浅克隆即可，不消耗 token。
+      # 克隆失败不阻断审计：DEPLOY_REPO_DIR 不存在时脚本自动降级为
+      # 仅日志判定（B 类维度退回 -，A 类不受影响）。
       # ================================================================
       - name: Clone deployment repo (infra wiring source)
+        continue-on-error: true
         run: |
           git clone --depth 1 https://github.com/opensourceways/ascend-ci-deployment /tmp/ascend-ci-deployment
 
