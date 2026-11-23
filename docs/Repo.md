@@ -7,7 +7,7 @@
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | ✅ | - | - | ✅ |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | - | - | - | - |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ❌ | ❌ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
@@ -29,10 +29,10 @@
 | [verl-project/uni-agent](https://github.com/verl-project/uni-agent) | ✅ | ❌ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (full scan).
+> Cache audit runs daily (incremental).
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
 > Last checked: 2026-11-23
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45149072052](https://github.com/ascend-gha-runners/docs/actions/runs/45149072052)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45150126412](https://github.com/ascend-gha-runners/docs/actions/runs/45150126412)
