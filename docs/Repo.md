@@ -7,20 +7,20 @@
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | ✅ | - | - | ✅ |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | - | - | - | - |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ❌ | ❌ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | ✅ | - |
-| [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ✅ | ❌ | ❌ | ✅ | - | - |
-| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | - | - |
+| [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
+| [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | ✅ | - |
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
-| [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | - | ✅ |
+| [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ | ✅ |
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ | ✅ |
-| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
+| [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [Ascend/cann-container-image](https://github.com/Ascend/cann-container-image) | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | - |
 | [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | ❌ | ✅ | ✅ | - |
@@ -30,10 +30,10 @@
 | [mooncake-ai-test/mooncake](https://github.com/mooncake-ai-test/mooncake) | - | - | - | - | - | - | - | - |
 <!-- CACHE_AUDIT_TABLE_END -->
 
-> Cache audit runs daily (incremental).
+> Cache audit runs daily (full scan).
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
 > Last checked: 2026-11-23
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45158602615](https://github.com/ascend-gha-runners/docs/actions/runs/45158602615)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45160504388](https://github.com/ascend-gha-runners/docs/actions/runs/45160504388)
