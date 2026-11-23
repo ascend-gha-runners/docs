@@ -303,7 +303,10 @@
     "verl-project/verl-omni": [
       "linux-aarch64-a2b4-2",
       "linux-aarch64-a2b4-4",
-      "linux-aarch64-a2b4-8"
+      "linux-aarch64-a2b4-8",
+      "linux-aarch64-a2b4-omni-fed-2",
+      "linux-aarch64-a2b4-omni-fed-4",
+      "linux-aarch64-a2b4-omni-fed-8"
     ],
     "vllm-ascend/vllm-ascend-recipes": [
       "linux-aarch64-a2b4-0",
@@ -740,6 +743,15 @@
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2b4-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-omni-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-omni-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2b4-omni-fed-8": [
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a3": [
