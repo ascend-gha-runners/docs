@@ -64,6 +64,8 @@ nav:
     - English: user-manual-buildkite-en.md
     - 中文: user-manual-buildkite-zh.md
   - Integrated Repos: Repo.md
+  - Cache Audit Strategy:
+    - 中文: cache-audit-strategy-zh.md
   - Cluster Map: Cluster.md
   - Features: feature.md
   - Job Failure Reference:

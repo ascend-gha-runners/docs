@@ -1,25 +1,25 @@
-# org/repo|workflow-file.yml|pypi_default|apt_default|ccache_default|uv_default|buildkit_default|squid_default|runson_default
+# org/repo|workflow-file.yml|pypi_default|apt_default|ccache_default|uv_default|buildkit_default|squid_default|gitcdn_default|runson_default
 # 默认值仅在审计无法确认时使用（⚙️/🔍/⚠️）
 # 审计确认的 ✅ 或 ❌ 优先级高于默认值
-sgl-project/sglang|pr-test-npu.yml|||||||
-vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅|||||
-vllm-project/vllm-omni||||||||
-sgl-project/sgl-kernel-npu||✅|✅|||||
-verl-project/verl|e2e_ascend.yml|✅|✅|||||
-hiyouga/LlamaFactory|tests_npu.yml|||||||
-modelscope/ms-swift|citest_npu.yaml|||||||
-triton-lang/triton-ascend|||✅|||||
-vllm-ascend/vllm-ascend-recipes||||||||
-verl-project/verl-omni||||||||
-Ascend/pytorch||||||||
-Ascend/sglang||||||||
-alibaba/ROLL||||||||
-areal-project/AReaL||||||||
-fla-org/flash-linear-attention||||||||
-tile-ai/tilelang-mlir-ascend||||||||
-verl-project/verl-SpeCo||||||||
-sgl-project/sglang-omni||||||||
-verl-project/uni-agent||||||||
-tile-ai/tilelang||||||||
-Ascend/cann-container-image||||||||
-XPU-Forces/mojo_opset||||||||
+sgl-project/sglang|pr-test-npu.yml||||||||
+vllm-project/vllm-ascend|pr_test_full.yaml|✅|✅||||||
+vllm-project/vllm-omni|||||||||
+sgl-project/sgl-kernel-npu||✅|✅||||||
+verl-project/verl|e2e_ascend.yml|✅|✅||||||
+hiyouga/LlamaFactory|tests_npu.yml||||||||
+modelscope/ms-swift|citest_npu.yaml||||||||
+triton-lang/triton-ascend|||✅||||||
+vllm-ascend/vllm-ascend-recipes|||||||||
+verl-project/verl-omni|||||||||
+Ascend/pytorch|||||||||
+Ascend/sglang|||||||||
+alibaba/ROLL|||||||||
+areal-project/AReaL|||||||||
+fla-org/flash-linear-attention|||||||||
+tile-ai/tilelang-mlir-ascend|||||||||
+verl-project/verl-SpeCo|||||||||
+sgl-project/sglang-omni|||||||||
+verl-project/uni-agent|||||||||
+tile-ai/tilelang|||||||||
+Ascend/cann-container-image|||||||||
+XPU-Forces/mojo_opset|||||||||

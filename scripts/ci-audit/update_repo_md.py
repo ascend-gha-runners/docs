@@ -31,9 +31,9 @@ CHECK_MARK = "\u2705"  # ✅
 CROSS_MARK = "\u274c"  # ❌
 
 # 缓存维度顺序（必须与 check_cache_from_logs.sh 输出列顺序一致）
-DIMS = ("pypi", "apt", "ccache", "uv", "buildkit", "squid", "runson")
+DIMS = ("pypi", "apt", "ccache", "uv", "buildkit", "squid", "gitcdn", "runson")
 TABLE_HEADER = ("| Repo | PyPI | APT | CCache | uv "
-                "| BuildKit | Squid | runs-on |")
+                "| BuildKit | Squid | git-cdn | runs-on |")
 TABLE_ALIGN  = "| :--- | " + " | ".join([":---:"] * len(DIMS)) + " |"
 
 
@@ -42,8 +42,8 @@ def empty_marks():
 
 
 # ---------- 读取 repos.txt 默认值 ----------
-# 格式: org/repo|workflow.yml|pypi|apt|ccache|uv|buildkit|squid|runson
-# 默认值从 parts[2] 开始，依次对应 DIMS
+# 格式: org/repo|workflow.yml|pypi|apt|ccache|uv|buildkit|squid|gitcdn|runson
+# 默认值从 parts[2] 开始，依次对应 DIMS（旧 7 列行缺 gitcdn 列时按 None 处理）
 defaults = {}  # repo -> tuple(str|None, ...)
 
 with open(REPOS_FILE) as f:
@@ -85,9 +85,15 @@ if TABLE_START in content and TABLE_END in content:
             if not rm:
                 continue
             repo = rm.group(1)
-            if len(cols) >= len(DIMS) + 2:
-                # 新格式（len(DIMS) 个缓存列）
+            # 行形如 "| repo | m1..mN |"：split 后元素数 = N+3（首尾空元素）
+            if len(cols) >= len(DIMS) + 3:
+                # 新格式（8 个缓存列）
                 existing[repo] = tuple(cols[2:2 + len(DIMS)])
+            elif len(cols) == len(DIMS) + 2:
+                # 7 列旧格式（pypi..squid..runson，无 gitcdn）：
+                # 在 squid 之后插入 gitcdn='-'，其余旧值保留
+                old7 = cols[2:9]
+                existing[repo] = tuple(old7[:6]) + ("-",) + tuple(old7[6:])
             elif len(cols) >= 8:
                 # 旧格式（4 个缓存列 + Last Checked），迁移时补足为 len(DIMS) 维
                 existing[repo] = tuple(cols[2:6]) + tuple("-" for _ in range(len(DIMS) - 4))

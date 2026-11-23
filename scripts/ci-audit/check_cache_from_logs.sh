@@ -2,34 +2,53 @@
 set -euo pipefail
 
 # ==============================================================================
-# CI 缓存审计脚本 — 基于 GitHub Actions 运行日志分析
+# CI 缓存审计脚本 — 基于 GitHub Actions 运行日志 + 部署仓库接线状态分析
 #
-# 优化策略（v4）：
-#   1. GraphQL 查询替代 REST 翻页（获取 runs，1 次 GraphQL 替代 2-4 次 REST）
+# 缓存维度分两类（详见 docs/cache-audit-strategy-zh.md）：
+#
+#   A. 项目自配型（项目仓库可见，日志可验证）：
+#      PyPI / APT / CCache / uv / runs-on cache —— 只扫 job 日志
+#
+#   B. 基建注入型（由 ascend-ci-deployment 的 pod template 注入，项目仓库
+#      workflow 与日志中基本不可见，不能扫项目仓库来判定）：
+#      BuildKit —— postStart: buildkit-acquire + docker buildx create
+#                  --driver remote --use，共享 buildkitd 的 PVC 层缓存
+#                  服务端自动生效，项目无需 cache-from/cache-to
+#      Squid    —— runner/job pod env 注入 HTTP_PROXY（透明代理）
+#      git-cdn  —— postStart git config url.insteadOf（透明改写）
+#      B 类以部署仓库接线状态为权威判定（DEPLOY_REPO_DIR 本地克隆 +
+#      grep），job 日志运行时证据为补充。
+#
+# 优化策略（v5）：
+#   1. REST 获取 runs（success+failure）
 #   2. 候选收集：从 runs 中收集最多 MAX_CANDIDATES 个 NPU job 候选
 #   3. 聚合证据：Phase 2 扫描多个候选日志，对每种缓存类型取"任一日志有正面证据→✅"
 #   4. 并发：repo 级 PARALLEL 并发处理
 #   5. 全量扫描：设 MAX_NPU_SEARCH=0 触发全量模式（内部 cap 200 runs + 30 candidates
 #      + unlimited log aggregation），避免 API rate limit (5000/hr) 耗尽导致静默失败
+#   6. 基建注入型维度：部署仓库本地克隆 grep（0 API 调用，权威），
+#      日志仅提供运行时补充证据（buildkitd remote driver / CACHED /
+#      Runner is running behind proxy 等）
 #
 # 标记图例：
-#   ✅ = confirmed in use（日志或 workflow 中找到缓存使用证据）
-#   ❌ = confirmed NOT in use（有反面证据且无正面证据）
+#   ✅ = confirmed in use（部署侧已接线 或 日志/工作流中找到使用证据）
+#   ❌ = confirmed NOT in use（部署侧未接线 或 有反面证据且无正面证据）
 #   -  = unknown（无证据或无法确定）
 #
-# 检测维度（7 列）：
+# 检测维度（8 列）：
 #   PyPI / APT / CCache / uv —— 基于 job 日志
-#   BuildKit —— workflow 静态扫（cache-from/cache-to/--import-cache/--export-cache/buildcache）
-#               + 日志（=> CACHED / importing cache manifest / exporting cache）
-#   Squid    —— 通用 HTTP 正向代理缓存（squid-cache / :3128），workflow 静态扫 + 日志
-#   runs-on/cache —— runs-on 的 S3 后端 Actions 缓存（runs-on/cache@v5），workflow 静态扫 + 日志
+#   BuildKit / Squid / git-cdn —— 部署仓库接线（权威）+ job 日志（运行时）
+#   runs-on/cache —— runs-on 的 S3 后端 Actions 缓存（runs-on/cache@v5），
+#                    项目侧可见，workflow 静态扫 + 日志
 #
 # repos.txt 格式：
-#   org/repo                           — 自动模式，GraphQL 查询
+#   org/repo                           — 自动模式
 #   org/repo|workflow-file.yml         — 定向模式，REST 翻页搜指定 workflow
-#   可选默认值列（第 3 列起）：pypi|apt|ccache|uv|buildkit|squid|runson
+#   可选默认值列（第 3 列起）：pypi|apt|ccache|uv|buildkit|squid|gitcdn|runson
 #
 # 环境变量（设 0 = 全量模式，内部使用 cap 防止 rate limit）：
+#   DEPLOY_REPO_DIR   — ascend-ci-deployment 本地克隆路径（基建注入型维度的
+#                       权威数据源；未设置/不存在时 B 类维度降级为仅日志判定）
 #   RUNNER_FILTER     — runner label 过滤词（逗号分隔），默认 "linux-aarch64,linux-amd64"
 #   MAX_NPU_SEARCH    — 最多搜多少个 run，默认 50；0 = 全量模式（cap 200）
 #   MAX_CANDIDATES    — Phase 1 最多收集多少个候选 job，默认 15；0 = 全量模式（cap 30）
@@ -62,9 +81,29 @@ PYPI_CACHE_HOST="${PYPI_CACHE_HOST:-cache-service.nginx-pypi-cache.svc.cluster.l
 APT_CACHE_PORT="${APT_CACHE_PORT:-8081}"
 APT_CACHE_HOST="${APT_CACHE_HOST:-}"
 CCACHE_KEYWORD="${CCACHE_KEYWORD:-ccache}"
-# Squid 检测：squid 缓存，或真实代理端点 :3128（后面必须不是数字/冒号，
-# 以排除 "block_sparse_attention_tiling.cpp:3128:22" 这类编译器 行:列 告警）
-SQUID_PATTERN='squid-cache|:3128([^0-9:]|$)|HTTP_PROXY|HTTPS_PROXY|http_proxy|https_proxy'
+# 部署仓库本地克隆（基建注入型维度的权威数据源；见头部注释 B 类说明）
+DEPLOY_REPO_DIR="${DEPLOY_REPO_DIR:-}"
+# Squid 运行时证据：只认我们集群的 squid 服务地址（runner 会打印
+# "Runner is running behind proxy server 'http://squid-cache.squid.svc...'"）。
+# 不匹配裸 :3128 / HTTP_PROXY —— 项目自配的其它代理（如 100.68.174.87:3128）
+# 不是我们的缓存，匹配了只会造成假阳性。
+SQUID_LOG_PATTERN='squid-cache\.squid\.svc\.cluster\.local'
+# BuildKit 运行时正面证据：
+#   remote driver —— buildx 每次构建开头都会打印 building with "buildkitd"
+#                    instance using remote driver（我们的 postStart 创建的
+#                    builder 名固定叫 buildkitd，本地 dind/默认 builder 打印
+#                    "default" + docker driver，可区分）
+#   缓存命中      —— #N CACHED（plain progress，GHA 无 TTY 的默认格式）、
+#                    => CACHED / CACHED [（tty/auto 格式）、importing/exporting cache
+#   buildkit 进度 —— #N [internal] load ... / #N [x/y] RUN ...（仅说明走了 buildkit）
+BUILDKIT_REMOTE_PATTERN='building with "?buildkitd"? instance|buildkit-acquire|buildkitd-dispatcher|--builder buildkitd|\.buildkitd:1234'
+BUILDKIT_CACHE_PATTERN='#[0-9]+ CACHED|=> CACHED|CACHED \[[0-9]|importing cache manifest|exporting cache|exporting layers'
+BUILDKIT_PROGRESS_PATTERN='#[0-9]+ \[internal\] load (build definition|metadata)|#[0-9]+ \[[0-9]+/[0-9]+\] '
+# BuildKit 反面证据：legacy builder 输出（Step N/M，未走 BuildKit）、
+# 无 daemon / 无 docker（非接线 runner 上构建根本无法发生）
+BUILDKIT_COUNTER_PATTERN='Step [0-9]+/[0-9]+ :|Cannot connect to the Docker daemon|docker: command not found'
+# git-cdn 运行时证据：透明改写只在 git 报错/verbose 时露出真实 URL
+GITCDN_LOG_PATTERN='git-cdn-service\.git-cdn'
 RUNNER_FILTER="${RUNNER_FILTER:-linux-aarch64,linux-amd64}"
 MAX_NPU_SEARCH="${MAX_NPU_SEARCH:-50}"
 MAX_CANDIDATES="${MAX_CANDIDATES:-15}"
@@ -109,11 +148,16 @@ else
     APT_PATTERN=":${APT_CACHE_PORT}"
 fi
 
-echo "Log-based Cache Audit Configuration (v4 — optimized + aggregated):"
+echo "Log-based Cache Audit Configuration (v5 — logs + deployment wiring):"
 echo " - PyPI Cache Host:  $PYPI_CACHE_HOST"
 echo " - APT Pattern:      $APT_PATTERN"
 echo " - CCache Keyword:   $CCACHE_KEYWORD"
 echo " - Runner Filter:    $RUNNER_FILTER (regex: $RUNNER_REGEX)"
+if [ -n "$DEPLOY_REPO_DIR" ] && [ -d "$DEPLOY_REPO_DIR" ]; then
+echo " - Deploy Repo Dir:  $DEPLOY_REPO_DIR (BuildKit/Squid/git-cdn 以部署侧接线为准)"
+else
+echo " - Deploy Repo Dir:  NOT SET (BuildKit/Squid/git-cdn 降级为仅日志判定)"
+fi
 if [ "$FULL_SCAN_MODE" = true ]; then
 echo " - Mode:             FULL SCAN (capped at $MAX_NPU_SEARCH runs, $MAX_CANDIDATES candidates, unlimited logs)"
 else
@@ -237,17 +281,92 @@ get_npu_jobs() {
 }
 
 # ==============================================================================
+# Infra-side wiring scan (B 类维度的权威判定)
+#
+# BuildKit / Squid / git-cdn 由 ascend-ci-deployment 的 pod template 注入：
+#   BuildKit: postStart 执行 buildkit-acquire + docker buildx create
+#             --driver remote --use（共享 buildkitd 的缓存自动生效）
+#   Squid:    runner/job pod env 注入 HTTP_PROXY（透明代理）
+#   git-cdn:  postStart git config url.insteadOf（透明改写）
+# 这些接线对项目仓库的 workflow 完全不可见，因此不能扫项目仓库判定，
+# 必须读部署仓库本身。DEPLOY_REPO_DIR 指向部署仓库的本地克隆（0 API 调用）。
+#
+# repo -> 部署仓库项目根目录的映射以 values.yaml 的 githubConfigUrl 为准
+# （目录名可能是旧 org 名，如 volcengine/verl 实为 verl-project/verl）。
+#
+# Sets globals: infra_found ("found" | "notfound" | "unknown")
+#               infra_wired_buildkit infra_ev_buildkit
+#               infra_wired_squid    infra_ev_squid
+#               infra_wired_gitcdn   infra_ev_gitcdn
+# ==============================================================================
+scan_deployment_wiring() {
+    local REPO="$1"
+    infra_found="unknown"
+    infra_wired_buildkit=false
+    infra_wired_squid=false
+    infra_wired_gitcdn=false
+    infra_ev_buildkit=""
+    infra_ev_squid=""
+    infra_ev_gitcdn=""
+
+    if [ -z "$DEPLOY_REPO_DIR" ] || [ ! -d "$DEPLOY_REPO_DIR" ]; then
+        return 0
+    fi
+
+    # githubConfigUrl -> 项目根目录（values.yaml 在
+    # projects/{org}/{repo}/{scale-set}/values.yaml，dirname 两次回到根）
+    local repo_esc roots line
+    repo_esc=$(printf '%s' "$REPO" | sed 's/[.[\*^$()+?{}|]/\\&/g')
+    roots=$(grep -rlE --include='values.yaml' --exclude-dir=.git \
+        "github\.com/${repo_esc}([^a-zA-Z0-9_.-]|$)" \
+        "$DEPLOY_REPO_DIR/projects" "$DEPLOY_REPO_DIR/other" 2>/dev/null \
+        | xargs -r -n1 dirname | xargs -r -n1 dirname | sort -u) || true
+
+    if [ -z "$roots" ]; then
+        infra_found="notfound"
+        return 0
+    fi
+    infra_found="found"
+
+    if [ "$infra_wired_buildkit" = false ]; then
+        line=$(grep -rm1 -E --include='*.yaml' --include='*.yml' --exclude-dir=.git \
+            'buildkit-acquire|docker buildx create|BUILDKITD_ADDR' $roots 2>/dev/null) || true
+        if [ -n "$line" ]; then
+            infra_wired_buildkit=true
+            line="${line#$DEPLOY_REPO_DIR/}"
+            infra_ev_buildkit="部署侧已接线: ${line:0:160}"
+        fi
+    fi
+    if [ "$infra_wired_squid" = false ]; then
+        line=$(grep -rm1 -E --include='*.yaml' --include='*.yml' --exclude-dir=.git \
+            'squid-cache\.squid\.svc\.cluster\.local|squid-ca-cert' $roots 2>/dev/null) || true
+        if [ -n "$line" ]; then
+            infra_wired_squid=true
+            line="${line#$DEPLOY_REPO_DIR/}"
+            infra_ev_squid="部署侧已接线(env透明注入): ${line:0:160}"
+        fi
+    fi
+    if [ "$infra_wired_gitcdn" = false ]; then
+        line=$(grep -rm1 -E --include='*.yaml' --include='*.yml' --exclude-dir=.git \
+            'git-cdn-service' $roots 2>/dev/null) || true
+        if [ -n "$line" ]; then
+            infra_wired_gitcdn=true
+            line="${line#$DEPLOY_REPO_DIR/}"
+            infra_ev_gitcdn="部署侧已接线(insteadOf透明改写): ${line:0:160}"
+        fi
+    fi
+    return 0
+}
+
+# ==============================================================================
 # Static scan: read a repo's workflow YAML files for config-visible cache usage
-# Sets globals: static_buildkit static_squid static_runson
-#               static_ev_buildkit static_ev_squid static_ev_runson
+# 仅保留项目侧可见的维度（runs-on/cache）。BuildKit/Squid/git-cdn 属基建注入型，
+# 项目 workflow 中不存在，已改由 scan_deployment_wiring 判定。
+# Sets globals: static_runson static_ev_runson
 # ==============================================================================
 scan_workflows_static() {
     local REPO="$1"
-    static_buildkit=false
-    static_squid=false
     static_runson=false
-    static_ev_buildkit=""
-    static_ev_squid=""
     static_ev_runson=""
 
     local files
@@ -273,31 +392,18 @@ scan_workflows_static() {
                 static_ev_runson="workflow静态: ${line:0:200}"
             fi
         fi
-        if [ "$static_buildkit" = false ]; then
-            line=$(printf '%s' "$content" | grep -m1 -iE "cache-from|cache-to|--import-cache|--export-cache|buildcache|buildkit-cache" 2>/dev/null) || true
-            if [ -n "$line" ]; then
-                static_buildkit=true
-                static_ev_buildkit="workflow静态: ${line:0:200}"
-            fi
-        fi
-        if [ "$static_squid" = false ]; then
-            line=$(printf '%s' "$content" | grep -m1 -iE "$SQUID_PATTERN" 2>/dev/null) || true
-            if [ -n "$line" ]; then
-                static_squid=true
-                static_ev_squid="workflow静态: ${line:0:200}"
-            fi
-        fi
     done <<< "$files"
     return 0
 }
 
 # ==============================================================================
 # Phase 2: search ONE log for cache evidence
-# Sets globals: repo_pypi repo_apt repo_ccache repo_uv repo_buildkit repo_squid repo_runson
-#               ev_pypi ev_apt ev_ccache ev_uv ev_buildkit ev_squid ev_runson
+# Sets globals: repo_pypi repo_apt repo_ccache repo_uv repo_buildkit repo_squid repo_gitcdn repo_runson
+#               ev_pypi ev_apt ev_ccache ev_uv ev_buildkit ev_squid ev_gitcdn ev_runson
 #               counter_evidence_pypi counter_evidence_apt
 #               counter_evidence_ccache counter_evidence_uv
-#               counter_evidence_buildkit counter_evidence_squid counter_evidence_runson
+#               counter_evidence_buildkit counter_evidence_gitcdn counter_evidence_runson
+#               repo_buildkit_level ("remote" | "cache" | "progress" | "")
 # Returns: 0 = log has package activity (evidence searched)
 #          1 = log has no package activity (skip)
 # ==============================================================================
@@ -305,7 +411,7 @@ search_log_evidence() {
     local log_file="$1"
 
     # Pre-check: skip jobs with no package installation / cache activity
-    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja|buildctl|build-push|cache-from|cache-to|import-cache|export-cache|buildcache|buildkit|docker build|$SQUID_PATTERN|runs-on/cache|Cache restored|Cache saved" "$log_file" 2>/dev/null; then
+    if ! grep -qiE "pip install|apt-get install|apt install|uv install|uv pip|dnf install|yum install|rustup toolchain|cargo install|ccache|cmake|gcc|g\+\+|make|ninja|buildctl|build-push|cache-from|cache-to|import-cache|export-cache|buildcache|buildkit|docker build|docker buildx|CACHED|$SQUID_LOG_PATTERN|$GITCDN_LOG_PATTERN|runs-on/cache|Cache restored|Cache saved" "$log_file" 2>/dev/null; then
         return 1
     fi
 
@@ -475,32 +581,78 @@ search_log_evidence() {
     fi
 
     # ---------- BuildKit cache evidence ----------
+    # 基建注入型：共享 buildkitd 的层缓存由服务端 PVC 自动生效，项目无需
+    # cache-from/cache-to，因此不以缓存指令为证据，而是看构建是否真的走了
+    # 我们 postStart 创建的远程 builder（名为 buildkitd）以及缓存是否命中。
+    # 注意 plain progress 格式（GHA 无 TTY 默认）：命中行是 "#5 CACHED"，
+    # 没有旧脚本匹配的 "=> CACHED" 或 "CACHED ["（那是 tty/auto 格式）。
     ev_buildkit=""
     counter_evidence_buildkit=""
     repo_buildkit=false
+    repo_buildkit_level=""
 
-    grep_line=$(grep -m1 -iE "cache-from|cache-to|--import-cache|--export-cache|importing cache manifest|exporting cache|=> CACHED|CACHED \[|buildcache|buildkit-cache" "$log_file" 2>/dev/null || true)
+    # Level 1 (strongest): 远程 builder 实锤 —— buildx 构建开头打印
+    # "#0 building with \"buildkitd\" instance using remote driver"
+    grep_line=$(grep -m1 -E "$BUILDKIT_REMOTE_PATTERN" "$log_file" 2>/dev/null || true)
     if [ -n "$grep_line" ]; then
         repo_buildkit=true
-        ev_buildkit="buildkit-cache(运行时/配置): ${grep_line:0:200}"
+        repo_buildkit_level="remote"
+        ev_buildkit="buildkit-远程builder(运行时): ${grep_line:0:200}"
     fi
-    # Counter-evidence: uses buildkit but no cache instruction
+    # Level 2: 缓存命中/导出（importing/exporting cache、#N CACHED、=> CACHED）
     if [ "$repo_buildkit" = false ]; then
-        grep_line=$(grep -m1 -iE "BUILDKITD_ADDR|buildctl|buildkitd" "$log_file" 2>/dev/null || true)
+        grep_line=$(grep -m1 -E "$BUILDKIT_CACHE_PATTERN" "$log_file" 2>/dev/null || true)
         if [ -n "$grep_line" ]; then
-            counter_evidence_buildkit="用buildkit但无缓存指令: ${grep_line:0:200}"
+            repo_buildkit=true
+            repo_buildkit_level="cache"
+            ev_buildkit="buildkit缓存命中(运行时): ${grep_line:0:200}"
+        fi
+    fi
+    # Level 3 (weakest): buildkit 进度格式（仅说明走了 BuildKit，
+    # 无法区分我们的远程 builder 与本地 dind）
+    if [ "$repo_buildkit" = false ]; then
+        grep_line=$(grep -m1 -E "$BUILDKIT_PROGRESS_PATTERN" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            repo_buildkit=true
+            repo_buildkit_level="progress"
+            ev_buildkit="buildkit构建进度(运行时): ${grep_line:0:200}"
+        fi
+    fi
+    # Counter-evidence: 构建未走共享 buildkitd —— legacy builder 输出
+    # （Step N/M）、无 docker daemon / 无 docker 命令（未接线 runner）
+    if [ "$repo_buildkit" = false ]; then
+        grep_line=$(grep -m1 -E "$BUILDKIT_COUNTER_PATTERN" "$log_file" 2>/dev/null || true)
+        if [ -n "$grep_line" ]; then
+            counter_evidence_buildkit="构建未走buildkit: ${grep_line:0:200}"
         fi
     fi
 
     # ---------- Squid proxy evidence ----------
+    # 基建注入型：HTTP_PROXY 在 pod 层注入，日志中可靠信号是 runner 打印的
+    # "Runner is running behind proxy server 'http://squid-cache.squid.svc...'"。
+    # 只匹配我们的 squid 服务地址，避免把项目自配代理（如 100.68.174.87:3128）
+    # 误判为我们的缓存（旧脚本的真实假阳性案例：verl-project/uni-agent）。
     ev_squid=""
     counter_evidence_squid=""
     repo_squid=false
 
-    grep_line=$(grep -m1 -iE "$SQUID_PATTERN" "$log_file" 2>/dev/null || true)
+    grep_line=$(grep -m1 -iE "$SQUID_LOG_PATTERN" "$log_file" 2>/dev/null || true)
     if [ -n "$grep_line" ]; then
         repo_squid=true
-        ev_squid="squid代理: ${grep_line:0:200}"
+        ev_squid="squid代理(运行时): ${grep_line:0:200}"
+    fi
+
+    # ---------- git-cdn evidence ----------
+    # 基建注入型：postStart 的 git url.insteadOf 透明改写，仅在 git
+    # 报错/verbose 输出中露出真实 URL（git-cdn-service.git-cdn...）
+    ev_gitcdn=""
+    counter_evidence_gitcdn=""
+    repo_gitcdn=false
+
+    grep_line=$(grep -m1 -iE "$GITCDN_LOG_PATTERN" "$log_file" 2>/dev/null || true)
+    if [ -n "$grep_line" ]; then
+        repo_gitcdn=true
+        ev_gitcdn="git-cdn(运行时): ${grep_line:0:200}"
     fi
 
     # ---------- runs-on/cache evidence ----------
@@ -547,11 +699,15 @@ process_repo() {
     mkdir -p "$log_dir"
 
     # Stats for this repo
-    local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_buildkit=0 s_squid=0 s_runson=0
+    local s_pypi=0 s_apt=0 s_ccache=0 s_uv=0 s_buildkit=0 s_squid=0 s_gitcdn=0 s_runson=0
     local s_no_cache=0 s_no_npu=0 s_error=0
 
-    # Static scan of workflow files (config-visible evidence for BuildKit / Squid / runs-on cache)
+    # Static scan of workflow files (project-side config-visible evidence: runs-on/cache)
     scan_workflows_static "$REPO" || true
+
+    # Infra-side wiring scan (deployment repo clone; authoritative for
+    # BuildKit / Squid / git-cdn — see header comment B 类说明)
+    scan_deployment_wiring "$REPO" || true
 
     # ===== Phase 1: Collect candidates (up to MAX_CANDIDATES) =====
     local candidates=""
@@ -595,14 +751,14 @@ process_repo() {
     if [ "$candidate_count" -eq 0 ]; then
         local row=""
         if [ "$runs_scanned" -gt 0 ]; then
-            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
+            row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | - | - | - | - | No NPU runner jobs found in last $runs_scanned runs |"
             s_no_npu=1
         else
-            row="| $REPO | - | - | - | - | - | - | - | - | - | No completed runs / no access |"
+            row="| $REPO | - | - | - | - | - | - | - | - | - | - | No completed runs / no access |"
             s_error=1
         fi
         echo "$row" > "$row_file"
-        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_gitcdn|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
         rm -rf "$log_dir"
         return 0
     fi
@@ -612,12 +768,14 @@ process_repo() {
     #   ✅ = ANY log has positive evidence
     #   ❌ = NO log has positive evidence AND ANY log has counter-evidence
     #   -  = otherwise (no evidence in any direction)
+    # B 类维度（buildkit/squid/git-cdn）另有部署侧接线状态兜底（见输出判定）。
     local agg_pypi=false agg_apt=false agg_ccache=false agg_uv=false
-    local agg_buildkit=false agg_squid=false agg_runson=false
+    local agg_buildkit=false agg_squid=false agg_gitcdn=false agg_runson=false
     local agg_ev_pypi="" agg_ev_apt="" agg_ev_ccache="" agg_ev_uv=""
-    local agg_ev_buildkit="" agg_ev_squid="" agg_ev_runson=""
+    local agg_ev_buildkit="" agg_ev_squid="" agg_ev_gitcdn="" agg_ev_runson=""
     local agg_counter_pypi="" agg_counter_apt="" agg_counter_ccache="" agg_counter_uv=""
-    local agg_counter_buildkit="" agg_counter_squid="" agg_counter_runson=""
+    local agg_counter_buildkit="" agg_counter_squid="" agg_counter_gitcdn="" agg_counter_runson=""
+    local agg_buildkit_level=""
     local logs_checked=0
     local log_no_pkg_activity=0
     local repo_run="" repo_runner="" repo_job_url=""
@@ -634,7 +792,7 @@ process_repo() {
 
         local log_file="$log_dir/${safe}_${c_run_id}_${c_job_id}.log"
         local log_stderr="$log_dir/gh_api_stderr.log"
-        curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+        curl -fsSL -H "Authorization: Bearer ${GH_TOKEN:-}" \
             "https://api.github.com/repos/$REPO/actions/jobs/$c_job_id/logs" \
             >"$log_file" 2>"$log_stderr" || {
             echo "  [log download failed] $REPO job=$c_job_id:" >&2
@@ -700,10 +858,22 @@ process_repo() {
         if [ "$repo_buildkit" = true ] && [ "$agg_buildkit" = false ]; then
             agg_buildkit=true
             agg_ev_buildkit="$ev_buildkit"
+            agg_buildkit_level="$repo_buildkit_level"
+        fi
+        # Upgrade buildkit evidence level if a later log has stronger proof
+        # (remote builder beats cache-hit beats progress format)
+        if [ "$repo_buildkit" = true ] && [ "$repo_buildkit_level" = "remote" ] \
+           && [ "$agg_buildkit_level" != "remote" ]; then
+            agg_buildkit_level="remote"
+            agg_ev_buildkit="$ev_buildkit"
         fi
         if [ "$repo_squid" = true ] && [ "$agg_squid" = false ]; then
             agg_squid=true
             agg_ev_squid="$ev_squid"
+        fi
+        if [ "$repo_gitcdn" = true ] && [ "$agg_gitcdn" = false ]; then
+            agg_gitcdn=true
+            agg_ev_gitcdn="$ev_gitcdn"
         fi
         if [ "$repo_runson" = true ] && [ "$agg_runson" = false ]; then
             agg_runson=true
@@ -729,13 +899,16 @@ process_repo() {
         if [ "$repo_squid" = false ] && [ -n "$counter_evidence_squid" ] && [ -z "$agg_counter_squid" ]; then
             agg_counter_squid="$counter_evidence_squid"
         fi
+        if [ "$repo_gitcdn" = false ] && [ -n "$counter_evidence_gitcdn" ] && [ -z "$agg_counter_gitcdn" ]; then
+            agg_counter_gitcdn="$counter_evidence_gitcdn"
+        fi
         if [ "$repo_runson" = false ] && [ -n "$counter_evidence_runson" ] && [ -z "$agg_counter_runson" ]; then
             agg_counter_runson="$counter_evidence_runson"
         fi
 
-        # Early exit: all 7 cache types have positive evidence, no need to check more logs
+        # Early exit: all 8 cache types have positive evidence, no need to check more logs
         if [ "$agg_pypi" = true ] && [ "$agg_apt" = true ] && [ "$agg_ccache" = true ] && [ "$agg_uv" = true ] \
-           && [ "$agg_buildkit" = true ] && [ "$agg_squid" = true ] && [ "$agg_runson" = true ]; then
+           && [ "$agg_buildkit" = true ] && [ "$agg_squid" = true ] && [ "$agg_gitcdn" = true ] && [ "$agg_runson" = true ]; then
             break
         fi
 
@@ -744,27 +917,38 @@ process_repo() {
     # ===== Output =====
     local row=""
     if [ "$logs_checked" -eq 0 ]; then
-        # No usable logs found (download failed/empty or no package activity)
+        # No usable logs found (download failed/empty or no package activity).
+        # B 类维度仍可依据部署侧接线状态判定（基建注入型不依赖项目日志），
+        # runs-on/cache 依据 workflow 静态扫描。
         local first_candidate first_run_id first_job_id first_runner first_url
         first_candidate=$(echo "$sorted_candidates" | grep -v '^$' | head -1)
         first_run_id=$(echo "$first_candidate" | cut -d'|' -f1)
         first_job_id=$(echo "$first_candidate" | cut -d'|' -f4)
         first_runner=$(echo "$first_candidate" | cut -d'|' -f6)
         first_url="https://github.com/${REPO}/actions/runs/${first_run_id}/job/${first_job_id}"
-        # Apply static (workflow) evidence for the 3 config-visible dims even without pkg activity
-        local nb_mark ns_mark nr_mark
-        nb_mark="-"; ns_mark="-"; nr_mark="-"
-        if [ "$static_buildkit" = true ]; then nb_mark="✅"; s_buildkit=1; fi
-        if [ "$static_squid" = true ]; then ns_mark="✅"; s_squid=1; fi
-        if [ "$static_runson" = true ]; then nr_mark="✅"; s_runson=1; fi
+        local nb_mark ns_mark ng_mark nr_mark nb_ev="" ns_ev="" ng_ev="" nr_ev=""
+        nb_mark="-"; ns_mark="-"; ng_mark="-"; nr_mark="-"
+        if [ "$infra_wired_buildkit" = true ]; then nb_mark="✅"; nb_ev="$infra_ev_buildkit"; s_buildkit=1
+        elif [ "$infra_found" = "found" ]; then nb_mark="❌"; nb_ev="部署侧未接线"
+        elif [ "$infra_found" = "notfound" ]; then nb_ev="未在部署仓库找到该项目"
+        else nb_ev="部署仓库不可用"; fi
+        if [ "$infra_wired_squid" = true ]; then ns_mark="✅"; ns_ev="$infra_ev_squid"; s_squid=1
+        elif [ "$infra_found" = "found" ]; then ns_mark="❌"; ns_ev="部署侧未接线"
+        elif [ "$infra_found" = "notfound" ]; then ns_ev="未在部署仓库找到该项目"
+        else ns_ev="部署仓库不可用"; fi
+        if [ "$infra_wired_gitcdn" = true ]; then ng_mark="✅"; ng_ev="$infra_ev_gitcdn"; s_gitcdn=1
+        elif [ "$infra_found" = "found" ]; then ng_mark="❌"; ng_ev="部署侧未接线"
+        elif [ "$infra_found" = "notfound" ]; then ng_ev="未在部署仓库找到该项目"
+        else ng_ev="部署仓库不可用"; fi
+        if [ "$static_runson" = true ]; then nr_mark="✅"; nr_ev="$static_ev_runson"; s_runson=1; fi
         if [ "$log_no_pkg_activity" = 1 ]; then
-            row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $nr_mark | NPU runner jobs found but no package installation in recent logs — [查看]($first_url) |"
+            row="| $REPO | (NPU jobs found, no pkg activity) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | $nr_mark | NPU runner jobs found but no package installation in recent logs; ${nb_ev}; ${ns_ev}; ${ng_ev} — [查看]($first_url) |"
         else
-            row="| $REPO | (NPU jobs found, log download failed) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $nr_mark | NPU runner jobs found but logs could not be downloaded (expired or fetch failed) — [查看]($first_url) |"
+            row="| $REPO | (NPU jobs found, log download failed) | $first_runner | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | $nr_mark | NPU runner jobs found but logs could not be downloaded (expired or fetch failed); ${nb_ev}; ${ns_ev}; ${ng_ev} — [查看]($first_url) |"
         fi
         s_error=1
         echo "$row" > "$row_file"
-        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+        echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_gitcdn|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
         rm -rf "$log_dir"
         return 0
     fi
@@ -773,7 +957,7 @@ process_repo() {
 
     # Determine marks based on aggregated evidence
     local pypi_mark pypi_detail apt_mark apt_detail ccache_mark ccache_detail uv_mark uv_detail
-    local buildkit_mark buildkit_detail squid_mark squid_detail runson_mark runson_detail
+    local buildkit_mark buildkit_detail squid_mark squid_detail gitcdn_mark gitcdn_detail runson_mark runson_detail
 
     if [ "$agg_pypi" = true ]; then
         pypi_mark="✅"; pypi_detail="$agg_ev_pypi"; s_pypi=1
@@ -807,26 +991,57 @@ process_repo() {
         uv_mark="-"; uv_detail="无证据(日志中未出现 uv 相关输出)"
     fi
 
-    # BuildKit: workflow 静态证据优先，其次日志
-    if [ "$static_buildkit" = true ]; then
-        buildkit_mark="✅"; buildkit_detail="$static_ev_buildkit"; s_buildkit=1
-    elif [ "$agg_buildkit" = true ]; then
+    # BuildKit（基建注入型）：运行时证据优先，其次部署侧接线，再反面证据
+    if [ "$agg_buildkit" = true ]; then
         buildkit_mark="✅"; buildkit_detail="$agg_ev_buildkit"; s_buildkit=1
+        # 运行时只有弱证据（进度格式）时，用部署侧接线补强结论
+        if [ "$agg_buildkit_level" != "remote" ] && [ "$infra_wired_buildkit" = true ]; then
+            buildkit_detail="${agg_ev_buildkit}; ${infra_ev_buildkit}"
+        elif [ "$agg_buildkit_level" != "remote" ] && [ "$infra_found" = "found" ]; then
+            buildkit_detail="${agg_ev_buildkit}; 部署侧未接线(疑似本地/外部构建)"
+        fi
+    elif [ "$infra_wired_buildkit" = true ]; then
+        buildkit_mark="✅"
+        buildkit_detail="$infra_ev_buildkit; 近期日志未见构建活动(接线即生效,任何 docker build 都会走共享 buildkitd)"
+        s_buildkit=1
     elif [ -n "$agg_counter_buildkit" ]; then
         buildkit_mark="❌"; buildkit_detail="反面证据: ${agg_counter_buildkit}"; s_no_cache=1
+    elif [ "$infra_found" = "found" ]; then
+        buildkit_mark="❌"; buildkit_detail="部署侧未接线: 该项目 runner 无 buildkit 远程 builder 接线"; s_no_cache=1
+    elif [ "$infra_found" = "notfound" ]; then
+        buildkit_mark="-"; buildkit_detail="未在部署仓库找到该项目, 无法判定接线"
     else
-        buildkit_mark="-"; buildkit_detail="无证据(日志/workflow 中未出现 buildkit 缓存指令)"
+        buildkit_mark="-"; buildkit_detail="部署仓库不可用, 仅日志未发现 buildkit 构建证据"
     fi
 
-    # Squid: workflow 静态证据优先，其次日志
-    if [ "$static_squid" = true ]; then
-        squid_mark="✅"; squid_detail="$static_ev_squid"; s_squid=1
-    elif [ "$agg_squid" = true ]; then
+    # Squid（基建注入型）：运行时证据优先，其次部署侧接线
+    if [ "$agg_squid" = true ]; then
         squid_mark="✅"; squid_detail="$agg_ev_squid"; s_squid=1
-    elif [ -n "$agg_counter_squid" ]; then
-        squid_mark="❌"; squid_detail="反面证据: ${agg_counter_squid}"; s_no_cache=1
+    elif [ "$infra_wired_squid" = true ]; then
+        squid_mark="✅"
+        squid_detail="$infra_ev_squid; 代理对 runner/job 透明, 日志仅偶尔可见"
+        s_squid=1
+    elif [ "$infra_found" = "found" ]; then
+        squid_mark="❌"; squid_detail="部署侧未接线: 该项目 runner 未注入 squid 代理 env"; s_no_cache=1
+    elif [ "$infra_found" = "notfound" ]; then
+        squid_mark="-"; squid_detail="未在部署仓库找到该项目, 无法判定接线"
     else
-        squid_mark="-"; squid_detail="无证据(日志/workflow 中未出现 squid 代理地址)"
+        squid_mark="-"; squid_detail="部署仓库不可用, 仅日志未发现 squid 证据"
+    fi
+
+    # git-cdn（基建注入型）：运行时证据优先，其次部署侧接线
+    if [ "$agg_gitcdn" = true ]; then
+        gitcdn_mark="✅"; gitcdn_detail="$agg_ev_gitcdn"; s_gitcdn=1
+    elif [ "$infra_wired_gitcdn" = true ]; then
+        gitcdn_mark="✅"
+        gitcdn_detail="$infra_ev_gitcdn; url 改写对 git 透明, 日志仅报错时可见"
+        s_gitcdn=1
+    elif [ "$infra_found" = "found" ]; then
+        gitcdn_mark="❌"; gitcdn_detail="部署侧未接线: 该项目 runner 未配置 git-cdn insteadOf"; s_no_cache=1
+    elif [ "$infra_found" = "notfound" ]; then
+        gitcdn_mark="-"; gitcdn_detail="未在部署仓库找到该项目, 无法判定接线"
+    else
+        gitcdn_mark="-"; gitcdn_detail="部署仓库不可用, 仅日志未发现 git-cdn 证据"
     fi
 
     # runs-on/cache: workflow 静态证据优先，其次日志
@@ -840,15 +1055,15 @@ process_repo() {
         runson_mark="-"; runson_detail="无证据(日志/workflow 中未出现 runs-on/cache)"
     fi
 
-    local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}; ${buildkit_detail}; ${squid_detail}; ${runson_detail}"
+    local evidence="${pypi_detail}; ${apt_detail}; ${ccache_detail}; ${uv_detail}; ${buildkit_detail}; ${squid_detail}; ${gitcdn_detail}; ${runson_detail}"
     evidence="${evidence# ; }"
     evidence="${evidence% ; }"
     # Sanitize: replace pipe chars to prevent markdown table column corruption
     evidence="${evidence//|/¦}"
 
-    row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | $buildkit_mark | $squid_mark | $runson_mark | ${evidence:0:400} $job_link |"
+    row="| $REPO | $repo_run | $repo_runner | $pypi_mark | $apt_mark | $ccache_mark | $uv_mark | $buildkit_mark | $squid_mark | $gitcdn_mark | $runson_mark | ${evidence:0:400} $job_link |"
     echo "$row" > "$row_file"
-    echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
+    echo "$s_pypi|$s_apt|$s_ccache|$s_uv|$s_buildkit|$s_squid|$s_gitcdn|$s_runson|$s_no_cache|$s_no_npu|$s_error" > "$stat_file"
 
     rm -rf "$log_dir"
 }
@@ -874,8 +1089,8 @@ echo "Processing $TOTAL repos with $PARALLEL parallel workers, ${#AUDIT_TOKEN_LI
 echo ""
 
 # Output table header
-echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | BuildKit | Squid | runs-on/cache | 证据 (Evidence) |"
-echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |"
+echo "| 仓库 (Repository) | Run | Runner | PyPI 缓存 | APT 缓存 | CCache | uv | BuildKit | Squid | git-cdn | runs-on/cache | 证据 (Evidence) |"
+echo "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |"
 
 # Process repos in parallel
 # Use background processes with a concurrency limit
@@ -907,6 +1122,7 @@ STAT_CCACHE=0
 STAT_UV=0
 STAT_BUILDKIT=0
 STAT_SQUID=0
+STAT_GITCDN=0
 STAT_RUNSON=0
 STAT_NO_CACHE=0
 STAT_NO_NPU=0
@@ -921,18 +1137,19 @@ for line in "${REPO_LINES[@]}"; do
     if [ -f "$row_file" ]; then
         cat "$row_file"
     else
-        echo "| $REPO | - | - | - | - | - | - | - | - | - | Processing error — no output |"
-        echo "0|0|0|0|0|0|0|0|0|1" > "$stat_file"
+        echo "| $REPO | - | - | - | - | - | - | - | - | - | - | Processing error — no output |"
+        echo "0|0|0|0|0|0|0|0|0|0|1" > "$stat_file"
     fi
 
     if [ -f "$stat_file" ]; then
-        IFS='|' read -r sp sa sc su sbk ssq srs sn snn se < "$stat_file"
+        IFS='|' read -r sp sa sc su sbk ssq sgc srs sn snn se < "$stat_file"
         STAT_PYPI=$((STAT_PYPI + sp))
         STAT_APT=$((STAT_APT + sa))
         STAT_CCACHE=$((STAT_CCACHE + sc))
         STAT_UV=$((STAT_UV + su))
         STAT_BUILDKIT=$((STAT_BUILDKIT + sbk))
         STAT_SQUID=$((STAT_SQUID + ssq))
+        STAT_GITCDN=$((STAT_GITCDN + sgc))
         STAT_RUNSON=$((STAT_RUNSON + srs))
         STAT_NO_CACHE=$((STAT_NO_CACHE + sn))
         STAT_NO_NPU=$((STAT_NO_NPU + snn))
@@ -951,6 +1168,7 @@ echo "- CCache confirmed (✅): **$STAT_CCACHE** / $TOTAL"
 echo "- uv confirmed (✅): **$STAT_UV** / $TOTAL"
 echo "- BuildKit cache confirmed (✅): **$STAT_BUILDKIT** / $TOTAL"
 echo "- Squid proxy confirmed (✅): **$STAT_SQUID** / $TOTAL"
+echo "- git-cdn confirmed (✅): **$STAT_GITCDN** / $TOTAL"
 echo "- runs-on/cache confirmed (✅): **$STAT_RUNSON** / $TOTAL"
 echo "- Confirmed NOT in use (❌): **$STAT_NO_CACHE** — need cache config"
 echo "- No NPU runner jobs found: **$STAT_NO_NPU** — repos don't use our NPU runners"
