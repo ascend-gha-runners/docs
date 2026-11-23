@@ -276,10 +276,10 @@ def main():
     print(f"New repos to add: {new_repos}")
 
     # ---- Update Repo.md with new rows ----
-    # Row format matches the 7 cache dims; update_repo_md.py rewrites all
+    # Row format matches the 8 cache dims; update_repo_md.py rewrites all
     # cells later, the link is the only thing that matters here.
     new_rows = "".join(
-        f"| [{r}](https://github.com/{r}) | - | - | - | - | - | - | - |\n"
+        f"| [{r}](https://github.com/{r}) | - | - | - | - | - | - | - | - |\n"
         for r in new_repos
     )
     if TABLE_END in repo_md:

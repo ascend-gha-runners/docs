@@ -103,12 +103,27 @@ jobs:
           echo "=== 本次审计仓库列表 ==="
           cat /tmp/audit_repos.txt
 
+      # ================================================================
+      # Phase 3.5: Clone deployment repo (infra wiring source)
+      # BuildKit / Squid / git-cdn 属基建注入型缓存：接线在
+      # ascend-ci-deployment 的 pod template 中，项目仓库与日志不可见，
+      # 审计脚本需要部署仓库本地克隆来判定接线状态（0 API 调用）。
+      # 公开仓库，匿名浅克隆即可，不消耗 token。
+      # 克隆失败不阻断审计：DEPLOY_REPO_DIR 不存在时脚本自动降级为
+      # 仅日志判定（B 类维度退回 -，A 类不受影响）。
+      # ================================================================
+      - name: Clone deployment repo (infra wiring source)
+        continue-on-error: true
+        run: |
+          git clone --depth 1 https://github.com/opensourceways/ascend-ci-deployment /tmp/ascend-ci-deployment
+
       - name: Run log-based cache audit
         id: audit
         env:
           # Rotate several read-only tokens per repo so a single 5000/hr REST
           # bucket can't be exhausted; falls back to GH_TOKEN when unset/empty.
           AUDIT_TOKENS: ${{ secrets.AUDIT_TOKEN_1 }},${{ secrets.AUDIT_TOKEN_2 }}
+          DEPLOY_REPO_DIR: /tmp/ascend-ci-deployment
         run: |
           bash scripts/ci-audit/check_cache_from_logs.sh /tmp/audit_repos.txt | tee audit_result.md
 
