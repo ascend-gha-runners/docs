@@ -128,6 +128,23 @@
       "linux-aarch64-a2-swift-fed-4",
       "linux-aarch64-a2-swift-fed-8"
     ],
+    "mooncake-ai-test/mooncake": [
+      "linux-aarch64-a2-mooncake-fed-2",
+      "linux-aarch64-a2-mooncake-fed-4",
+      "linux-aarch64-a2-mooncake-fed-8",
+      "linux-aarch64-a3-0-gy004",
+      "linux-aarch64-a3-16-gy004",
+      "linux-aarch64-a3-2-gy004",
+      "linux-aarch64-a3-4-gy004",
+      "linux-aarch64-a3-8-gy004",
+      "linux-aarch64-a3-800i-mooncake-fed-16",
+      "linux-aarch64-a3-800i-mooncake-fed-2",
+      "linux-aarch64-a3-800i-mooncake-fed-4",
+      "linux-aarch64-a3-800i-mooncake-fed-8",
+      "linux-amd64-a5-mooncake-fed-2",
+      "linux-amd64-a5-mooncake-fed-4",
+      "linux-amd64-a5-mooncake-fed-8"
+    ],
     "sgl-project/sgl-kernel-npu": [
       "linux-aarch64-a2-0",
       "linux-aarch64-a2-1",
@@ -555,6 +572,15 @@
     "linux-aarch64-a2-mojo-fed-8": [
       "Karmada Federated Scheduling"
     ],
+    "linux-aarch64-a2-mooncake-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mooncake-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-mooncake-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2-swift-fed-1": [
       "Karmada Federated Scheduling"
     ],
@@ -760,6 +786,9 @@
     "linux-aarch64-a3-0-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-0-gy004": [
+      "openmerlin-guiyang-004-cluster"
+    ],
     "linux-aarch64-a3-0-sh-001": [
       "openmerlin-sh-001-cluster"
     ],
@@ -773,6 +802,9 @@
     "linux-aarch64-a3-16-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-16-gy004": [
+      "openmerlin-guiyang-004-cluster"
+    ],
     "linux-aarch64-a3-16-sh-001": [
       "openmerlin-sh-001-cluster"
     ],
@@ -782,6 +814,9 @@
     ],
     "linux-aarch64-a3-2-cn12-001": [
       "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-2-gy004": [
+      "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-2-sh-001": [
       "openmerlin-sh-001-cluster"
@@ -793,6 +828,9 @@
     "linux-aarch64-a3-4-cn12-001": [
       "ascend-cn12-001-cluster"
     ],
+    "linux-aarch64-a3-4-gy004": [
+      "openmerlin-guiyang-004-cluster"
+    ],
     "linux-aarch64-a3-4-sh-001": [
       "openmerlin-sh-001-cluster"
     ],
@@ -802,6 +840,9 @@
     ],
     "linux-aarch64-a3-8-cn12-001": [
       "ascend-cn12-001-cluster"
+    ],
+    "linux-aarch64-a3-8-gy004": [
+      "openmerlin-guiyang-004-cluster"
     ],
     "linux-aarch64-a3-8-sh-001": [
       "openmerlin-sh-001-cluster"
@@ -882,6 +923,18 @@
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a3-800i-mojo-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-mooncake-fed-16": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-mooncake-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-mooncake-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a3-800i-mooncake-fed-8": [
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a3-800i-pytorch-fed-16": [
@@ -1192,6 +1245,15 @@
     ],
     "linux-amd64-a5-8-sh-002": [
       "openmerlin-sh-002-cluster"
+    ],
+    "linux-amd64-a5-mooncake-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-amd64-a5-mooncake-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-amd64-a5-mooncake-fed-8": [
+      "Karmada Federated Scheduling"
     ],
     "linux-amd64-cpu-1-hk": [
       "ascend-hk-001-cluster"

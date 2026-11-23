@@ -10,11 +10,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Clusters</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">22</span>
+    <span class="stat-num">23</span>
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">404</span>
+    <span class="stat-num">419</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -22,14 +22,14 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <input type="search" id="cluster-filter" class="cluster-filter" placeholder="Filter by keywords (space-separated)" aria-label="Filter clusters">
 <select id="cluster-npu" class="cluster-npu-filter" aria-label="Filter by hardware">
   <option value="">All hardware</option>
-  <option value="ascend-1980">ascend-1980 · 287</option>
+  <option value="ascend-1980">ascend-1980 · 298</option>
   <option value="cpu">CPU (no NPU) · 54</option>
-  <option value="npu">npu · 38</option>
-  <option value="on-demand">on-demand · 11</option>
+  <option value="npu">npu · 41</option>
+  <option value="on-demand">on-demand · 12</option>
   <option value="Ascend910">Ascend910 · 9</option>
   <option value="ascend-310">ascend-310 · 5</option>
 </select>
-<span class="cluster-hint">10 clusters · 404 labels</span>
+<span class="cluster-hint">10 clusters · 419 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -548,7 +548,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-guiyang-004-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-guiyang-004-cluster</span>
-    <span class="cluster-meta">2 projects · 11 labels</span>
+    <span class="cluster-meta">3 projects · 16 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/sglang linux-amd64-cpu-2 linux-amd64-cpu-4 linux-amd64-cpu-8">
@@ -563,6 +563,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       <div class="machine-list" hidden>
         <div class="machine machine--cpu" data-label="linux-amd64-cpu-2" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-2</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-4" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-4</span><span class="machine-npu"> · cpu</span></div>        <div class="machine machine--cpu" data-label="linux-amd64-cpu-8" data-npu="cpu"><span class="machine-label">linux-amd64-cpu-8</span><span class="machine-npu"> · cpu</span></div>
         <div class="project-ns">namespace: <code>ascend</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="mooncake-ai-test/mooncake linux-aarch64-a3-0 linux-aarch64-a3-2 linux-aarch64-a3-4 linux-aarch64-a3-8 linux-aarch64-a3-16">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">mooncake-ai-test/mooncake</span>
+          <span class="project-count">5 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/mooncake-ai-test/mooncake" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-0-gy004" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-2-gy004" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-4-gy004" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-8-gy004" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-16-gy004" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>mooncake-ai-test-mooncake</code></div>
       </div>
     </div>
     <div class="project-row" data-search="sgl-project/sglang linux-amd64-cpu-2 linux-amd64-cpu-4 linux-aarch64-a3-0 a3-752t linux-aarch64-a3-2 a3-752t linux-aarch64-a3-4 a3-752t linux-aarch64-a3-8 a3-752t linux-aarch64-a3-16 a3-752t linux-amd64-cpu-test-8 gy004">
@@ -688,7 +702,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="Karmada Federated Scheduling">
   <div class="cluster-card-header">
     <span class="cluster-name">Karmada Federated Scheduling</span>
-    <span class="cluster-meta">16 projects · 131 labels</span>
+    <span class="cluster-meta">17 projects · 141 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="Ascend/pytorch linux-aarch64-a3-800i-pytorch-fed-2 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-2-cn12-001 linux-aarch64-a3-800i-pytorch-fed-4 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-4-cn12-001 linux-aarch64-a3-800i-pytorch-fed-8 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-8-cn12-001 linux-aarch64-a3-800i-pytorch-fed-16 linux-aarch64-a3-800i-16 linux-aarch64-a3-800i-16-cn12-001">
@@ -801,6 +815,20 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
       <div class="machine-list" hidden>
         <div class="machine" data-label="linux-aarch64-a2-swift-fed-1" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-1 + linux-aarch64-a2-1</span><span class="machine-npu"> · 1 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-2 + linux-aarch64-a2-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-4 + linux-aarch64-a2-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-swift-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-swift-fed-8 + linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>
         <div class="project-ns">namespace: <code>modelscope</code></div>
+      </div>
+    </div>
+    <div class="project-row" data-search="mooncake-ai-test/mooncake linux-amd64-a5-mooncake-fed-2 linux-amd64-a5-2 linux-amd64-a5-mooncake-fed-4 linux-amd64-a5-4 linux-amd64-a5-mooncake-fed-8 linux-amd64-a5-8 linux-aarch64-a2-mooncake-fed-2 linux-aarch64-a2-2 linux-aarch64-a2-mooncake-fed-4 linux-aarch64-a2-4 linux-aarch64-a2-mooncake-fed-8 linux-aarch64-a2-8 linux-aarch64-a3-800i-mooncake-fed-2 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-mooncake-fed-4 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-mooncake-fed-8 linux-aarch64-a3-800i-8 linux-aarch64-a3-800i-mooncake-fed-16 linux-aarch64-a3-800i-16">
+      <div class="project-line">
+        <button type="button" class="project-head" aria-expanded="false">
+          <span class="project-toggle"></span>
+          <span class="project-name-text">mooncake-ai-test/mooncake</span>
+          <span class="project-count">10 labels</span>
+        </button>
+        <a class="project-link" href="https://github.com/mooncake-ai-test/mooncake" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+      </div>
+      <div class="machine-list" hidden>
+        <div class="machine" data-label="linux-amd64-a5-mooncake-fed-2" data-npu="npu"><span class="machine-label">linux-amd64-a5-mooncake-fed-2 + linux-amd64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-mooncake-fed-4" data-npu="npu"><span class="machine-label">linux-amd64-a5-mooncake-fed-4 + linux-amd64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-amd64-a5-mooncake-fed-8" data-npu="npu"><span class="machine-label">linux-amd64-a5-mooncake-fed-8 + linux-amd64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a2-mooncake-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mooncake-fed-2 + linux-aarch64-a2-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-mooncake-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mooncake-fed-4 + linux-aarch64-a2-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a2-mooncake-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a2-mooncake-fed-8 + linux-aarch64-a2-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mooncake-fed-2" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mooncake-fed-2 + linux-aarch64-a3-800i-2</span><span class="machine-npu"> · 2 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mooncake-fed-4" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mooncake-fed-4 + linux-aarch64-a3-800i-4</span><span class="machine-npu"> · 4 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mooncake-fed-8" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mooncake-fed-8 + linux-aarch64-a3-800i-8</span><span class="machine-npu"> · 8 × ascend-1980</span></div>        <div class="machine" data-label="linux-aarch64-a3-800i-mooncake-fed-16" data-npu="ascend-1980"><span class="machine-label">linux-aarch64-a3-800i-mooncake-fed-16 + linux-aarch64-a3-800i-16</span><span class="machine-npu"> · 16 × ascend-1980</span></div>
+        <div class="project-ns">namespace: <code>arc-fedsched-a3-800i</code></div>
       </div>
     </div>
     <div class="project-row" data-search="sgl-project/sgl-kernel-npu linux-aarch64-a3-sgl-kernel-fed-2 linux-aarch64-a3-2 linux-aarch64-a3-2 linux-aarch64-a3-sgl-kernel-fed-4 linux-aarch64-a3-4 linux-aarch64-a3-4 linux-aarch64-a3-sgl-kernel-fed-8 linux-aarch64-a3-8 linux-aarch64-a3-8 linux-aarch64-a3-sgl-kernel-fed-16 linux-aarch64-a3-16 linux-aarch64-a3-16 linux-aarch64-a3-800i-sgl-kernel-fed-2 linux-aarch64-a3-800i-2 linux-aarch64-a3-800i-sgl-kernel-fed-4 linux-aarch64-a3-800i-4 linux-aarch64-a3-800i-sgl-kernel-fed-8 linux-aarch64-a3-800i-8 linux-aarch64-a3-800t-sgl-kernel-fed-2 linux-aarch64-a3-800t-2 linux-aarch64-a3-800t-sgl-kernel-fed-4 linux-aarch64-a3-800t-4 linux-aarch64-a3-800t-sgl-kernel-fed-8 linux-aarch64-a3-800t-8 linux-aarch64-a3-800i-sgl-kernel-fed-16 linux-aarch64-a3-800i-16 linux-aarch64-a3-800t-sgl-kernel-fed-16 linux-aarch64-a3-800t-16">
