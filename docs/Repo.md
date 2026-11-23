@@ -7,7 +7,7 @@
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | ✅ | - | - | ✅ |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | - | - | - | - |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ❌ | ❌ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
@@ -36,4 +36,4 @@
 >
 > Last checked: 2026-11-23
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45191122533](https://github.com/ascend-gha-runners/docs/actions/runs/45191122533)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45195340738](https://github.com/ascend-gha-runners/docs/actions/runs/45195340738)
