@@ -99,7 +99,7 @@ SQUID_LOG_PATTERN='squid-cache\.squid\.svc\.cluster\.local'
 BUILDKIT_REMOTE_PATTERN='building with "?buildkitd"? instance|buildkit-acquire|buildkitd-dispatcher|--builder buildkitd|buildkitd:1234'
 BUILDKIT_CACHE_PATTERN='#[0-9]+ CACHED|=> CACHED|CACHED \[[0-9]|importing cache manifest|exporting cache|exporting layers'
 # 命名阶段（如 #10 [cann-installer 2/7]）与数字阶段（#5 [2/7]）都算
-BUILDKIT_PROGRESS_PATTERN='#[0-9]+ \[internal\] load (build definition|metadata)|#[0-9]+ \[[^]]+ [0-9]+/[0-9]+\] '
+BUILDKIT_PROGRESS_PATTERN='#[0-9]+ \[internal\] load (build definition|metadata)|#[0-9]+ \[[^]]*[0-9]+/[0-9]+\] '
 # BuildKit 反面证据：legacy builder 输出（Step N/M，未走 BuildKit）、
 # 无 daemon / 无 docker（非接线 runner 上构建根本无法发生）
 BUILDKIT_COUNTER_PATTERN='Step [0-9]+/[0-9]+ :|Cannot connect to the Docker daemon|docker: command not found'
@@ -779,7 +779,7 @@ process_repo() {
             row="| $REPO | (scanned $runs_scanned runs) | - | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | - | No NPU runner jobs found in last $runs_scanned runs |"
             s_no_npu=1
         else
-            row="| $REPO | - | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | - | No completed runs / no access |"
+            row="| $REPO | - | - | - | - | - | - | $nb_mark | $ns_mark | $ng_mark | - | No completed runs / no access |"
             s_error=1
         fi
         echo "$row" > "$row_file"
