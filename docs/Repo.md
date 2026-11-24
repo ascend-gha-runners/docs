@@ -7,12 +7,12 @@
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | [vllm-project/vllm-ascend](https://github.com/vllm-project/vllm-ascend) | ✅ | ✅ | - | - | ✅ | - | - | ✅ |
 | [vllm-project/vllm-omni](https://github.com/vllm-project/vllm-omni) | - | - | - | - | - | - | - | - |
-| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ❌ | ❌ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
+| [sgl-project/sgl-kernel-npu](https://github.com/sgl-project/sgl-kernel-npu) | ✅ | ✅ | ✅ | ✅ | - | ✅ | ✅ | ✅ |
 | [sgl-project/sglang](https://github.com/sgl-project/sglang) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
 | [verl-project/verl](https://github.com/verl-project/verl) | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | - |
 | [hiyouga/LlamaFactory](https://github.com/hiyouga/LlamaFactory) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
-| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | ✅ | - |
 | [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ❌ | ❌ | - | ✅ | ✅ | - |
@@ -36,4 +36,4 @@
 >
 > Last checked: 2026-11-24
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45359297518](https://github.com/ascend-gha-runners/docs/actions/runs/45359297518)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45363931051](https://github.com/ascend-gha-runners/docs/actions/runs/45363931051)
