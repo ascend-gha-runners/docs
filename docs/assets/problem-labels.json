@@ -280,13 +280,6 @@
       "linux-amd64-cpu-8",
       "linux-amd64-cpu-8-hk"
     ],
-    "verl-project/uni-agent": [
-      "linux-aarch64-a2-0",
-      "linux-aarch64-a2-1",
-      "linux-aarch64-a2-2",
-      "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
-    ],
     "verl-project/verl": [
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
