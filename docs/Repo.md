@@ -14,7 +14,7 @@
 | [modelscope/ms-swift](https://github.com/modelscope/ms-swift) | ✅ | ✅ | ❌ | ✅ | - | ✅ | ✅ | - |
 | [triton-lang/triton-ascend](https://github.com/triton-lang/triton-ascend) | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
 | [vllm-ascend/vllm-ascend-recipes](https://github.com/vllm-ascend/vllm-ascend-recipes) | ❌ | - | ❌ | ❌ | - | ✅ | ✅ | - |
-| [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ✅ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
+| [verl-project/verl-omni](https://github.com/verl-project/verl-omni) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [Ascend/pytorch](https://github.com/Ascend/pytorch) | ❌ | ❌ | ✅ | ❌ | - | ✅ | ✅ | - |
 | [Ascend/sglang](https://github.com/Ascend/sglang) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | - |
 | [alibaba/ROLL](https://github.com/alibaba/ROLL) | ❌ | - | ✅ | ❌ | - | - | ✅ | ✅ |
@@ -36,4 +36,4 @@
 >
 > Last checked: 2026-11-26
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45819781544](https://github.com/ascend-gha-runners/docs/actions/runs/45819781544)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/45832429708](https://github.com/ascend-gha-runners/docs/actions/runs/45832429708)
