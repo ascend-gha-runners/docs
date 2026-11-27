@@ -14,7 +14,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
     <span class="stat-label">Projects</span>
   </div>
   <div class="stat-card">
-    <span class="stat-num">428</span>
+    <span class="stat-num">422</span>
     <span class="stat-label">Labels</span>
   </div>
 </div>
@@ -25,11 +25,11 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
   <option value="ascend-1980">ascend-1980 · 307</option>
   <option value="cpu">CPU (no NPU) · 54</option>
   <option value="npu">npu · 41</option>
-  <option value="on-demand">on-demand · 12</option>
-  <option value="Ascend910">Ascend910 · 9</option>
+  <option value="on-demand">on-demand · 11</option>
   <option value="ascend-310">ascend-310 · 5</option>
+  <option value="Ascend910">Ascend910 · 4</option>
 </select>
-<span class="cluster-hint">10 clusters · 428 labels</span>
+<span class="cluster-hint">10 clusters · 422 labels</span>
 </div>
 <div class="cluster-grid" id="cluster-grid">
 
@@ -650,7 +650,7 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
 <div class="cluster-card" data-name="openmerlin-sh-001-cluster">
   <div class="cluster-card-header">
     <span class="cluster-name">openmerlin-sh-001-cluster</span>
-    <span class="cluster-meta">3 projects · 16 labels</span>
+    <span class="cluster-meta">3 projects · 10 labels</span>
   </div>
   <div class="cluster-body">
     <div class="project-row" data-search="vllm-ascend/vllm-ascend-recipes linux-aarch64-a5-0 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
@@ -667,17 +667,17 @@ Auto-generated from CI deployment configuration: each runner's cluster is derive
         <div class="project-ns">namespace: <code>vllm-ascend-vllm-ascend-recipes</code></div>
       </div>
     </div>
-    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a5-0 linux-aarch64-a5-1 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8 linux-aarch64-a3-0-sh-001 linux-aarch64-a3-2-sh-001 linux-aarch64-a3-4-sh-001 linux-aarch64-a3-8-sh-001 linux-aarch64-a3-16-sh-001 linux-aarch64-a3-test-16-sh-001">
+    <div class="project-row" data-search="vllm-project/vllm-ascend linux-aarch64-a5-0 linux-aarch64-a5-1 linux-aarch64-a5-2 linux-aarch64-a5-4 linux-aarch64-a5-8">
       <div class="project-line">
         <button type="button" class="project-head" aria-expanded="false">
           <span class="project-toggle"></span>
           <span class="project-name-text">vllm-project/vllm-ascend</span>
-          <span class="project-count">11 labels</span>
+          <span class="project-count">5 labels</span>
         </button>
         <a class="project-link" href="https://github.com/vllm-project/vllm-ascend" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
       </div>
       <div class="machine-list" hidden>
-        <div class="machine machine--ondemand" data-label="linux-aarch64-a5-0" data-npu="on-demand"><span class="machine-label">linux-aarch64-a5-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a5-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>        <div class="machine machine--ondemand" data-label="linux-aarch64-a3-0-sh-001" data-npu="on-demand"><span class="machine-label">linux-aarch64-a3-0-sh-001</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a3-2-sh-001" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a3-2-sh-001</span><span class="machine-npu"> · 2 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a3-4-sh-001" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a3-4-sh-001</span><span class="machine-npu"> · 4 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a3-8-sh-001" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a3-8-sh-001</span><span class="machine-npu"> · 8 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a3-16-sh-001" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a3-16-sh-001</span><span class="machine-npu"> · 16 × Ascend910</span></div>        <div class="machine" data-label="linux-aarch64-a3-test-16-sh-001" data-npu="Ascend910"><span class="machine-label">linux-aarch64-a3-test-16-sh-001</span><span class="machine-npu"> · 16 × Ascend910</span></div>
+        <div class="machine machine--ondemand" data-label="linux-aarch64-a5-0" data-npu="on-demand"><span class="machine-label">linux-aarch64-a5-0</span><span class="machine-npu"> · on-demand</span></div>        <div class="machine" data-label="linux-aarch64-a5-1" data-npu="npu"><span class="machine-label">linux-aarch64-a5-1</span><span class="machine-npu"> · 1 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-2" data-npu="npu"><span class="machine-label">linux-aarch64-a5-2</span><span class="machine-npu"> · 2 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-4" data-npu="npu"><span class="machine-label">linux-aarch64-a5-4</span><span class="machine-npu"> · 4 × npu</span></div>        <div class="machine" data-label="linux-aarch64-a5-8" data-npu="npu"><span class="machine-label">linux-aarch64-a5-8</span><span class="machine-npu"> · 8 × npu</span></div>
         <div class="project-ns">namespace: <code>vllm-project</code></div>
       </div>
     </div>
