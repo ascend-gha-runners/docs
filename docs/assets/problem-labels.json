@@ -225,7 +225,11 @@
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a2-sglang-omni-fed-1",
+      "linux-aarch64-a2-sglang-omni-fed-2",
+      "linux-aarch64-a2-sglang-omni-fed-4",
+      "linux-aarch64-a2-sglang-omni-fed-8"
     ],
     "tile-ai/tilelang": [
       "linux-amd64-a5-1-sh-002",
@@ -285,7 +289,11 @@
       "linux-aarch64-a2-1",
       "linux-aarch64-a2-2",
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a2-uni-agent-fed-1",
+      "linux-aarch64-a2-uni-agent-fed-2",
+      "linux-aarch64-a2-uni-agent-fed-4",
+      "linux-aarch64-a2-uni-agent-fed-8"
     ],
     "verl-project/verl": [
       "linux-aarch64-a2-1",
@@ -315,7 +323,11 @@
     ],
     "verl-project/verl-SpeCo": [
       "linux-aarch64-a2-4",
-      "linux-aarch64-a2-8"
+      "linux-aarch64-a2-8",
+      "linux-aarch64-a2-verl-speco-fed-1",
+      "linux-aarch64-a2-verl-speco-fed-2",
+      "linux-aarch64-a2-verl-speco-fed-4",
+      "linux-aarch64-a2-verl-speco-fed-8"
     ],
     "verl-project/verl-omni": [
       "linux-aarch64-a2b4-2",
@@ -584,6 +596,18 @@
     "linux-aarch64-a2-mooncake-fed-8": [
       "Karmada Federated Scheduling"
     ],
+    "linux-aarch64-a2-sglang-omni-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-sglang-omni-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-sglang-omni-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-sglang-omni-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2-swift-fed-1": [
       "Karmada Federated Scheduling"
     ],
@@ -611,6 +635,18 @@
     "linux-aarch64-a2-triton-fed-8": [
       "Karmada Federated Scheduling"
     ],
+    "linux-aarch64-a2-uni-agent-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-uni-agent-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-uni-agent-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-uni-agent-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
     "linux-aarch64-a2-verl-fed-1": [
       "Karmada Federated Scheduling"
     ],
@@ -621,6 +657,18 @@
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2-verl-fed-8": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-speco-fed-1": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-speco-fed-2": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-speco-fed-4": [
+      "Karmada Federated Scheduling"
+    ],
+    "linux-aarch64-a2-verl-speco-fed-8": [
       "Karmada Federated Scheduling"
     ],
     "linux-aarch64-a2b1-1": [
