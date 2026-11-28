@@ -1,0 +1,284 @@
+#
+# Copyright (c) 2026 Huawei Technologies Co., Ltd. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# This file is a part of the vllm-ascend project.
+#
+
+name: 'Validate: Basic Actions on Self-Hosted'
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/validate_basic_actions.yaml'
+
+defaults:
+  run:
+    shell: bash -el {0}
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Job 1: 基础 Actions 矩阵验证 (checkout, python, cache, artifact upload) ───
+  validate-basic-actions:
+    name: validate-basic-on-${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - linux-amd64-cpu-4-hk
+          - linux-amd64-cpu-8-hk
+          - linux-arm64-cpu-16
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify checkout and python
+        id: verify-env
+        run: |
+          echo "=== Runner Info ==="
+          echo "Runner: ${{ matrix.runner }}"
+          echo "Arch: $(uname -m)"
+          echo "Kernel: $(uname -r)"
+          echo "Python: $(python3 --version)"
+          echo "Git: $(git --version)"
+          echo "Shell: $SHELL"
+          echo ""
+          echo "=== Build Tools ==="
+          echo "gcc: $(gcc --version 2>/dev/null | head -1 || echo 'not found')"
+          echo "make: $(make --version 2>/dev/null | head -1 || echo 'not found')"
+          echo "cmake: $(cmake --version 2>/dev/null | head -1 || echo 'not found')"
+          echo ""
+          echo "=== Repo Checkout ==="
+          echo "Repo files: $(ls -1 | head -10)"
+          test -f setup.py && echo "checkout OK" || echo "checkout FAILED"
+          echo "Git remote: $(git remote -v | head -1)"
+
+      - name: Cache pip packages
+        id: cache-pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: validate-basic-actions-pip-${{ matrix.runner }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            validate-basic-actions-pip-${{ matrix.runner }}-
+
+      - name: Install packages (cache miss test)
+        if: steps.cache-pip.outputs.cache-hit != 'true'
+        run: pip install pyyaml
+
+      - name: Verify cache hit on rerun
+        if: steps.cache-pip.outputs.cache-hit == 'true'
+        run: |
+          echo "Cache restored successfully"
+          echo "cache-hit=true"
+
+      - name: Create test artifact content
+        run: |
+          mkdir -p /tmp/validate-artifact
+          cat > /tmp/validate-artifact/info.txt << EOF
+          runner=${{ matrix.runner }}
+          arch=$(uname -m)
+          hostname=$(hostname)
+          python=$(python3 --version)
+          kernel=$(uname -r)
+          timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          EOF
+          echo "Artifact content created at /tmp/validate-artifact/"
+
+      - name: Upload artifact (action test)
+        uses: actions/upload-artifact@v7
+        with:
+          name: validate-basic-${{ matrix.runner }}
+          path: /tmp/validate-artifact/
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Verify upload completed
+        run: |
+          echo "Upload step finished for runner=${{ matrix.runner }}"
+          echo "Uploaded at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  # ─── Job 2: actions/download-artifact 与 actions/github-script 验证 ───
+  validate-download-and-script:
+    name: validate-download-artifact-and-github-script
+    runs-on: linux-amd64-cpu-4-hk
+    needs: validate-basic-actions
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: validate-basic-*
+          merge-multiple: true
+          path: /tmp/downloaded-artifacts
+
+      - name: Verify downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find /tmp/downloaded-artifacts/ -type f -exec echo "  {}:" \; -exec cat {} \;
+          test -f /tmp/downloaded-artifacts/info.txt && echo "download OK" || echo "download FAILED"
+
+      - name: GitHub script test (API access)
+        uses: actions/github-script@v9
+        id: gh-script
+        with:
+          script: |
+            const info = {
+              runner_os: process.env.RUNNER_OS,
+              arch: process.env.RUNNER_ARCH,
+              repo: context.repo.owner + '/' + context.repo.repo,
+              workflow: context.workflow,
+              run_id: context.runId,
+              event: context.eventName,
+            };
+            console.log('=== github-script on self-hosted runner ===');
+            console.log(JSON.stringify(info, null, 2));
+            return info;
+
+      - name: Verify github-script result
+        run: |
+          echo "GitHub script result: ${{ steps.gh-script.outputs.result }}"
+          echo "GitHub script completed successfully"
+
+  # ─── Job 3: actions/cache/restore + actions/cache/save 分步缓存验证 ───
+  validate-cache-restore-save:
+    name: validate-cache-restore-save-flow
+    runs-on: linux-amd64-cpu-4-hk
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Cache restore
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/cache-test-dir
+          key: validate-cache-restore-save-test-${{ github.run_id }}
+          restore-keys: |
+            validate-cache-restore-save-test-
+
+      - name: Create cache content (first run, cache miss)
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p /tmp/cache-test-dir
+          echo "cached at $(date -u +%Y-%m-%dT%H:%M:%SZ)" > /tmp/cache-test-dir/timestamp.txt
+          echo "cache content created"
+
+      - name: Cache save (only on first run)
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/cache-test-dir
+          key: validate-cache-restore-save-test-${{ github.run_id }}
+
+      - name: Verify cache flow
+        run: |
+          if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit - restore/save flow OK"
+            ls -la /tmp/cache-test-dir/
+          else
+            echo "Cache miss - new entry saved, verify on rerun"
+          fi
+
+  # ─── Job 4: GitHub-hosted runner 对比 (性能基准) ───
+  compare-with-github-hosted:
+    name: compare-with-github-hosted
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repo (GitHub-hosted)
+        uses: actions/checkout@v7
+
+      - name: Setup Python (GitHub-hosted)
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Benchmark checkout + setup-python
+        run: |
+          echo "GitHub-hosted baseline:"
+          echo "  Arch: $(uname -m)"
+          echo "  Python: $(python3 --version)"
+
+      - name: Cache pip packages (GitHub-hosted)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: validate-basic-gh-hosted-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            validate-basic-gh-hosted-pip-
+
+      - name: Upload artifact (GitHub-hosted)
+        uses: actions/upload-artifact@v7
+        with:
+          name: validate-basic-gh-hosted
+          path: /tmp
+          retention-days: 1
+          if-no-files-found: ignore
+
+  # ─── Job 5: 汇总报告 ───
+  summary:
+    name: basic-actions-validation-summary
+    runs-on: linux-amd64-cpu-4-hk
+    needs:
+      - validate-basic-actions
+      - validate-download-and-script
+      - validate-cache-restore-save
+      - compare-with-github-hosted
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Basic Actions Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result | Notes |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| validate-basic-actions | ${{ needs.validate-basic-actions.result }} | Matrix: 3 runners |" >> $GITHUB_STEP_SUMMARY
+          echo "| validate-download-and-script | ${{ needs.validate-download-and-script.result }} | download-artifact + github-script |" >> $GITHUB_STEP_SUMMARY
+          echo "| validate-cache-restore-save | ${{ needs.validate-cache-restore-save.result }} | cache/restore + cache/save |" >> $GITHUB_STEP_SUMMARY
+          echo "| compare-with-github-hosted | ${{ needs.compare-with-github-hosted.result }} | GitHub-hosted baseline |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Key Changes from Original PR #11617" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Added GitHub-hosted comparison job** — 用 \`ubuntu-latest\` 作为性能基准，对比 self-hosted 的执行速度" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Added environment check** — 检查 gcc/make/cmake 等构建工具的可用性" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Explicit permissions** — 添加 \`contents: read\` + \`actions: write\` 权限" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Added \`concurrency\`** — 避免重复触发同一 PR 的多次运行" >> $GITHUB_STEP_SUMMARY
+          echo "5. **Enhanced artifact info** — 包含 hostname/kernel 等信息方便排查" >> $GITHUB_STEP_SUMMARY

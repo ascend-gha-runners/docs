@@ -1,0 +1,1694 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ascend-gha-runners.github.io/docs/cache-audit-strategy-zh/">
+      
+      
+        <link rel="prev" href="../Repo/">
+      
+      
+        <link rel="next" href="../Cluster/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>中文 - Ascend GitHub Action Runners</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ci" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-header__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ascend GitHub Action Runners
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              中文
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden="">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required="">
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-gha-en/" class="md-tabs__link">
+          
+  
+  
+  GitHub Actions Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../user-manual-buildkite-en/" class="md-tabs__link">
+          
+  
+  
+  Buildkite Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Repo/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Integrated Repos
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Cache Audit Strategy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Cluster/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Cluster Map
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../feature/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Features
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../error-types/" class="md-tabs__link">
+          
+  
+  
+  Job Failure Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ascend GitHub Action Runners" class="md-nav__button md-logo" aria-label="Ascend GitHub Action Runners" data-md-component="logo">
+      
+  <img src="../assets/logo/logo.png" alt="logo">
+
+    </a>
+    Ascend GitHub Action Runners
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ascend-gha-runners/docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    ascend-gha-runners/docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1">
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="#future-plans" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future Plans
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2">
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub Actions Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GitHub Actions Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-gha-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3">
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Buildkite Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Buildkite Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-en/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-manual-buildkite-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Repo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrated Repos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked="">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache Audit Strategy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Cache Audit Strategy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        审计要回答的问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心原则：两类缓存，两套检测路径
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="核心原则：两类缓存，两套检测路径">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A 类：项目自配型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B 类：基建注入型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B 类各维度的日志证据
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        判定优先级（B 类）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v4-v5-bug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v4 → v5 修复的三个 bug（含真实案例）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-cdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新增 git-cdn 列
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        已知局限
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实现索引
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Failure Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Job Failure Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    English
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-types-zh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    中文
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        审计要回答的问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        核心原则：两类缓存，两套检测路径
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="核心原则：两类缓存，两套检测路径">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A 类：项目自配型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B 类：基建注入型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B 类各维度的日志证据
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        判定优先级（B 类）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v4-v5-bug" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v4 → v5 修复的三个 bug（含真实案例）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-cdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新增 git-cdn 列
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        已知局限
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实现索引
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ascend-gha-runners/docs/blob/main/docs/cache-audit-strategy-zh.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ascend-gha-runners/docs/raw/main/docs/cache-audit-strategy-zh.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
+    </a>
+  
+
+
+<h1 id="ci">CI 缓存审计策略<a class="headerlink" href="#ci" title="Permanent link">¶</a></h1>
+<p>本文档说明 <a href="https://github.com/ascend-gha-runners/docs/blob/main/.github/workflows/check-cache-audit.yml">check-cache-audit.yml</a>
+每日审计的检测策略：每个缓存维度<strong>查什么、去哪里查、如何判定</strong>，以及已知局限。
+判定逻辑的实现见 <code>scripts/ci-audit/check_cache_from_logs.sh</code>（v5）。</p>
+<h2 id="_1">审计要回答的问题<a class="headerlink" href="#_1" title="Permanent link">¶</a></h2>
+<p>对每个接入 NPU runner 的仓库，回答：<strong>它的 CI 是否实际受益于集群提供的各类缓存</strong>，
+从而知道哪些仓库需要接入/修复缓存配置，以及各缓存基础设施的真实利用率。</p>
+<p>标记图例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">标记</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">✅</td>
+<td style="text-align: left;">confirmed in use（已确认在用）</td>
+</tr>
+<tr>
+<td style="text-align: center;">❌</td>
+<td style="text-align: left;">confirmed NOT in use（已确认未用）</td>
+</tr>
+<tr>
+<td style="text-align: center;">-</td>
+<td style="text-align: left;">unknown（无法判定）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">核心原则：两类缓存，两套检测路径<a class="headerlink" href="#_2" title="Permanent link">¶</a></h2>
+<p>集群缓存按「配置方在哪一侧」分为两类，这决定了可靠的检测数据源：</p>
+<h3 id="a">A 类：项目自配型<a class="headerlink" href="#a" title="Permanent link">¶</a></h3>
+<p>缓存是否生效取决于<strong>项目仓库自己的配置</strong>，项目 workflow 和 job 日志里都有可见痕迹。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">项目侧配置形态</th>
+<th style="text-align: left;">日志侧可见痕迹</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">PyPI</td>
+<td style="text-align: left;"><code>pip config</code> / <code>PIP_INDEX_URL</code> / <code>UV_INDEX_URL</code> 指向 nginx-pypi-cache</td>
+<td style="text-align: left;"><code>Looking in indexes: http://cache-service.nginx-pypi-cache...</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">APT</td>
+<td style="text-align: left;"><code>sources.list</code> / <code>Acquire::http</code> 指向 apt 缓存端口</td>
+<td style="text-align: left;"><code>Get:/Hit:</code> 行出现缓存主机</td>
+</tr>
+<tr>
+<td style="text-align: left;">CCache</td>
+<td style="text-align: left;">安装并启用 ccache</td>
+<td style="text-align: left;"><code>cache hit/miss</code> 统计、<code>CC=ccache</code> 等</td>
+</tr>
+<tr>
+<td style="text-align: left;">uv</td>
+<td style="text-align: left;">使用 uv 命令</td>
+<td style="text-align: left;"><code>uv pip/sync</code> 输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">runs-on/cache</td>
+<td style="text-align: left;">workflow 中引用 <code>runs-on/cache@v5</code></td>
+<td style="text-align: left;"><code>Cache restored/saved from key</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>检测路径：扫 job 日志为主</strong>（日志能证明"实际用了"而非"配置了"），workflow 静态扫描仅作 runs-on 的补充。
+反面证据（如 <code>Looking in indexes: https://pypi.org/simple</code>）用于判 ❌。</p>
+<h3 id="b">B 类：基建注入型<a class="headerlink" href="#b" title="Permanent link">¶</a></h3>
+<p>缓存由 <strong>ascend-ci-deployment 仓库的 runner pod template 注入</strong>，对项目仓库完全透明——
+项目 workflow 里不存在任何相关配置，job 日志里也几乎没有直接痕迹。
+<strong>扫项目仓库来判定 B 类必然得到错误结论</strong>（这正是 v4 的 bug，见下文）。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">注入方式（部署仓库侧）</th>
+<th style="text-align: left;">接线位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">BuildKit</td>
+<td style="text-align: left;">postStart 执行 <code>buildkit-acquire</code>（向 dispatcher 租约独占 worker）+ <code>docker buildx create --name buildkitd --driver remote --use</code>；共享 buildkitd 的 PVC 层缓存由服务端 GC 自动管理</td>
+<td style="text-align: left;"><code>projects/{org}/{repo}/config*/\*configmap\*.yaml</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Squid</td>
+<td style="text-align: left;">runner/job pod env 注入 <code>HTTP_PROXY=http://squid-cache.squid.svc.cluster.local:3128</code>（含 NO_PROXY 与 CA bundle）</td>
+<td style="text-align: left;">pod template configmap + 各 scale set <code>values.yaml</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">git-cdn</td>
+<td style="text-align: left;">postStart <code>git config --system url."http://git-cdn-service.git-cdn...".insteadOf https://github.com/</code> 透明改写</td>
+<td style="text-align: left;">pod template configmap</td>
+</tr>
+</tbody>
+</table>
+<p><strong>检测路径：部署仓库接线状态为权威判定 + job 日志运行时证据为补充</strong>：</p>
+<ol>
+<li><strong>部署侧（权威，0 API 调用）</strong>：workflow 先浅克隆
+   <code>opensourceways/ascend-ci-deployment</code>，脚本按 <code>githubConfigUrl</code>（values.yaml，
+   目录名可能是旧 org 名，如 <code>volcengine/verl</code> → <code>verl-project/verl</code>）定位项目根目录，
+   在其中 grep 接线特征：</li>
+<li>BuildKit：<code>buildkit-acquire|docker buildx create|BUILDKITD_ADDR</code></li>
+<li>Squid：<code>squid-cache.squid.svc.cluster.local|squid-ca-cert</code></li>
+<li>git-cdn：<code>git-cdn-service</code></li>
+<li><strong>日志侧（运行时补充）</strong>：见下表。注意 B 类的日志证据天然稀疏，找不到不代表没用。</li>
+</ol>
+<h3 id="b_1">B 类各维度的日志证据<a class="headerlink" href="#b_1" title="Permanent link">¶</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">正面证据（→✅）</th>
+<th style="text-align: left;">反面证据（→❌）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">BuildKit</td>
+<td style="text-align: left;"><code>#0 building with "buildkitd" instance using remote driver</code>（<strong>实锤</strong>：builder 名固定为 buildkitd、remote driver，可与本地 dind 区分）；<code>#5 CACHED</code> / <code>=&gt; CACHED</code>（缓存命中，两种 progress 格式）；<code>importing/exporting cache</code>；<code>#N [internal] load ...</code>（buildkit 进度格式，弱证据）</td>
+<td style="text-align: left;"><code>Step N/M :</code>（legacy builder）；<code>Cannot connect to the Docker daemon</code> / <code>docker: command not found</code>（未接线 runner 上构建无法发生）</td>
+</tr>
+<tr>
+<td style="text-align: left;">Squid</td>
+<td style="text-align: left;">runner 打印的 <code>Runner is running behind proxy server 'http://squid-cache.squid.svc...'</code></td>
+<td style="text-align: left;">—（代理透明，日志无反面证据可言）</td>
+</tr>
+<tr>
+<td style="text-align: left;">git-cdn</td>
+<td style="text-align: left;">git 报错/verbose 输出中露出 <code>git-cdn-service.git-cdn...</code> 真实 URL</td>
+<td style="text-align: left;">—（url 改写透明）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="b_2">判定优先级（B 类）<a class="headerlink" href="#b_2" title="Permanent link">¶</a></h3>
+<pre><code>日志运行时正面证据 ✅ &gt; 部署侧已接线 ✅ &gt; 日志反面证据 ❌ &gt; 部署侧未接线 ❌ &gt; 未在部署仓库找到该项目 -
+</code></pre>
+<ul>
+<li>部署侧「已接线」即判 ✅：<strong>并集语义</strong>——项目根目录下任一 scale set / config 命中接线特征
+  即判该仓库已接线，不需要项目做任何事；接线的 scale set 上，<code>docker build</code> /
+  <code>docker buildx build</code> / HTTP 请求 / git clone 自动走共享缓存；</li>
+<li>部署侧「未接线」判 ❌：该项目的所有 runner 均未接线，不会路由到对应缓存；</li>
+<li>部署仓库中找不到该项目（如尚未部署、或经 Fork 同步的镜像仓库）判 <code>-</code>。</li>
+</ul>
+<h2 id="v4-v5-bug">v4 → v5 修复的三个 bug（含真实案例）<a class="headerlink" href="#v4-v5-bug" title="Permanent link">¶</a></h2>
+<p>2026-11-23 的审计 run 数据验证了 v4 的三个系统性错误：</p>
+<ol>
+<li><strong>BuildKit 静态扫描找错了对象</strong>：v4 在<strong>项目</strong> workflow 里找
+   <code>cache-from|cache-to|--import-cache|--export-cache|buildcache</code>。共享 buildkitd
+   架构下项目<strong>不需要</strong>这些 flag（缓存服务端自动生效），这组 pattern 检测的是
+   "项目往 registry 导出缓存"——另一个概念。</li>
+<li>假阳性：<code>sgl-project/sglang</code>、<code>verl-project/verl</code> 的 workflow 含 registry cache
+     配置（其构建 job 实际跑在 GitHub 托管 runner 上）→ 被误标 ✅；</li>
+<li>假阴性：最大用户 <code>vllm-ascend</code>（裸 <code>docker buildx build</code>）无任何匹配 → <code>-</code>。</li>
+<li><strong>BuildKit 反面证据整个反转</strong>：日志出现 <code>buildkitd</code>（builder 名、endpoint、
+   <code>docker buildx ls</code> 输出）恰是"接着我们的远程 buildkitd"的直接证据，v4 却判
+   ❌"用buildkit但无缓存指令"。真实案例：<code>Ascend/cann-container-image</code>（已接线，
+   日志里有 <code>#10 [cann-installer 2/7] RUN ...</code> 构建输出）被误标 ❌。</li>
+<li><strong>Squid 日志 pattern 假阳性</strong>：匹配裸 <code>:3128</code>/<code>HTTP_PROXY</code>，把项目自配代理
+   当成我们的缓存。真实案例：<code>verl-project/uni-agent</code> 的
+   <code>HTTP_PROXY: "http://100.68.174.87:3128"</code>（项目自己的代理）被误标 ✅。
+   v5 只匹配 <code>squid-cache.squid.svc.cluster.local</code>。</li>
+</ol>
+<p>另注：v4 的 <code>=&gt; CACHED|CACHED \[</code> 只覆盖 TTY/auto progress 格式；GHA 里 stdout
+是管道，buildx 走 plain progress，命中行是 <code>#5 CACHED</code>——v4 漏掉了绝大多数真实
+缓存命中。v5 两种格式都覆盖。</p>
+<h2 id="git-cdn">新增 git-cdn 列<a class="headerlink" href="#git-cdn" title="Permanent link">¶</a></h2>
+<p>B 类第三个维度 git-cdn 此前没有列。v5 起表格为 8 列（PyPI / APT / CCache / uv /
+BuildKit / Squid / git-cdn / runs-on），<code>update_repo_md.py</code> 会把 7 列旧表自动迁移
+（在 Squid 后插入 git-cdn 列，旧值保留）。</p>
+<h2 id="_3">已知局限<a class="headerlink" href="#_3" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>并集判定不区分 scale set</strong>：接线判定对项目根目录整体取并集——任一 scale set/config
+    命中即判整个仓库 ✅。多 scale set 仓库（如 vllm-ascend 约 120 个 scale set，BuildKit
+    接线仅在构建用的 <code>config-cn12-001</code> CPU 档）会出现「审计的那个 NPU job 所在 scale set
+    实际未接线，但仓库被判 ✅」。审计的是「仓库是否享有接线」，不是「这次 job 是否走了
+    接线」；后者以日志运行时证据为准（证据列会注明并集判定）。</li>
+<li><strong>首建无命中</strong>：冷缓存上的第一次构建没有 <code>CACHED</code> 行（缓存只写不读）。
+  因此日志证据把"buildkit 进度格式"也算正面证据（只要部署侧接线，就是我们的缓存）。</li>
+<li><strong>日志不可用</strong>：日志过期/下载失败时，B 类维度靠部署侧接线兜底（这正是权威判定的
+  价值——vllm-ascend 长期"log download failed"，v4 只能给 <code>-</code>，v5 给出确定结论）；
+  A 类维度则只能保留旧值（见下）。</li>
+<li><strong>旧值保持规则</strong>：<code>update_repo_md.py</code> 在新结果为 <code>-</code> 时保留 Repo.md 旧值。这是
+  刻意的（避免一次扫不到就清空），但也意味着历史假阳性会一直留到被新证据推翻——
+  B 类维度的部署侧判定恰好提供这种确定性推翻。</li>
+<li><strong>部署克隆时效</strong>：部署仓库浅克隆是审计时刻的 HEAD；接线变更后最长延迟一个
+  审计周期（每日 10:24 CST）。克隆失败时该 step 不阻断审计（continue-on-error），
+  B 类维度自动降级为仅日志判定（退回 <code>-</code>）。</li>
+<li><strong>无 githubConfigUrl 的项目走目录名回退</strong>：Buildkite agent-stack-k8s 部署的项目
+  （如 vllm-project/vllm-omni，values.yaml 无 githubConfigUrl）按目录名回退匹配
+  （与 discover_new_repos.py 的收录方式一致，大小写不敏感）；<code>manifests/arc-fedsched/*/pod-templates</code>
+  下的联邦接线暂不在扫描范围。</li>
+<li><strong>progress 格式的歧义</strong>：<code>#N [x/y]</code> 进度格式无法区分我们的远程 buildkitd 与
+  本地 dind（<code>building with "buildkitd" ... remote driver</code> 才能区分）；仅当部署侧
+  同时显示未接线时才作为可疑信号记入证据。</li>
+</ul>
+<h2 id="_4">实现索引<a class="headerlink" href="#_4" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">文件</th>
+<th style="text-align: left;">职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>.github/workflows/check-cache-audit.yml</code></td>
+<td style="text-align: left;">每日调度；克隆部署仓库；调审计脚本；回写 Repo.md</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scripts/ci-audit/check_cache_from_logs.sh</code></td>
+<td style="text-align: left;">主体：Phase 1 收集 NPU job 候选，Phase 2 聚合日志证据，部署侧接线判定（<code>scan_deployment_wiring</code>）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scripts/ci-audit/update_repo_md.py</code></td>
+<td style="text-align: left;">把审计结果合并进 Repo.md 表格（8 维 + 旧表迁移）</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scripts/ci-audit/discover_new_repos.py</code></td>
+<td style="text-align: left;">从部署仓库 projects/ 发现新接入仓库</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>scripts/ci-audit/repos.txt</code></td>
+<td style="text-align: left;">仓库清单 + 各维度默认值（8 列）</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="../javascripts/tablesort.js"></script>
+      
+        <script src="../javascripts/cluster-map.js"></script>
+      
+        <script src="../javascripts/problem-report.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>
