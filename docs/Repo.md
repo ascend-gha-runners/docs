@@ -21,7 +21,7 @@
 | [areal-project/AReaL](https://github.com/areal-project/AReaL) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [fla-org/flash-linear-attention](https://github.com/fla-org/flash-linear-attention) | ❌ | - | ✅ | ❌ | - | ✅ | ✅ | ✅ |
 | [tile-ai/tilelang-mlir-ascend](https://github.com/tile-ai/tilelang-mlir-ascend) | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | - |
-| [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ❌ | ❌ | ❌ | ✅ | ✅ | - |
+| [verl-project/verl-SpeCo](https://github.com/verl-project/verl-SpeCo) | ❌ | - | ✅ | ❌ | ❌ | ✅ | ✅ | - |
 | [Ascend/cann-container-image](https://github.com/Ascend/cann-container-image) | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | - |
 | [XPU-Forces/mojo_opset](https://github.com/XPU-Forces/mojo_opset) | ❌ | - | ❌ | ❌ | ❌ | ✅ | ✅ | - |
 | [sgl-project/sglang-omni](https://github.com/sgl-project/sglang-omni) | - | - | - | - | - | - | - | - |
@@ -34,6 +34,6 @@
 >
 > ✅ = confirmed in use · ❌ = confirmed NOT in use · - = unknown
 >
-> Last checked: 2026-11-27
+> Last checked: 2026-11-28
 >
-> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/46009117076](https://github.com/ascend-gha-runners/docs/actions/runs/46009117076)
+> Results sourced from [https://github.com/ascend-gha-runners/docs/actions/runs/46121965278](https://github.com/ascend-gha-runners/docs/actions/runs/46121965278)
